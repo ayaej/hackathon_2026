@@ -25,5 +25,8 @@ export const config: DataLakeConfig = {
 export const serverConfig = {
   port: parseInt(process.env.PORT || '3000'),
   nodeEnv: process.env.NODE_ENV || 'development',
-  apiKey: process.env.API_KEY || 'dev-api-key'
+  apiKey: process.env.API_KEY || 'dev-api-key',
+  jwtSecret: process.env.JWT_SECRET || 'your-secret-jwt-key-change-in-production',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '24h',
+  enableAuth: process.env.ENABLE_AUTH === 'true'
 };

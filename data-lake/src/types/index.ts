@@ -1,5 +1,7 @@
 // Types pour les documents dans le Data Lake
 
+import { Request } from 'express';
+
 export enum DocumentType {
   FACTURE = 'FACTURE',
   DEVIS = 'DEVIS',
@@ -136,4 +138,15 @@ export interface DataLakeStats {
     byType: Record<DocumentType, number>;
     byStatus: Record<DocumentStatus, number>;
   };
+}
+
+// JWT Authentication middleware
+export interface JWTPayload {
+  userId: string;
+  role: 'admin' | 'user' | 'readonly';
+  email: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: JWTPayload;
 }
