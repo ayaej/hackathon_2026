@@ -1,1 +1,4 @@
 .github
+simu/
+airflow/logs/
+airflow/dags/__pycache__/
