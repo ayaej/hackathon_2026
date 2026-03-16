@@ -1,28 +1,38 @@
 import json
+import os
+
 from extractor import extract_information
 from evaluator import evaluate
 
 
-def process_text(text):
-
-    extracted = extract_information(text)
-
-    score = evaluate(extracted)
-
-    result = {
-        "ocr_text": text,
-        "extracted_data": extracted,
-        "ocr_score": score
-    }
-
-    return result
+INPUT_FOLDER = "inputs"
+OUTPUT_FILE = "results.json"
 
 
-if __name__ == "__main__":
+results = []
 
-    with open("texte_brut.txt", "r") as f:
+for filename in os.listdir(INPUT_FOLDER):
+
+    path = os.path.join(INPUT_FOLDER, filename)
+
+    with open(path, "r", encoding="utf-8") as f:
         text = f.read()
 
-    result = process_text(text)
+    data = extract_information(text)
 
-    print(json.dumps(result, indent=4))
+    score = evaluate(data)
+
+    result = {
+        "file": filename,
+        "extracted_data": data,
+        "extraction_score": score
+    }
+
+    results.append(result)
+
+
+with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+    json.dump(results, f, indent=4)
+
+
+print("Results saved in results.json")

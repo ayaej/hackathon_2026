@@ -1,0 +1,22 @@
+[
+  {
+    "file": "texte_brut copy.txt",
+    "extracted_data": {
+      "siret": "12345678901234",
+      "tva": "FR123456789",
+      "montants": ["1200"],
+      "dates": ["10/03/2026"]
+    },
+    "extraction_score": 1.0
+  },
+  {
+    "file": "texte_brut.txt",
+    "extracted_data": {
+      "siret": "12345678901234",
+      "tva": "FR123456789",
+      "montants": ["1200"],
+      "dates": ["10/03/2026"]
+    },
+    "extraction_score": 1.0
+  }
+]
