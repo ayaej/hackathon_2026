@@ -1,0 +1,16 @@
+# Ignorer tout ce qui est dans le dossier data
+data/raw/*
+data/silver/*
+data/gold/*
+
+# Garder les dossiers vides sur Git en utilisant des fichiers .gitkeep
+!data/raw/.gitkeep
+!data/silver/.gitkeep
+!data/gold/.gitkeep
+
+# Ignorer les environnements virtuels et fichiers temporaires
+venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store

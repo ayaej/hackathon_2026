@@ -1,0 +1,6 @@
+easyocr
+spacy
+pandas
+Pillow
+python-docx
+PyPDF2
