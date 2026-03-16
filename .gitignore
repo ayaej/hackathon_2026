@@ -1,3 +1,8 @@
+.github
+simu/
+airflow/logs/
+airflow/dags/__pycache__/
+
 backend/node_modules/
 backend/.env
 backend/uploads/
