@@ -79,7 +79,7 @@ with DAG(
     start_date=datetime(2026, 3, 16),
     schedule=None,
     catchup=False,
-    tags=["orchestration", "mock", "m2"],
+    tags=["mock", "matis"],
 ) as dag:
     # marqueur de debut (EmptyOperator = tache vide, juste pour structurer le graphe)
     debut = EmptyOperator(task_id="debut_pipeline")
