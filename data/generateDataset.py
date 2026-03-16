@@ -5,8 +5,7 @@ import json
 
 class Facture :
     def __init__(self) :
-        self.id = int(random.random()*1e9)
-        self._dictkeys = ("date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client")
+        self._dictkeys = ("document_id", "date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client")
 
     def __iter__(self):
         for key in self._dictkeys :
@@ -24,6 +23,8 @@ class Facture :
         self.date_facturation = str(self.date_facturation)
         self.date_echeance = str(self.date_echeance)
         self.date_prestation = str(self.date_prestation)
+
+        self.document_id = f"FA-{self.date_facturation[:4]}-{round(random.random()*1000):04d}"
 
         # Génération des montants
         self.montant_ht = round(random.random()*10000, 2)
@@ -45,6 +46,8 @@ class Facture :
         print(f"""
 # FACTURE
               
+    ID : {self.document_id}
+              
     DATE FACTURATION : {self.date_facturation}
     DATE PRESTATION  : {self.date_prestation}
     DATE ECHEANCE    : {self.date_echeance}
@@ -54,9 +57,9 @@ class Facture :
     MONTANT TTC : {self.montant_ttc} €
     """)
         print("# CREANCIER :")
-        self.creancier.display()
+        self.obj_creancier.display()
         print("# CLIENT :")
-        self.client.display()
+        self.obj_client.display()
 
 
 class Personne :
@@ -116,6 +119,10 @@ class Personne :
     APE / NAF : {self.ape}
     """)
 
+
+# facture = Facture()
+# facture.generateRandom()
+# facture.display()
 
 liste = []
 for _ in range(100) :
