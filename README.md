@@ -15,5 +15,5 @@
 
 | Groupe | Membres |
 |--------|---------|
-| M1 | Corentin, Danielle, Eliot, Monica |
+| M1 | Corentin, Danielle, Elliot, Monica |
 | M2 | Aya, Matis, Sara |
