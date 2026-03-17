@@ -7,6 +7,7 @@ PATTERN_MONTANT_ENTIER = r'\b(\d+)\s*(€|EUR|euros?)\b'
 PATTERN_NUMERO_DOC = r'\b([A-Z]{2,5}[\-_]?\d{4}[\-_]?\d{2,6})\b'
 PATTERN_TVA_TAUX = r'\bTVA\s*:?\s*(\d{1,2}(?:[,\.]\d{1,2})?)\s*%'
 PATTERN_IBAN = r'\bFR\d{2}[\s\d]{23,30}\b'
+PATTERN_DATE_EXPIRATION = r'(?:échéance|echeance|valable jusqu\'au|expiration|expire le|date limite|fin de validité)[^\d]*(\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})'
 
 
 def nettoyer_siret(valeur):
@@ -31,6 +32,12 @@ def extraire_siren(siret):
 def extraire_date(texte):
     match = re.search(PATTERN_DATE, texte)
     return match.group().strip() if match else None
+
+
+def extraire_date_expiration(texte):
+    match = re.search(PATTERN_DATE_EXPIRATION, texte, re.IGNORECASE)
+    return match.group(1).strip() if match else None
+
 
 
 def extraire_montants(texte):
@@ -113,6 +120,7 @@ def extraire_infos_cles(texte):
             "siren": extraire_siren(siret),
             "numero_document": extraire_numero_document(texte),
             "date": extraire_date(texte),
+            "date_expiration": extraire_date_expiration(texte),
             "fournisseur": extraire_fournisseur_spacy(texte),
             "iban": extraire_iban(texte),
             **extraire_montants(texte)
