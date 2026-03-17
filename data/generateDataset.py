@@ -44,11 +44,13 @@ class Facture :
         self.date_facturation = faker.date_between(start_date = min_date, end_date = max_date)
         self.date_echeance = faker.date_between(start_date = self.date_facturation, end_date = max_date)
         self.date_prestation = self.date_facturation if random.random()>.5 else faker.date_between(start_date = self.date_facturation, end_date = max_date)
-        self.date_facturation = str(self.date_facturation)
-        self.date_echeance = str(self.date_echeance)
-        self.date_prestation = str(self.date_prestation)
         
-        self.document_id = f"FA-{self.date_facturation[:4]}-{random.randint(0, 9999):04d}"
+        self.document_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
+        date_format = random.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
+        self.date_facturation = str(self.date_facturation.strftime(date_format))
+        self.date_echeance = str(self.date_echeance.strftime(date_format))
+        self.date_prestation = str(self.date_prestation.strftime(date_format))
+        
 
         # Génération d'articles
         self.articles = []
