@@ -6,7 +6,7 @@ import json
 
 faker = Faker('fr_FR')
 
-article_descriptions = [
+ARTICLE_DESCRIPTIONS = [
     "Service de conseil",
     "Formation",
     "Abonnement",
@@ -18,12 +18,13 @@ article_descriptions = [
     "Intervention",
     "Assistance"
 ]
-article_connecteurs = [" en"," de"," pour","",""]
-article_domaines = [
+ARTICLE_CONNECTEURS = [" en"," de"," pour","",""]
+ARTICLE_DOMAINES = [
     " informatique", " marketing", " comptabilité",
     " ressources humaines", " communication", " administration",
     " sécurité", " cloud", " data", " réseau"
 ]
+
 
 
 
