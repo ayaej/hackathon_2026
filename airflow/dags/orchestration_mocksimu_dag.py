@@ -28,20 +28,28 @@ def lire_mock_ocr() -> None:
     with SIMU_INPUT.open("r", encoding="utf-8-sig") as fichier:
         contenu = json.load(fichier)
 
-    # on stocke le contenu dans xcom pour que la tache suivante puisse le lire
-    ti.xcom_push(key="ocr_mock", value=contenu)
+    # on stocke seulement des metadonnees dans xcom pour eviter un payload trop volumineux
+    ti.xcom_push(key="ocr_source", value=str(SIMU_INPUT))
+    ti.xcom_push(key="ocr_document_id", value=contenu.get("document_id"))
     logging.info("Simulation OCR lue avec succes pour le document %s", contenu.get("document_id"))
 
 
-# construit le payload "curated" : donnees propres et structurees pret a etre envoyes au CRM
+# construit le payload "curated" (prêt à etre envoyes au CRM)
 # c'est la zone curated du data lake (Raw > Clean > Curated)
 def construire_curated() -> None:
     context = get_current_context()
     ti: TaskInstance = context["ti"]
-    # recupere les donnees posees par la tache precedente via xcom
-    ocr_mock = ti.xcom_pull(task_ids="simuler_ocr", key="ocr_mock")
-    if not ocr_mock:
-        raise ValueError("Aucune donnee OCR mock disponible dans XCom")
+    # recupere le chemin du fichier OCR pose par la tache precedente via xcom
+    source_path = ti.xcom_pull(task_ids="simuler_ocr", key="ocr_source")
+    if not source_path:
+        raise ValueError("Aucun chemin OCR mock disponible dans XCom")
+
+    chemin_source = Path(source_path)
+    if not chemin_source.exists():
+        raise FileNotFoundError(f"Fichier OCR mock introuvable: {chemin_source}")
+
+    with chemin_source.open("r", encoding="utf-8-sig") as fichier:
+        ocr_mock = json.load(fichier)
 
     curated = {
         "document_id": ocr_mock["document_id"],

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 from urllib import error, parse, request
 
@@ -43,15 +43,39 @@ def _http_json(method: str, url: str, payload: dict[str, Any] | None = None, tim
 
 def recuperer_documents_en_attente(**context) -> None:
     base_url = _get_backend_base_url()
-    query = parse.urlencode({"status": "uploaded", "limit": 50, "page": 1})
-    url = f"{base_url}/api/documents?{query}"
+    limit = 50
+    page = 1
+    documents_ids: list[str] = []
+    pages_lues = 0
 
-    response = _http_json("GET", url)
-    documents = response.get("data", [])
-    documents_ids = [doc.get("_id") for doc in documents if doc.get("_id")]
+    while True:
+        query = parse.urlencode({"status": "uploaded", "limit": limit, "page": page})
+        url = f"{base_url}/api/documents?{query}"
+
+        response = _http_json("GET", url)
+        documents = response.get("data", [])
+        if not isinstance(documents, list):
+            raise ValueError("le backend a retourne un format inattendu pour data")
+
+        documents_ids.extend(doc.get("_id") for doc in documents if isinstance(doc, dict) and doc.get("_id"))
+        pages_lues += 1
+
+        if not documents:
+            break
+
+        meta = response.get("meta") if isinstance(response.get("meta"), dict) else {}
+        total_pages = meta.get("totalPages") or meta.get("total_pages")
+        current_page = meta.get("page") or page
+        if isinstance(total_pages, int) and isinstance(current_page, int) and current_page >= total_pages:
+            break
+
+        if len(documents) < limit:
+            break
+
+        page += 1
 
     context["ti"].xcom_push(key="documents_ids", value=documents_ids)
-    logging.info("documents detectes en statut uploaded: %s", len(documents_ids))
+    logging.info("documents detectes en statut uploaded: %s (pages lues: %s)", len(documents_ids), pages_lues)
 
 
 def basculer_documents_en_processing(**context) -> None:
@@ -64,7 +88,7 @@ def basculer_documents_en_processing(**context) -> None:
         return
 
     dag_run_id = context["run_id"]
-    now_iso = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     for document_id in documents_ids:
         payload = {
@@ -88,7 +112,7 @@ def finaliser_documents_en_processed(**context) -> None:
         logging.info("aucun document a finaliser en processed")
         return
 
-    now_iso = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     for document_id in documents_ids:
         payload = {

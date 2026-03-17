@@ -51,7 +51,7 @@ def lire_mock_ocr() -> None:
     logging.info("Simulation OCR lue avec succes: %s document(s) depuis %s", len(documents), chemin_source)
 
 
-# construit le payload "curated" : donnees propres et structurees pret a etre envoyes au CRM
+# construit le payload "curated" (prêt à etre envoyes au CRM)
 # c'est la zone curated du data lake (Raw > Clean > Curated)
 def construire_curated() -> None:
     context = get_current_context()
