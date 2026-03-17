@@ -48,6 +48,7 @@ for i in range(5) :
 
 
     # Génération du PDF
+    
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
                             pagesize=A4,
                             rightMargin=random.randint(20,40),
@@ -127,6 +128,8 @@ for i in range(5) :
 
     story.append(table)
 
+    ## Footer
+
     story.append(Spacer(1, random.randint(6,18)))
     story.append(Paragraph(f"Date de prestation : {date_prestation}", styles["Normal"]))
     story.append(Paragraph(f"Date d'échéance du paiement : {date_echeance}", styles["Normal"]))
@@ -134,7 +137,10 @@ for i in range(5) :
     story.append(Spacer(1, random.randint(12,36)))
 
 
+    # Enregistrement
+
     doc.build(story)
 
     image = convert_from_path(f"pdf/facture_{i}.pdf")
-    image[0].save('pdf/facture_image_'+ str(i) +'.pdf', 'PDF')
+    format = random.choice(['jpg','png','pdf'])
+    image[0].save(f"pdf/facture_image_{i}.{format}", format.capitalize())
