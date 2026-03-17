@@ -11,9 +11,9 @@ from reportlab.lib import colors
 
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
-    f.close()
 
-for i in range(len(data)) :
+for i in range(5) :
+# for i in range(len(data)) :
 
     # Récupération des données
 
@@ -44,7 +44,7 @@ for i in range(len(data)) :
 
     # Génération du PDF
 
-    if not os.path.isdir("pdf"):
+    if not os.path.isdir("pdf") :
         os.mkdir("pdf")
 
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
@@ -97,6 +97,8 @@ for i in range(len(data)) :
 
     couleur_header = random.choice([colors.gray, colors.skyblue, colors.lightblue, colors.lightcoral, colors.lightpink])
     couleur_footer = random.choice([colors.beige, colors.white, colors.white, colors.lightcyan])
+    couleur_grille = random.choice([colors.black, colors.black, colors.lightslategray, colors.gray])
+    couleur_grille_int = random.choice([couleur_grille, couleur_grille, colors.lightslategray, colors.gray, colors.whitesmoke])
 
     tableau = [["Description", "Quantité", "Prix unitaire", "Total"]]
 
@@ -107,15 +109,19 @@ for i in range(len(data)) :
     tableau.append(["", "", "TVA :", f"{tva:.2f} €"])
     tableau.append(["", "", "Total TTC:", f"{montant_ttc:.2f} €"])
 
-    table = Table(tableau, colWidths=[100*mm, 25*mm, 35*mm, 35*mm])
+    largeur_tableau = random.randint(150,200)
+    taille_col = [100, random.randint(15,25), random.randint(25,35)]
+    taille_col[0] = largeur_tableau - taille_col[1] - 2*taille_col[2]
+    table = Table(tableau, colWidths=[taille_col[0]*mm, taille_col[1]*mm, taille_col[2]*mm, taille_col[2]*mm])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), couleur_header),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, -1), random.choice(['LEFT', 'CENTER'])),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), random.randint(9,15)),
         ('BACKGROUND', (0, -3), (-1, -1), couleur_footer),
-        ('GRID', (0, 0), (-1, -3), 1, colors.black),
+        ('INNERGRID', (0, 0), (-1, -3), 1, couleur_grille_int),
+        ('GRID', (0, 0), (-1, -3), 1, couleur_grille),
     ]))
 
     story.append(table)
