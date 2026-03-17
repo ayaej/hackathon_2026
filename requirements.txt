@@ -1,3 +1,8 @@
+pandas
+numpy
+scikit-learn
+python-dateutil
+
 faker==40.11.0
 reportlab==4.4.10
 
