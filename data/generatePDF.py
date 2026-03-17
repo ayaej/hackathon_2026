@@ -12,6 +12,10 @@ from reportlab.lib import colors
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
 
+if not os.path.isdir("pdf") :
+    os.mkdir("pdf")
+
+
 for i in range(5) :
 # for i in range(len(data)) :
 
@@ -43,10 +47,6 @@ for i in range(5) :
 
 
     # Génération du PDF
-
-    if not os.path.isdir("pdf") :
-        os.mkdir("pdf")
-
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
                             pagesize=A4,
                             rightMargin=random.randint(20,40),
