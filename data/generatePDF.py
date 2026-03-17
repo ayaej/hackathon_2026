@@ -1,6 +1,6 @@
 import json
-
 import random
+import os
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -13,7 +13,7 @@ with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
     f.close()
 
-for i in range(5) :
+for i in range(len(data)) :
 
     # Récupération des données
 
@@ -44,7 +44,8 @@ for i in range(5) :
 
     # Génération du PDF
 
-    ## Header
+    if not os.path.isdir("pdf"):
+        os.mkdir("pdf")
 
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
                             pagesize=A4,
@@ -54,6 +55,8 @@ for i in range(5) :
                             bottomMargin=random.randint(12,24))
     styles = getSampleStyleSheet()
     story = []
+
+    ## Header
 
     story.append(Paragraph("FACTURE", styles["Title"]))
     story.append(Spacer(1, random.randint(6,18)))
@@ -90,7 +93,7 @@ for i in range(5) :
 
     story.append(Spacer(1, random.randint(12,36)))
 
-    ## Tableau
+    ## Tableau d'articles
 
     couleur_header = random.choice([colors.gray, colors.skyblue, colors.lightblue, colors.lightcoral, colors.lightpink])
     couleur_footer = random.choice([colors.beige, colors.white, colors.white, colors.lightcyan])
