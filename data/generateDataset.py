@@ -21,7 +21,7 @@ ARTICLE_DESCRIPTIONS = [
 ARTICLE_CONNECTEURS = [" en"," de"," pour","",""]
 ARTICLE_DOMAINES = [
     " informatique", " marketing", " comptabilité",
-    " ressources humaines", " communication", " administration",
+    " RH", " communication", " administration",
     " sécurité", " cloud", " data", " réseau"
 ]
 
