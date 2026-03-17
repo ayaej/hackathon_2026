@@ -1,6 +1,6 @@
 [
   {
-    "file": "texte_brut copy.txt",
+    "file": "fac1.txt",
     "extracted_data": {
       "siret": "12345678901234",
       "tva": "FR123456789",
@@ -10,7 +10,17 @@
     "extraction_score": 1.0
   },
   {
-    "file": "texte_brut.txt",
+    "file": "fac2.txt",
+    "extracted_data": {
+      "siret": "12345678901234",
+      "tva": null,
+      "montants": ["1200450"],
+      "dates": ["10/03/2056"]
+    },
+    "extraction_score": 0.75
+  },
+  {
+    "file": "fac3.txt",
     "extracted_data": {
       "siret": "12345678901234",
       "tva": "FR123456789",

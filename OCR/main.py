@@ -4,14 +4,16 @@ import os
 from extractor import extract_information
 from evaluator import evaluate
 
-
 INPUT_FOLDER = "inputs"
-OUTPUT_FILE = "results.json"
+OUTPUT_FOLDER = "outputs"
+OUTPUT_FILE = os.path.join(OUTPUT_FOLDER, "results.json")
 
 
 results = []
 
 for filename in os.listdir(INPUT_FOLDER):
+
+    print("Processing:", filename)
 
     path = os.path.join(INPUT_FOLDER, filename)
 
@@ -19,20 +21,18 @@ for filename in os.listdir(INPUT_FOLDER):
         text = f.read()
 
     data = extract_information(text)
-
     score = evaluate(data)
 
-    result = {
+    results.append({
         "file": filename,
         "extracted_data": data,
         "extraction_score": score
-    }
+    })
 
-    results.append(result)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(results, f, indent=4)
+    json.dump(results, f, indent=4, ensure_ascii=False)
 
-
-print("Results saved in results.json")
+print("DONE → results.json created")

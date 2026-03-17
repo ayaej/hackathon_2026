@@ -1,0 +1,5 @@
+Facture
+SIRET : 12345678901234
+TVA : FR12345fddfddf6789
+Montant TTC : 1200450€
+Date : 10/03/2056
