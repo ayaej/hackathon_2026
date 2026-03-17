@@ -43,7 +43,7 @@ for i in range(5) :
     creancier = facture["creancier"]
     nom_creancier = f"{creancier['prenom']} {creancier['prenom_2']} {creancier['prenom_3']} {creancier['nom']}"
     adresse_creancier_1 = f"{creancier['adresse']}"
-    adresse_creancier_2 = f"{creancier["code_postal"]} {creancier['commune']}"
+    adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
     siren_creancier = f"{creancier['siren']}"
 
 
