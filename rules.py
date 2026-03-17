@@ -30,12 +30,17 @@ def check_tva_format(tva):
     return bool(re.match(pattern, tva))
 
 
+
+from datetime import datetime
+
 def check_expiration(date_exp):
+    try:
+        today = datetime.utcnow().date()
+        expiration = datetime.strptime(date_exp, "%Y-%m-%d").date()
+        return expiration > today
+    except Exception:
+        return False
 
-    today = datetime.today()
-    expiration = datetime.strptime(date_exp, "%Y-%m-%d")
-
-    return expiration > today
 
 
 def check_amount_limits(ht):
