@@ -26,6 +26,8 @@ for i in range(5) :
     tva = facture["tva"]
     montant_ttc = facture["montant_ttc"]
 
+    articles = facture["articles"]
+
     client = facture["client"]
     nom_client = f"{client['prenom']} {client['prenom_2']} {client['prenom_3']} {client['nom']}"
     adresse_client_1 = f"{client['adresse']}"
@@ -95,11 +97,12 @@ for i in range(5) :
 
     tableau = [["Description", "Quantité", "Prix unitaire", "Total"]]
 
-    tableau.append(["Kiwi", 10, "1 €", "10 €"])
+    for article in articles :
+        tableau.append([article["nom"], str(article["quantite"]), f"{article["prix"]:.2f} €", f"{(article["quantite"]*article["prix"]):.2f} €"])
 
-    tableau.append(["", "", "Total HT:", f"{montant_ht} €"])
-    tableau.append(["", "", "TVA :", f"{tva} €"])
-    tableau.append(["", "", "Total TTC:", f"{montant_ttc} €"])
+    tableau.append(["", "", "Total HT:", f"{montant_ht:.2f} €"])
+    tableau.append(["", "", "TVA :", f"{tva:.2f} €"])
+    tableau.append(["", "", "Total TTC:", f"{montant_ttc:.2f} €"])
 
     table = Table(tableau, colWidths=[100*mm, 25*mm, 35*mm, 35*mm])
     table.setStyle(TableStyle([
