@@ -122,7 +122,7 @@ for i in range(5) :
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), random.randint(9,15)),
         ('BACKGROUND', (0, -3), (-1, -1), couleur_footer),
-        ('INNERGRID', (0, 0), (-1, -3), 1, couleur_grille_int),
+        ('INNERGRID', (0, 0), (-1, -4), 1, couleur_grille_int),
         ('GRID', (0, 0), (-1, -3), 1, couleur_grille),
     ]))
 
@@ -143,4 +143,4 @@ for i in range(5) :
 
     image = convert_from_path(f"pdf/facture_{i}.pdf")
     format = random.choice(['jpeg','png','pdf'])
-    image[0].save(f"pdf/facture_image_{i}.{format}", format.capitalize())
+    image[0].save(f"pdf/facture_image_{i}.{format}", format.upper())
