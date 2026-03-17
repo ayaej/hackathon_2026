@@ -1,6 +1,7 @@
 import os
 import json
 import easyocr
+from datetime import datetime
 
 reader = easyocr.Reader(['fr'], gpu=False)
 
