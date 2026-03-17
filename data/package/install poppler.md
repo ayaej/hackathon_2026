@@ -1,7 +1,7 @@
-Source: https://pypi.org/project/pdf2image/
+### Source: https://pypi.org/project/pdf2image/
 
 
-mini guide poppler pour linux et macos
+## linux et macos
 
 objectif
 - installer poppler pour que pdf2image trouve pdfinfo
@@ -35,7 +35,8 @@ si python ne trouve toujours pas poppler
 
 
 -----------------------------
+# windows
 
 Windows :
-Executez le script installer_poppler_windows.ps1 installer Poppler 25.12.0. 
-Assurez-vous d'avoir les droits d'administrateur pour exécuter ce script. Ce qui mettra dans le PATH de votre système le dossier contenant pdfinfo.exe.
+- Executez le script installer_poppler_windows.ps1 installer Poppler 25.12.0. 
+- Assurez-vous d'avoir les droits d'administrateur pour exécuter ce script. Ce qui mettra dans le PATH de votre système le dossier contenant pdfinfo.exe.
