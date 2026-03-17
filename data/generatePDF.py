@@ -54,9 +54,9 @@ for i in range(5) :
     
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
                             pagesize=A4,
-                            rightMargin=random.randint(20,40),
-                            leftMargin=random.randint(20,40),
-                            topMargin=random.randint(20,40),
+                            rightMargin=random.randint(30,50),
+                            leftMargin=random.randint(30,50),
+                            topMargin=random.randint(30,60),
                             bottomMargin=random.randint(12,24))
     styles = getSampleStyleSheet()
     story = []
@@ -73,7 +73,7 @@ for i in range(5) :
     story.append(Spacer(1, random.randint(6,18)))
     story.append(Paragraph(f"{bold_1}{random.choice(['Numéro :', 'N°', ''])} {document_id}{bold_2}"))
     story.append(Paragraph(f"{bold_1}Date{' de facturation' if random.random()>.5 else ''} :{bold_2} {date_facturation}", styles["Normal"]))
-    story.append(Spacer(1, random.randint(6,18)))
+    story.append(Spacer(1, random.randint(12,24)))
 
     if random.random()>.5 :
         bold_1 = "<b>"
@@ -84,11 +84,11 @@ for i in range(5) :
 
     if(random.random()>.25) : header_client = bold_1 + random.choice(["Client : ",
                                                                       "Nom du client : "]) + random.choice(["<br/>", ""]) + bold_2 + header_client
-    if(random.random()>.25) : header_creancier = bold_1 + random.choice(["A : ",
+    if(random.random()>.25) : header_creancier = bold_1 + random.choice(["À : ",
                                                                          "Créancier : ",
                                                                          "Vendeur : ",
                                                                          "Expéditeur : ",
-                                                                         "Emetteur : "]) + random.choice(["<br/>", ""]) + bold_2 + header_creancier
+                                                                         "Émetteur : "]) + random.choice(["<br/>", ""]) + bold_2 + header_creancier
 
     if(random.random()>.9) :
         header_client += f"<br/>N° SIREN : {siren_client}"
@@ -100,17 +100,23 @@ for i in range(5) :
     header_client = Paragraph(header_client, styles["Normal"])
     header_creancier = Paragraph(header_creancier, styles["Normal"])
 
-    taille_col = random.randint(80,100)
-    table_header = Table([[header_client, header_creancier]] if random.random()>.25 else [[header_client, Paragraph("")]], colWidths=[taille_col*mm, taille_col*mm])
-    table_header.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
-
-    story.append(table_header)
+    deux_colonnes = random.choice([True, True, True, False])
+    if deux_colonnes :
+        taille_col = random.randint(70,90)
+        table_header = Table([[header_client, header_creancier]] if random.random()>.25 else [[header_client, Paragraph("")]], colWidths=[taille_col*mm, taille_col*mm])
+        table_header.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+        story.append(table_header)
+    else :
+        story.append(header_client)
+        if random.random()>.25 :
+            story.append(Spacer(1, random.randint(6,18)))
+            story.append(header_creancier)
 
     story.append(Spacer(1, random.randint(12,36)))
 
     ## Tableau d'articles
 
-    couleur_header = random.choice([colors.gray, colors.skyblue, colors.lightblue, colors.lightcoral, colors.lightpink, colors.khaki])
+    couleur_header = random.choice([colors.gray, colors.skyblue, colors.lightblue, colors.lightcoral, colors.lightpink])
     couleur_footer = random.choice([colors.beige, colors.lightcyan, colors.white, colors.white, colors.white])
     couleur_grille = random.choice([colors.black, colors.black, colors.lightslategray, colors.gray])
     couleur_grille_int = random.choice([couleur_grille, couleur_grille, colors.lightslategray, colors.gray, colors.whitesmoke, colors.white])
@@ -160,7 +166,7 @@ for i in range(5) :
 
     story.append(Spacer(1, random.randint(6,18)))
     story.append(Paragraph(f"Date de {random.choice(['prestation', 'livraison', 'résolution'])} : {date_prestation}", styles["Normal"]))
-    story.append(Paragraph(f"{random.choice(['Date d\'échéance', 'Echéance'])}{random.choice(['du paiement', ''])} : {date_echeance}", styles["Normal"]))
+    story.append(Paragraph(f"{random.choice(['Date d\'échéance', 'Échéance'])}{random.choice(['du paiement', ''])} : {date_echeance}", styles["Normal"]))
 
     story.append(Spacer(1, random.randint(12,36)))
 
