@@ -6,9 +6,31 @@ import json
 
 faker = Faker('fr_FR')
 
+ARTICLE_DESCRIPTIONS = [
+    "Service de conseil",
+    "Formation",
+    "Abonnement",
+    "Licence logiciel",
+    "Maintenance",
+    "Support technique",
+    "Développement",
+    "Audit",
+    "Intervention",
+    "Assistance"
+]
+ARTICLE_CONNECTEURS = [" en"," de"," pour","",""]
+ARTICLE_DOMAINES = [
+    " informatique", " marketing", " comptabilité",
+    " ressources humaines", " communication", " administration",
+    " sécurité", " cloud", " data", " réseau"
+]
+
+
+
+
 class Facture :
     def __init__(self) :
-        self._dictkeys = ("document_id", "date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client")
+        self._dictkeys = ("document_id", "date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client","articles")
 
     def __iter__(self):
         for key in self._dictkeys :
@@ -28,10 +50,21 @@ class Facture :
         
         self.document_id = f"FA-{self.date_facturation[:4]}-{random.randint(0, 9999):04d}"
 
+        # Génération d'articles
+        self.articles = []
+        for _ in range(random.randint(1,10)) :
+            article = random.choice(article_descriptions)
+            if random.random()>.2 :
+                article += random.choice(article_connecteurs) + random.choice(article_domaines)
+            prix = round(1/(random.random()*200+1)*1000, 2)
+            quantite = random.randint(1,10)
+            self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
+
         # Génération des montants
-        self.montant_ht = round(random.random()*10000, 2)
+        self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
+        self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
         self.tva = round(random.random()/10 * self.montant_ht, 2)
-        self.montant_ttc = round(self.montant_ht + self.tva, 2)
+        self.montant_ttc = round(self.montant_ht + self.tva, 2) if random.random()>.95 else round((self.montant_ht + self.tva)*(1+random.random()/10),2)
 
         # Génération des parties prenantes
         creancier = Personne()
@@ -62,6 +95,9 @@ class Facture :
         self.obj_creancier.display()
         print("# CLIENT :")
         self.obj_client.display()
+        print("# ARTICLES :")
+        for article in self.articles :
+            print(f"    - {article['quantite']} {article['nom']} ({article['prix']} €) : {(article['quantite']*article['prix']):.2f} €")
 
 
 class Personne :
