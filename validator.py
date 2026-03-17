@@ -25,11 +25,14 @@ class DocumentValidator:
 
         self.anomaly = AnomalyDetector()
 
+        
+       import logging
+
         try:
             self.anomaly.load()
-        except:
+        except FileNotFoundError:
+            logging.warning("Could not load anomaly model. Anomaly detection disabled.")
             self.anomaly = None
-
 
     def validate(self,facture,attestation):
 
