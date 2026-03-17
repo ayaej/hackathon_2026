@@ -8,6 +8,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 
+from pdf2image import convert_from_path
 
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
@@ -35,15 +36,15 @@ for i in range(5) :
     client = facture["client"]
     nom_client = f"{client['prenom']} {client['prenom_2']} {client['prenom_3']} {client['nom']}"
     adresse_client_1 = f"{client['adresse']}"
-    adresse_client_2 = f"{client["code_postal"]} {client["commune"]}"
-    siren_client = f"{client["siren"]}"
-    n_tva_client = f"{client["n_tva"]}"
+    adresse_client_2 = f"{client['code_postal']} {client['commune']}"
+    siren_client = f"{client['siren']}"
+    n_tva_client = f"{client['n_tva']}"
 
     creancier = facture["creancier"]
     nom_creancier = f"{creancier['prenom']} {creancier['prenom_2']} {creancier['prenom_3']} {creancier['nom']}"
     adresse_creancier_1 = f"{creancier['adresse']}"
-    adresse_creancier_2 = f"{creancier["code_postal"]} {creancier["commune"]}"
-    siren_creancier = f"{creancier["siren"]}"
+    adresse_creancier_2 = f"{creancier["code_postal"]} {creancier['commune']}"
+    siren_creancier = f"{creancier['siren']}"
 
 
     # Génération du PDF
@@ -103,7 +104,7 @@ for i in range(5) :
     tableau = [["Description", "Quantité", "Prix unitaire", "Total"]]
 
     for article in articles :
-        tableau.append([article["nom"], str(article["quantite"]), f"{article["prix"]:.2f} €", f"{(article["quantite"]*article["prix"]):.2f} €"])
+        tableau.append([article["nom"], str(article["quantite"]), f"{article['prix']:.2f} €", f"{(article['quantite']*article['prix']):.2f} €"])
 
     tableau.append(["", "", "Total HT:", f"{montant_ht:.2f} €"])
     tableau.append(["", "", "TVA :", f"{tva:.2f} €"])
@@ -133,5 +134,7 @@ for i in range(5) :
     story.append(Spacer(1, random.randint(12,36)))
 
 
-
     doc.build(story)
+
+    image = convert_from_path(f"pdf/facture_{i}.pdf")
+    image[0].save('pdf/facture_image_'+ str(i) +'.pdf', 'PDF')
