@@ -8,11 +8,17 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 
+from pdf2image import convert_from_path
 
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
 
-for i in range(len(data)) :
+if not os.path.isdir("pdf") :
+    os.mkdir("pdf")
+
+
+for i in range(5) :
+# for i in range(len(data)) :
 
     # Récupération des données
 
@@ -30,22 +36,18 @@ for i in range(len(data)) :
     client = facture["client"]
     nom_client = f"{client['prenom']} {client['prenom_2']} {client['prenom_3']} {client['nom']}"
     adresse_client_1 = f"{client['adresse']}"
-    adresse_client_2 = f"{client["code_postal"]} {client["commune"]}"
-    siren_client = f"{client["siren"]}"
-    n_tva_client = f"{client["n_tva"]}"
+    adresse_client_2 = f"{client['code_postal']} {client['commune']}"
+    siren_client = f"{client['siren']}"
+    n_tva_client = f"{client['n_tva']}"
 
     creancier = facture["creancier"]
     nom_creancier = f"{creancier['prenom']} {creancier['prenom_2']} {creancier['prenom_3']} {creancier['nom']}"
     adresse_creancier_1 = f"{creancier['adresse']}"
-    adresse_creancier_2 = f"{creancier["code_postal"]} {creancier["commune"]}"
-    siren_creancier = f"{creancier["siren"]}"
+    adresse_creancier_2 = f"{creancier["code_postal"]} {creancier['commune']}"
+    siren_creancier = f"{creancier['siren']}"
 
 
     # Génération du PDF
-
-    if not os.path.isdir("pdf"):
-        os.mkdir("pdf")
-
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
                             pagesize=A4,
                             rightMargin=random.randint(20,40),
@@ -96,25 +98,31 @@ for i in range(len(data)) :
 
     couleur_header = random.choice([colors.gray, colors.skyblue, colors.lightblue, colors.lightcoral, colors.lightpink])
     couleur_footer = random.choice([colors.beige, colors.white, colors.white, colors.lightcyan])
+    couleur_grille = random.choice([colors.black, colors.black, colors.lightslategray, colors.gray])
+    couleur_grille_int = random.choice([couleur_grille, couleur_grille, colors.lightslategray, colors.gray, colors.whitesmoke])
 
     tableau = [["Description", "Quantité", "Prix unitaire", "Total"]]
 
     for article in articles :
-        tableau.append([article["nom"], str(article["quantite"]), f"{article["prix"]:.2f} €", f"{(article["quantite"]*article["prix"]):.2f} €"])
+        tableau.append([article["nom"], str(article["quantite"]), f"{article['prix']:.2f} €", f"{(article['quantite']*article['prix']):.2f} €"])
 
     tableau.append(["", "", "Total HT:", f"{montant_ht:.2f} €"])
     tableau.append(["", "", "TVA :", f"{tva:.2f} €"])
     tableau.append(["", "", "Total TTC:", f"{montant_ttc:.2f} €"])
 
-    table = Table(tableau, colWidths=[100*mm, 25*mm, 35*mm, 35*mm])
+    largeur_tableau = random.randint(150,200)
+    taille_col = [100, random.randint(15,25), random.randint(25,35)]
+    taille_col[0] = largeur_tableau - taille_col[1] - 2*taille_col[2]
+    table = Table(tableau, colWidths=[taille_col[0]*mm, taille_col[1]*mm, taille_col[2]*mm, taille_col[2]*mm])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), couleur_header),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, -1), random.choice(['LEFT', 'CENTER'])),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), random.randint(9,15)),
         ('BACKGROUND', (0, -3), (-1, -1), couleur_footer),
-        ('GRID', (0, 0), (-1, -3), 1, colors.black),
+        ('INNERGRID', (0, 0), (-1, -3), 1, couleur_grille_int),
+        ('GRID', (0, 0), (-1, -3), 1, couleur_grille),
     ]))
 
     story.append(table)
@@ -126,5 +134,7 @@ for i in range(len(data)) :
     story.append(Spacer(1, random.randint(12,36)))
 
 
-
     doc.build(story)
+
+    image = convert_from_path(f"pdf/facture_{i}.pdf")
+    image[0].save('pdf/facture_image_'+ str(i) +'.pdf', 'PDF')
