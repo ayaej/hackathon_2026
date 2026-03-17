@@ -11,7 +11,6 @@ from reportlab.lib import colors
 
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
-    f.close()
 
 for i in range(len(data)) :
 
