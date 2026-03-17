@@ -1,0 +1,41 @@
+Source: https://pypi.org/project/pdf2image/
+
+
+mini guide poppler pour linux et macos
+
+objectif
+- installer poppler pour que pdf2image trouve pdfinfo
+
+linux (debian/ubuntu)
+1. sudo apt update
+2. sudo apt install -y poppler-utils
+3. verifier: pdfinfo -v
+
+linux (fedora)
+1. sudo dnf install -y poppler-utils
+2. verifier: pdfinfo -v
+
+linux (arch)
+1. sudo pacman -S --noconfirm poppler
+2. verifier: pdfinfo -v
+
+macos (homebrew)
+1. brew update
+2. brew install poppler
+3. verifier: pdfinfo -v
+
+test projet
+1. aller dans le dossier data
+2. lancer: python ./generatePDF.py
+
+si python ne trouve toujours pas poppler
+- definir la variable d'environnement POPPLER_PATH vers le dossier contenant pdfinfo
+- exemple macos (apple silicon): export POPPLER_PATH=/opt/homebrew/bin
+- exemple linux: export POPPLER_PATH=/usr/bin
+
+
+-----------------------------
+
+Windows :
+Executez le script installer_poppler_windows.ps1 installer Poppler 25.12.0. 
+Assurez-vous d'avoir les droits d'administrateur pour exécuter ce script. Ce qui mettra dans le PATH de votre système le dossier contenant pdfinfo.exe.
