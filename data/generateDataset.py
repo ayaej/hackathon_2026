@@ -61,9 +61,7 @@ class Facture :
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
         # Génération des montants
-        self.montant_ht = 0
-        for article in self.articles :
-            self.montant_ht += article["prix"]*article["quantite"]
+        self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
         self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
         self.tva = round(random.random()/10 * self.montant_ht, 2)
         self.montant_ttc = round(self.montant_ht + self.tva, 2) if random.random()>.95 else round((self.montant_ht + self.tva)*(1+random.random()/10),2)
