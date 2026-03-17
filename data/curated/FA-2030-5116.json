@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "21356305853793",
+        "siren": "213563058",
+        "numero_document": "FA-2030-5116",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "367.87",
+        "montant_ht": "335.5",
+        "tva_montant": "32.37",
+        "tva_taux": null,
+        "document_id": "FA-2030-5116",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2030-5116\n        Date de facturation : 2030-04-04\n        Echéance : 2032-06-02\n        \n        EMETTEUR :\n        De Sousa David\n        SIRET : 21356305853793\n        TVA : FR64 213563058\n        Adresse : rue de Mary, 54520 Gonzalez\n        \n        MONTANTS :\n        Total HT : 335.5 €\n        TVA : 32.37 €\n        Total TTC : 367.87 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2030-5116.json",
+        "document_id": "FA-2030-5116",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.938003",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "213563058",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.698789"
+    }
+}

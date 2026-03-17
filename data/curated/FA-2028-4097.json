@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "05973217299653",
+        "siren": "059732172",
+        "numero_document": "FA-2028-4097",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "664.68",
+        "montant_ht": "623.96",
+        "tva_montant": "11.83",
+        "tva_taux": null,
+        "document_id": "FA-2028-4097",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2028-4097\n        Date de facturation : 2028-07-21\n        Echéance : 2034-04-29\n        \n        EMETTEUR :\n        Roux Maryse\n        SIRET : 05973217299653\n        TVA : FR8 059732172\n        Adresse : 31, rue Marcelle Neveu, 33620 Maillot\n        \n        MONTANTS :\n        Total HT : 623.96 €\n        TVA : 11.83 €\n        Total TTC : 664.68 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2028-4097.json",
+        "document_id": "FA-2028-4097",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.793569",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "059732172",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.623486"
+    }
+}

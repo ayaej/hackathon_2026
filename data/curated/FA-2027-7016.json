@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "59899540714027",
+        "siren": "598995407",
+        "numero_document": "FA-2027-7016",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "7916.61",
+        "montant_ht": "7815.26",
+        "tva_montant": "101.35",
+        "tva_taux": null,
+        "document_id": "FA-2027-7016",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2027-7016\n        Date de facturation : 2027-02-01\n        Echéance : 2027-04-19\n        \n        EMETTEUR :\n        Thierry Joséphine\n        SIRET : 59899540714027\n        TVA : FR93 598995407\n        Adresse : 81, rue Hardy, 19866 Martineau\n        \n        MONTANTS :\n        Total HT : 7815.26 €\n        TVA : 101.35 €\n        Total TTC : 7916.61 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2027-7016.json",
+        "document_id": "FA-2027-7016",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.762067",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "598995407",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.602837"
+    }
+}

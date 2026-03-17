@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "30512814145252",
+        "siren": "305128141",
+        "numero_document": "FA-2023-6066",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "10021.0",
+        "montant_ht": "9957.42",
+        "tva_montant": "63.58",
+        "tva_taux": null,
+        "document_id": "FA-2023-6066",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-6066\n        Date de facturation : 2023-08-21\n        Echéance : 2026-08-11\n        \n        EMETTEUR :\n        Schneider Marie\n        SIRET : 30512814145252\n        TVA : FR100 305128141\n        Adresse : 51, rue de Buisson, 85388 Ruiz\n        \n        MONTANTS :\n        Total HT : 9957.42 €\n        TVA : 63.58 €\n        Total TTC : 10021.0 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-6066.json",
+        "document_id": "FA-2023-6066",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.555411",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "305128141",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.443093"
+    }
+}

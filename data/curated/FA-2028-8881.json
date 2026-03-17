@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "96036645079998",
+        "siren": "960366450",
+        "numero_document": "FA-2028-8881",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8261.04",
+        "montant_ht": "7952.91",
+        "tva_montant": "308.13",
+        "tva_taux": null,
+        "document_id": "FA-2028-8881",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2028-8881\n        Date de facturation : 2028-11-01\n        Echéance : 2034-08-01\n        \n        EMETTEUR :\n        Clerc Jacques\n        SIRET : 96036645079998\n        TVA : FR91 960366450\n        Adresse : 32, chemin Jeannine Grondin, 56235 Bonneau\n        \n        MONTANTS :\n        Total HT : 7952.91 €\n        TVA : 308.13 €\n        Total TTC : 8261.04 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2028-8881.json",
+        "document_id": "FA-2028-8881",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.828525",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "960366450",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.644514"
+    }
+}

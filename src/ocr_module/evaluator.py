@@ -1,10 +1,9 @@
 from difflib import SequenceMatcher
 
 
-# -------- OCR QUALITY --------
 def taux_similarite(texte_ocr, texte_reference):
     if not texte_reference:
-        return 0  # 👈 FIX
+        return 0
     return SequenceMatcher(None, texte_ocr, texte_reference).ratio()
 
 
@@ -33,7 +32,6 @@ def rapport_qualite(texte_ocr, texte_reference, nom_fichier=""):
     }
 
 
-# -------- EXTRACTION --------
 def evaluate_extraction(data):
 
     score = 0
@@ -51,7 +49,6 @@ def evaluate_extraction(data):
     return score / total
 
 
-# -------- GLOBAL --------
 def evaluate_global(texte_ocr, texte_reference, data, filename=""):
 
     ocr_eval = rapport_qualite(texte_ocr, texte_reference, filename)

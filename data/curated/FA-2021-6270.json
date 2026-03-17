@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "75167352552908",
+        "siren": "751673525",
+        "numero_document": "FA-2021-6270",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3308.61",
+        "montant_ht": "3219.6",
+        "tva_montant": "89.01",
+        "tva_taux": null,
+        "document_id": "FA-2021-6270",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2021-6270\n        Date de facturation : 2021-08-30\n        Echéance : 2032-03-22\n        \n        EMETTEUR :\n        Dos Santos Constance\n        SIRET : 75167352552908\n        TVA : FR80 751673525\n        Adresse : 32, rue de Julien, 97481 Joseph\n        \n        MONTANTS :\n        Total HT : 3219.6 €\n        TVA : 89.01 €\n        Total TTC : 3308.61 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2021-6270.json",
+        "document_id": "FA-2021-6270",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.458055",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "751673525",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.366520"
+    }
+}

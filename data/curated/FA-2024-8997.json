@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "99373998133801",
+        "siren": "993739981",
+        "numero_document": "FA-2024-8997",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "294.29",
+        "montant_ht": "279.69",
+        "tva_montant": "9.29",
+        "tva_taux": null,
+        "document_id": "FA-2024-8997",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2024-8997\n        Date de facturation : 2024-05-04\n        Echéance : 2024-10-01\n        \n        EMETTEUR :\n        Rossi Marine\n        SIRET : 99373998133801\n        TVA : FR71 993739981\n        Adresse : 809, rue Marques, 45167 Guyot\n        \n        MONTANTS :\n        Total HT : 279.69 €\n        TVA : 9.29 €\n        Total TTC : 294.29 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2024-8997.json",
+        "document_id": "FA-2024-8997",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.629482",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "993739981",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.505948"
+    }
+}

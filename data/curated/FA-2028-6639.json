@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "78750048615875",
+        "siren": "787500486",
+        "numero_document": "FA-2028-6639",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "741.61",
+        "montant_ht": "717.63",
+        "tva_montant": "23.98",
+        "tva_taux": null,
+        "document_id": "FA-2028-6639",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2028-6639\n        Date de facturation : 2028-10-02\n        Echéance : 2028-11-30\n        \n        EMETTEUR :\n        Labbé Sophie\n        SIRET : 78750048615875\n        TVA : FR99 787500486\n        Adresse : 89, chemin Geneviève Marques, 93144 Sainte Gilbert\n        \n        MONTANTS :\n        Total HT : 717.63 €\n        TVA : 23.98 €\n        Total TTC : 741.61 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2028-6639.json",
+        "document_id": "FA-2028-6639",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.822437",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "787500486",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.639076"
+    }
+}

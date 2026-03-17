@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "15528774796829",
+        "siren": "155287747",
+        "numero_document": "FA-2027-7601",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3124.06",
+        "montant_ht": "3032.28",
+        "tva_montant": "91.78",
+        "tva_taux": null,
+        "document_id": "FA-2027-7601",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2027-7601\n        Date de facturation : 2027-01-02\n        Echéance : 2034-07-16\n        \n        EMETTEUR :\n        Ramos Alexandre\n        SIRET : 15528774796829\n        TVA : FR13 155287747\n        Adresse : 6, rue Juliette Langlois, 29720 Seguindan\n        \n        MONTANTS :\n        Total HT : 3032.28 €\n        TVA : 91.78 €\n        Total TTC : 3124.06 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2027-7601.json",
+        "document_id": "FA-2027-7601",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.767672",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "155287747",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.607263"
+    }
+}

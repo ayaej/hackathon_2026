@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "07686850434788",
+        "siren": "076868504",
+        "numero_document": "FA-2025-3484",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8.84",
+        "montant_ht": "8.13",
+        "tva_montant": "0.4",
+        "tva_taux": null,
+        "document_id": "FA-2025-3484",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2025-3484\n        Date de facturation : 2025-05-18\n        Echéance : 2026-11-10\n        \n        EMETTEUR :\n        Guyon Susan\n        SIRET : 07686850434788\n        TVA : FR33 076868504\n        Adresse : 9, rue Joubert, 74850 Fournier-sur-Bruneau\n        \n        MONTANTS :\n        Total HT : 8.13 €\n        TVA : 0.4 €\n        Total TTC : 8.84 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2025-3484.json",
+        "document_id": "FA-2025-3484",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.646956",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "076868504",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.519311"
+    }
+}

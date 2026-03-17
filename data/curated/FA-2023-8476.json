@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "09900787037202",
+        "siren": "099007870",
+        "numero_document": "FA-2023-8476",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "6497.66",
+        "montant_ht": "6402.99",
+        "tva_montant": "94.67",
+        "tva_taux": null,
+        "document_id": "FA-2023-8476",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-8476\n        Date de facturation : 2023-09-29\n        Echéance : 2034-06-29\n        \n        EMETTEUR :\n        Perrier Hélène\n        SIRET : 09900787037202\n        TVA : FR92 099007870\n        Adresse : 94, rue Gilles Fleury, 45876 Lombard\n        \n        MONTANTS :\n        Total HT : 6402.99 €\n        TVA : 94.67 €\n        Total TTC : 6497.66 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-8476.json",
+        "document_id": "FA-2023-8476",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.576684",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "099007870",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.458616"
+    }
+}

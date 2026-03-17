@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "70530380072187",
+        "siren": "705303800",
+        "numero_document": "FA-2025-6967",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8219.99",
+        "montant_ht": "7707.28",
+        "tva_montant": "512.71",
+        "tva_taux": null,
+        "document_id": "FA-2025-6967",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2025-6967\n        Date de facturation : 2025-12-08\n        Echéance : 2026-11-28\n        \n        EMETTEUR :\n        Alexandre Alain\n        SIRET : 70530380072187\n        TVA : FR70 705303800\n        Adresse : 22, rue de Torres, 53766 Dupré-sur-Mer\n        \n        MONTANTS :\n        Total HT : 7707.28 €\n        TVA : 512.71 €\n        Total TTC : 8219.99 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2025-6967.json",
+        "document_id": "FA-2025-6967",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.664296",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "705303800",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.531982"
+    }
+}

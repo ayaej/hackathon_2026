@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "86389727741378",
+        "siren": "863897277",
+        "numero_document": "FA-2015-9544",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "596.6",
+        "montant_ht": "565.56",
+        "tva_montant": "31.04",
+        "tva_taux": null,
+        "document_id": "FA-2015-9544",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2015-9544\n        Date de facturation : 2015-10-10\n        Echéance : 2021-02-20\n        \n        EMETTEUR :\n        Bertin Mathilde\n        SIRET : 86389727741378\n        TVA : FR56 863897277\n        Adresse : 29, boulevard Sophie Ledoux, 77425 Pages\n        \n        MONTANTS :\n        Total HT : 565.56 €\n        TVA : 31.04 €\n        Total TTC : 596.6 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2015-9544.json",
+        "document_id": "FA-2015-9544",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.249098",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "863897277",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.203023"
+    }
+}

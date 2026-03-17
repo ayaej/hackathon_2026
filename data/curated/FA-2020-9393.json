@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "64898259969323",
+        "siren": "648982599",
+        "numero_document": "FA-2020-9393",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "320.64",
+        "montant_ht": "293.62",
+        "tva_montant": "4.24",
+        "tva_taux": null,
+        "document_id": "FA-2020-9393",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2020-9393\n        Date de facturation : 2020-05-29\n        Echéance : 2030-09-05\n        \n        EMETTEUR :\n        Chauvet Amélie\n        SIRET : 64898259969323\n        TVA : FR5 648982599\n        Adresse : 88, rue William Chauveau, 14243 Merle\n        \n        MONTANTS :\n        Total HT : 293.62 €\n        TVA : 4.24 €\n        Total TTC : 320.64 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2020-9393.json",
+        "document_id": "FA-2020-9393",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.440216",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "648982599",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.352434"
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "82925921269470",
+        "siren": "829259212",
+        "numero_document": "FA-2033-0044",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "4054.26",
+        "montant_ht": "3826.63",
+        "tva_montant": "227.63",
+        "tva_taux": null,
+        "document_id": "FA-2033-0044",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2033-0044\n        Date de facturation : 2033-01-10\n        Echéance : 2034-02-20\n        \n        EMETTEUR :\n        Vallée David\n        SIRET : 82925921269470\n        TVA : FR43 829259212\n        Adresse : 209, rue de Marques, 48980 Loiseau-sur-Muller\n        \n        MONTANTS :\n        Total HT : 3826.63 €\n        TVA : 227.63 €\n        Total TTC : 4054.26 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2033-0044.json",
+        "document_id": "FA-2033-0044",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.082105",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "829259212",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.788729"
+    }
+}

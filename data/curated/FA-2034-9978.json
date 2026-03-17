@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "10153234597879",
+        "siren": "101532345",
+        "numero_document": "FA-2034-9978",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3648.97",
+        "montant_ht": "3463.96",
+        "tva_montant": "185.01",
+        "tva_taux": null,
+        "document_id": "FA-2034-9978",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2034-9978\n        Date de facturation : 2034-09-09\n        Echéance : 2034-10-23\n        \n        EMETTEUR :\n        Vasseur Anouk\n        SIRET : 10153234597879\n        TVA : FR61 101532345\n        Adresse : chemin de Thierry, 89246 Saint Zoé\n        \n        MONTANTS :\n        Total HT : 3463.96 €\n        TVA : 185.01 €\n        Total TTC : 3648.97 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2034-9978.json",
+        "document_id": "FA-2034-9978",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.156049",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "101532345",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.860714"
+    }
+}

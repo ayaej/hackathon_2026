@@ -15,8 +15,6 @@ with open("dataset.json", "r", encoding="utf-8") as f:
 
 for i in range(len(data)) :
 
-    # Récupération des données
-
     facture = data[i]
     document_id = facture["document_id"]
     date_facturation = facture["date_facturation"]
@@ -41,9 +39,6 @@ for i in range(len(data)) :
     adresse_creancier_2 = f"{creancier["code_postal"]} {creancier["commune"]}"
     siren_creancier = f"{creancier["siren"]}"
 
-
-    # Génération du PDF
-
     if not os.path.isdir("pdf"):
         os.mkdir("pdf")
 
@@ -55,8 +50,6 @@ for i in range(len(data)) :
                             bottomMargin=random.randint(12,24))
     styles = getSampleStyleSheet()
     story = []
-
-    ## Header
 
     story.append(Paragraph("FACTURE", styles["Title"]))
     story.append(Spacer(1, random.randint(6,18)))
@@ -92,8 +85,6 @@ for i in range(len(data)) :
     story.append(table_header)
 
     story.append(Spacer(1, random.randint(12,36)))
-
-    ## Tableau d'articles
 
     couleur_header = random.choice([colors.gray, colors.skyblue, colors.lightblue, colors.lightcoral, colors.lightpink])
     couleur_footer = random.choice([colors.beige, colors.white, colors.white, colors.lightcyan])

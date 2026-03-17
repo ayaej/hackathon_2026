@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "72052778109122",
+        "siren": "720527781",
+        "numero_document": "FA-2023-1274",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "313.4",
+        "montant_ht": "275.53",
+        "tva_montant": "19.77",
+        "tva_taux": null,
+        "document_id": "FA-2023-1274",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-1274\n        Date de facturation : 2023-06-04\n        Echéance : 2032-10-12\n        \n        EMETTEUR :\n        Breton Benoît\n        SIRET : 72052778109122\n        TVA : FR97 720527781\n        Adresse : 5, rue Georges Blanc, 11385 Leblanc-sur-Blanc\n        \n        MONTANTS :\n        Total HT : 275.53 €\n        TVA : 19.77 €\n        Total TTC : 313.4 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-1274.json",
+        "document_id": "FA-2023-1274",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.522505",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "720527781",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.415854"
+    }
+}

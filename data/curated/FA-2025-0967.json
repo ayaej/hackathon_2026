@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "15561879795155",
+        "siren": "155618797",
+        "numero_document": "FA-2025-0967",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "4893.71",
+        "montant_ht": "4780.18",
+        "tva_montant": "113.53",
+        "tva_taux": null,
+        "document_id": "FA-2025-0967",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2025-0967\n        Date de facturation : 2025-09-29\n        Echéance : 2027-08-03\n        \n        EMETTEUR :\n        Toussaint Louise\n        SIRET : 15561879795155\n        TVA : FR79 155618797\n        Adresse : 49, avenue Colas, 71309 Sainte AstridVille\n        \n        MONTANTS :\n        Total HT : 4780.18 €\n        TVA : 113.53 €\n        Total TTC : 4893.71 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2025-0967.json",
+        "document_id": "FA-2025-0967",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.640759",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "155618797",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.515754"
+    }
+}

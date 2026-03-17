@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "22937768379849",
+        "siren": "229377683",
+        "numero_document": "FA-2019-9758",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "5437.36",
+        "montant_ht": "5433.65",
+        "tva_montant": "3.71",
+        "tva_taux": null,
+        "document_id": "FA-2019-9758",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2019-9758\n        Date de facturation : 2019-01-20\n        Echéance : 2023-02-05\n        \n        EMETTEUR :\n        Brun Véronique\n        SIRET : 22937768379849\n        TVA : FR49 229377683\n        Adresse : 724, boulevard Weber, 45229 Dias\n        \n        MONTANTS :\n        Total HT : 5433.65 €\n        TVA : 3.71 €\n        Total TTC : 5437.36 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2019-9758.json",
+        "document_id": "FA-2019-9758",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.421284",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "229377683",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.333988"
+    }
+}

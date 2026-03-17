@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "75649388771797",
+        "siren": "756493887",
+        "numero_document": "FA-2030-3039",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "7637.1",
+        "montant_ht": "7412.31",
+        "tva_montant": "224.79",
+        "tva_taux": null,
+        "document_id": "FA-2030-3039",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2030-3039\n        Date de facturation : 2030-01-17\n        Echéance : 2032-07-22\n        \n        EMETTEUR :\n        Lebrun William\n        SIRET : 75649388771797\n        TVA : FR53 756493887\n        Adresse : 66, rue Julien, 50735 Brun\n        \n        MONTANTS :\n        Total HT : 7412.31 €\n        TVA : 224.79 €\n        Total TTC : 7637.1 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2030-3039.json",
+        "document_id": "FA-2030-3039",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.917674",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "756493887",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.686235"
+    }
+}

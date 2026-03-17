@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "70306937337919",
+        "siren": "703069373",
+        "numero_document": "FA-2018-9146",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "878.91",
+        "montant_ht": "802.5",
+        "tva_montant": "18.59",
+        "tva_taux": null,
+        "document_id": "FA-2018-9146",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2018-9146\n        Date de facturation : 2018-09-15\n        Echéance : 2028-06-14\n        \n        EMETTEUR :\n        Delannoy Amélie\n        SIRET : 70306937337919\n        TVA : FR88 703069373\n        Adresse : 9, chemin Michelle Mahe, 32404 Jean\n        \n        MONTANTS :\n        Total HT : 802.5 €\n        TVA : 18.59 €\n        Total TTC : 878.91 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2018-9146.json",
+        "document_id": "FA-2018-9146",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.389379",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "703069373",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.303909"
+    }
+}

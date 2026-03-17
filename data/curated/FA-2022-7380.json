@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "27087932804646",
+        "siren": "270879328",
+        "numero_document": "FA-2022-7380",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "4923.5",
+        "montant_ht": "4688.16",
+        "tva_montant": "235.34",
+        "tva_taux": null,
+        "document_id": "FA-2022-7380",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2022-7380\n        Date de facturation : 2022-10-17\n        Echéance : 2024-03-10\n        \n        EMETTEUR :\n        Ledoux Roger\n        SIRET : 27087932804646\n        TVA : FR42 270879328\n        Adresse : 216, rue Joly, 60401 Delannoy\n        \n        MONTANTS :\n        Total HT : 4688.16 €\n        TVA : 235.34 €\n        Total TTC : 4923.5 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2022-7380.json",
+        "document_id": "FA-2022-7380",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.514545",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "270879328",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.408738"
+    }
+}

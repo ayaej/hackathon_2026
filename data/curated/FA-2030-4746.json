@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "44301700135387",
+        "siren": "443017001",
+        "numero_document": "FA-2030-4746",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3327.45",
+        "montant_ht": "3117.74",
+        "tva_montant": "209.71",
+        "tva_taux": null,
+        "document_id": "FA-2030-4746",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2030-4746\n        Date de facturation : 2030-06-29\n        Echéance : 2030-09-08\n        \n        EMETTEUR :\n        Boulay Franck\n        SIRET : 44301700135387\n        TVA : FR33 443017001\n        Adresse : 888, rue de Teixeira, 78919 Sainte Nicolasboeuf\n        \n        MONTANTS :\n        Total HT : 3117.74 €\n        TVA : 209.71 €\n        Total TTC : 3327.45 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2030-4746.json",
+        "document_id": "FA-2030-4746",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.935050",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "443017001",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.695610"
+    }
+}

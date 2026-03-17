@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "95412577109469",
+        "siren": "954125771",
+        "numero_document": "FA-2017-4733",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "510.28",
+        "montant_ht": "457.34",
+        "tva_montant": "33.56",
+        "tva_taux": null,
+        "document_id": "FA-2017-4733",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2017-4733\n        Date de facturation : 2017-04-11\n        Echéance : 2020-06-10\n        \n        EMETTEUR :\n        Riou Gérard\n        SIRET : 95412577109469\n        TVA : FR53 954125771\n        Adresse : 13, rue Voisin, 75180 Giraud\n        \n        MONTANTS :\n        Total HT : 457.34 €\n        TVA : 33.56 €\n        Total TTC : 510.28 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2017-4733.json",
+        "document_id": "FA-2017-4733",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.291767",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "954125771",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.237189"
+    }
+}

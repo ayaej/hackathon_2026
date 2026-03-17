@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "88174248938728",
+        "siren": "881742489",
+        "numero_document": "FA-2028-5667",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "7531.87",
+        "montant_ht": "7257.47",
+        "tva_montant": "274.4",
+        "tva_taux": null,
+        "document_id": "FA-2028-5667",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2028-5667\n        Date de facturation : 2028-09-29\n        Echéance : 2029-03-02\n        \n        EMETTEUR :\n        Leblanc Margot\n        SIRET : 88174248938728\n        TVA : FR61 881742489\n        Adresse : 41, rue de Pruvost, 15580 Guilbert-sur-Mer\n        \n        MONTANTS :\n        Total HT : 7257.47 €\n        TVA : 274.4 €\n        Total TTC : 7531.87 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2028-5667.json",
+        "document_id": "FA-2028-5667",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.802841",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "881742489",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.630765"
+    }
+}

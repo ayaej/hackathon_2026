@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "58147232887527",
+        "siren": "581472328",
+        "numero_document": "FA-2022-1317",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "1490.77",
+        "montant_ht": "1386.69",
+        "tva_montant": "104.08",
+        "tva_taux": null,
+        "document_id": "FA-2022-1317",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2022-1317\n        Date de facturation : 2022-01-11\n        Echéance : 2030-05-22\n        \n        EMETTEUR :\n        Collet Arthur\n        SIRET : 58147232887527\n        TVA : FR38 581472328\n        Adresse : 15, rue Sabine Hubert, 92134 Saint Marianne\n        \n        MONTANTS :\n        Total HT : 1386.69 €\n        TVA : 104.08 €\n        Total TTC : 1490.77 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2022-1317.json",
+        "document_id": "FA-2022-1317",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.489949",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "581472328",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.390977"
+    }
+}

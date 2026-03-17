@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "72685990274707",
+        "siren": "726859902",
+        "numero_document": "FA-2032-1089",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "7920.57",
+        "montant_ht": "7890.01",
+        "tva_montant": "30.56",
+        "tva_taux": null,
+        "document_id": "FA-2032-1089",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2032-1089\n        Date de facturation : 2032-09-22\n        Echéance : 2034-03-12\n        \n        EMETTEUR :\n        Blin Maurice\n        SIRET : 72685990274707\n        TVA : FR18 726859902\n        Adresse : 69, rue Hoareau, 84402 Sainte Christelledan\n        \n        MONTANTS :\n        Total HT : 7890.01 €\n        TVA : 30.56 €\n        Total TTC : 7920.57 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2032-1089.json",
+        "document_id": "FA-2032-1089",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.050869",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "726859902",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.764151"
+    }
+}

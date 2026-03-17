@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "29302590874888",
+        "siren": "293025908",
+        "numero_document": "FA-2023-2004",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "4036.14",
+        "montant_ht": "3688.59",
+        "tva_montant": "347.55",
+        "tva_taux": null,
+        "document_id": "FA-2023-2004",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-2004\n        Date de facturation : 2023-03-26\n        Echéance : 2025-12-24\n        \n        EMETTEUR :\n        Chevallier Zacharie\n        SIRET : 29302590874888\n        TVA : FR51 293025908\n        Adresse : 478, rue Ramos, 83968 Sainte Isabelle\n        \n        MONTANTS :\n        Total HT : 3688.59 €\n        TVA : 347.55 €\n        Total TTC : 4036.14 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-2004.json",
+        "document_id": "FA-2023-2004",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.528707",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "293025908",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.420560"
+    }
+}

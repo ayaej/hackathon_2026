@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "58012847705437",
+        "siren": "580128477",
+        "numero_document": "FA-2028-6542",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "68.03",
+        "montant_ht": "63.12",
+        "tva_montant": "2.74",
+        "tva_taux": null,
+        "document_id": "FA-2028-6542",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2028-6542\n        Date de facturation : 2028-11-15\n        Echéance : 2030-03-05\n        \n        EMETTEUR :\n        Leleu Alphonse\n        SIRET : 58012847705437\n        TVA : FR87 580128477\n        Adresse : chemin de Joubert, 09646 JolyVille\n        \n        MONTANTS :\n        Total HT : 63.12 €\n        TVA : 2.74 €\n        Total TTC : 68.03 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2028-6542.json",
+        "document_id": "FA-2028-6542",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.816493",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "580128477",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.634872"
+    }
+}

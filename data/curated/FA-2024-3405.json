@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "70632980336220",
+        "siren": "706329803",
+        "numero_document": "FA-2024-3405",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "1890.91",
+        "montant_ht": "1742.93",
+        "tva_montant": "39.88",
+        "tva_taux": null,
+        "document_id": "FA-2024-3405",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2024-3405\n        Date de facturation : 2024-01-30\n        Echéance : 2030-10-01\n        \n        EMETTEUR :\n        Buisson Arthur\n        SIRET : 70632980336220\n        TVA : FR14 706329803\n        Adresse : rue Marcelle Lebrun, 68336 Morel-sur-Marchand\n        \n        MONTANTS :\n        Total HT : 1742.93 €\n        TVA : 39.88 €\n        Total TTC : 1890.91 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2024-3405.json",
+        "document_id": "FA-2024-3405",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.599882",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "706329803",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.480073"
+    }
+}

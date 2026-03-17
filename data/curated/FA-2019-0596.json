@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "73239137225470",
+        "siren": "732391372",
+        "numero_document": "FA-2019-0596",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "5176.42",
+        "montant_ht": "5101.26",
+        "tva_montant": "75.16",
+        "tva_taux": null,
+        "document_id": "FA-2019-0596",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2019-0596\n        Date de facturation : 2019-05-30\n        Echéance : 2032-04-14\n        \n        EMETTEUR :\n        Merle Bertrand\n        SIRET : 73239137225470\n        TVA : FR71 732391372\n        Adresse : rue Labbé, 66763 Saint Emmanueldan\n        \n        MONTANTS :\n        Total HT : 5101.26 €\n        TVA : 75.16 €\n        Total TTC : 5176.42 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2019-0596.json",
+        "document_id": "FA-2019-0596",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.397351",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "732391372",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.308863"
+    }
+}

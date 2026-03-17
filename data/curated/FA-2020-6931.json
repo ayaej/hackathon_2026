@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "66286552278035",
+        "siren": "662865522",
+        "numero_document": "FA-2020-6931",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "5699.48",
+        "montant_ht": "5200.87",
+        "tva_montant": "498.61",
+        "tva_taux": null,
+        "document_id": "FA-2020-6931",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2020-6931\n        Date de facturation : 2020-01-03\n        Echéance : 2022-01-07\n        \n        EMETTEUR :\n        Raynaud Adèle\n        SIRET : 66286552278035\n        TVA : FR81 662865522\n        Adresse : chemin de Pichon, 63314 Meyer\n        \n        MONTANTS :\n        Total HT : 5200.87 €\n        TVA : 498.61 €\n        Total TTC : 5699.48 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2020-6931.json",
+        "document_id": "FA-2020-6931",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.436236",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "662865522",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.348507"
+    }
+}

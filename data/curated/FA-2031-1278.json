@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "71803684445263",
+        "siren": "718036844",
+        "numero_document": "FA-2031-1278",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "337.26",
+        "montant_ht": "314.47",
+        "tva_montant": "22.22",
+        "tva_taux": null,
+        "document_id": "FA-2031-1278",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2031-1278\n        Date de facturation : 2031-12-22\n        Echéance : 2034-02-02\n        \n        EMETTEUR :\n        Fouquet Aimée\n        SIRET : 71803684445263\n        TVA : FR27 718036844\n        Adresse : 26, rue Maggie Cordier, 69759 Lejeune\n        \n        MONTANTS :\n        Total HT : 314.47 €\n        TVA : 22.22 €\n        Total TTC : 337.26 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2031-1278.json",
+        "document_id": "FA-2031-1278",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.980162",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "718036844",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.720742"
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "72127001892095",
+        "siren": "721270018",
+        "numero_document": "FA-2026-5078",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "1866.85",
+        "montant_ht": "1672.61",
+        "tva_montant": "80.83",
+        "tva_taux": null,
+        "document_id": "FA-2026-5078",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2026-5078\n        Date de facturation : 2026-08-24\n        Echéance : 2032-02-28\n        \n        EMETTEUR :\n        De Sousa Thérèse\n        SIRET : 72127001892095\n        TVA : FR83 721270018\n        Adresse : 97, chemin Perrier, 74336 Launay-sur-Roche\n        \n        MONTANTS :\n        Total HT : 1672.61 €\n        TVA : 80.83 €\n        Total TTC : 1866.85 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2026-5078.json",
+        "document_id": "FA-2026-5078",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.697676",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "721270018",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.552689"
+    }
+}

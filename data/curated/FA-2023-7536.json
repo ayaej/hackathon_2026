@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "49030138508973",
+        "siren": "490301385",
+        "numero_document": "FA-2023-7536",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "9604.27",
+        "montant_ht": "8830.35",
+        "tva_montant": "773.92",
+        "tva_taux": null,
+        "document_id": "FA-2023-7536",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-7536\n        Date de facturation : 2023-09-16\n        Echéance : 2026-04-05\n        \n        EMETTEUR :\n        Charles Célina\n        SIRET : 49030138508973\n        TVA : FR15 490301385\n        Adresse : 694, boulevard Hebert, 80881 Chauveau\n        \n        MONTANTS :\n        Total HT : 8830.35 €\n        TVA : 773.92 €\n        Total TTC : 9604.27 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-7536.json",
+        "document_id": "FA-2023-7536",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.573177",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "490301385",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.456503"
+    }
+}

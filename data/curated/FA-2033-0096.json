@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "01519973157613",
+        "siren": "015199731",
+        "numero_document": "FA-2033-0096",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3963.59",
+        "montant_ht": "3807.49",
+        "tva_montant": "156.1",
+        "tva_taux": null,
+        "document_id": "FA-2033-0096",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2033-0096\n        Date de facturation : 2033-07-07\n        Echéance : 2033-09-17\n        \n        EMETTEUR :\n        Rodriguez Henri\n        SIRET : 01519973157613\n        TVA : FR2 015199731\n        Adresse : 24, avenue de Merle, 58552 Lejeune-sur-Voisin\n        \n        MONTANTS :\n        Total HT : 3807.49 €\n        TVA : 156.1 €\n        Total TTC : 3963.59 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2033-0096.json",
+        "document_id": "FA-2033-0096",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.084983",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "015199731",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.790902"
+    }
+}

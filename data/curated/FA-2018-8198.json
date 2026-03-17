@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "48599840274102",
+        "siren": "485998402",
+        "numero_document": "FA-2018-8198",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "1573.09",
+        "montant_ht": "1435.84",
+        "tva_montant": "137.25",
+        "tva_taux": null,
+        "document_id": "FA-2018-8198",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2018-8198\n        Date de facturation : 2018-05-28\n        Echéance : 2028-10-09\n        \n        EMETTEUR :\n        Weber Arnaude\n        SIRET : 48599840274102\n        TVA : FR64 485998402\n        Adresse : 66, avenue de Marchand, 53536 Allard\n        \n        MONTANTS :\n        Total HT : 1435.84 €\n        TVA : 137.25 €\n        Total TTC : 1573.09 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2018-8198.json",
+        "document_id": "FA-2018-8198",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.376464",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "485998402",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.291677"
+    }
+}

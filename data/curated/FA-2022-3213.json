@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "33327949651723",
+        "siren": "333279496",
+        "numero_document": "FA-2022-3213",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "10363.0",
+        "montant_ht": "9746.2",
+        "tva_montant": "616.8",
+        "tva_taux": null,
+        "document_id": "FA-2022-3213",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2022-3213\n        Date de facturation : 2022-08-09\n        Echéance : 2033-04-25\n        \n        EMETTEUR :\n        Petit Matthieu\n        SIRET : 33327949651723\n        TVA : FR86 333279496\n        Adresse : 87, rue Vincent Moulin, 78879 Thierry-sur-Petitjean\n        \n        MONTANTS :\n        Total HT : 9746.2 €\n        TVA : 616.8 €\n        Total TTC : 10363.0 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2022-3213.json",
+        "document_id": "FA-2022-3213",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.493326",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "333279496",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.392708"
+    }
+}

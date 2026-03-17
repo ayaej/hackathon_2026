@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "79181592202826",
+        "siren": "791815922",
+        "numero_document": "FA-2023-7492",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3571.81",
+        "montant_ht": "3309.61",
+        "tva_montant": "262.2",
+        "tva_taux": null,
+        "document_id": "FA-2023-7492",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-7492\n        Date de facturation : 2023-05-20\n        Echéance : 2028-08-02\n        \n        EMETTEUR :\n        Mathieu Pauline\n        SIRET : 79181592202826\n        TVA : FR71 791815922\n        Adresse : 42, avenue de Martins, 92744 Saint Capucine\n        \n        MONTANTS :\n        Total HT : 3309.61 €\n        TVA : 262.2 €\n        Total TTC : 3571.81 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-7492.json",
+        "document_id": "FA-2023-7492",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.570256",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "791815922",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.454057"
+    }
+}

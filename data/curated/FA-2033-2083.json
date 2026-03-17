@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "26925007007531",
+        "siren": "269250070",
+        "numero_document": "FA-2033-2083",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "610.01",
+        "montant_ht": "557.13",
+        "tva_montant": "22.43",
+        "tva_taux": null,
+        "document_id": "FA-2033-2083",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2033-2083\n        Date de facturation : 2033-12-05\n        Echéance : 2034-05-05\n        \n        EMETTEUR :\n        Marchal Patrick\n        SIRET : 26925007007531\n        TVA : FR7 269250070\n        Adresse : 19, chemin de Jean, 20514 Boyer\n        \n        MONTANTS :\n        Total HT : 557.13 €\n        TVA : 22.43 €\n        Total TTC : 610.01 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2033-2083.json",
+        "document_id": "FA-2033-2083",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.098607",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "269250070",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.802734"
+    }
+}

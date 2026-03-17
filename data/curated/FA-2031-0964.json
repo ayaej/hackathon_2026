@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "63618387889492",
+        "siren": "636183878",
+        "numero_document": "FA-2031-0964",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8033.66",
+        "montant_ht": "7345.02",
+        "tva_montant": "688.64",
+        "tva_taux": null,
+        "document_id": "FA-2031-0964",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2031-0964\n        Date de facturation : 2031-10-14\n        Echéance : 2034-06-28\n        \n        EMETTEUR :\n        Lebreton Diane\n        SIRET : 63618387889492\n        TVA : FR60 636183878\n        Adresse : 28, rue Charles Boyer, 03754 Leclercq\n        \n        MONTANTS :\n        Total HT : 7345.02 €\n        TVA : 688.64 €\n        Total TTC : 8033.66 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2031-0964.json",
+        "document_id": "FA-2031-0964",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.976970",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "636183878",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.718168"
+    }
+}

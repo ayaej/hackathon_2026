@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "35053958759020",
+        "siren": "350539587",
+        "numero_document": "FA-2030-6072",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "6013.73",
+        "montant_ht": "5947.01",
+        "tva_montant": "66.72",
+        "tva_taux": null,
+        "document_id": "FA-2030-6072",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2030-6072\n        Date de facturation : 2030-09-17\n        Echéance : 2030-12-17\n        \n        EMETTEUR :\n        Rolland David\n        SIRET : 35053958759020\n        TVA : FR17 350539587\n        Adresse : 7, chemin Lacroix, 52554 Devauxdan\n        \n        MONTANTS :\n        Total HT : 5947.01 €\n        TVA : 66.72 €\n        Total TTC : 6013.73 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2030-6072.json",
+        "document_id": "FA-2030-6072",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.940871",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "350539587",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.700423"
+    }
+}

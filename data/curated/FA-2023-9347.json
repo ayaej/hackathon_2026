@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "82032144835157",
+        "siren": "820321448",
+        "numero_document": "FA-2023-9347",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "254.77",
+        "montant_ht": "228.98",
+        "tva_montant": "5.87",
+        "tva_taux": null,
+        "document_id": "FA-2023-9347",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2023-9347\n        Date de facturation : 2023-06-19\n        Echéance : 2025-05-13\n        \n        EMETTEUR :\n        Roy Alfred\n        SIRET : 82032144835157\n        TVA : FR43 820321448\n        Adresse : 7, rue De Oliveira, 78248 Lebreton\n        \n        MONTANTS :\n        Total HT : 228.98 €\n        TVA : 5.87 €\n        Total TTC : 254.77 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2023-9347.json",
+        "document_id": "FA-2023-9347",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.587856",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "820321448",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.467731"
+    }
+}

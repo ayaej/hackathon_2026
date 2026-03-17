@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "04856401597771",
+        "siren": "048564015",
+        "numero_document": "FA-2015-2083",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "405.67",
+        "montant_ht": "375.76",
+        "tva_montant": "23.57",
+        "tva_taux": null,
+        "document_id": "FA-2015-2083",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2015-2083\n        Date de facturation : 2015-12-03\n        Echéance : 2026-03-29\n        \n        EMETTEUR :\n        Weber Claudine\n        SIRET : 04856401597771\n        TVA : FR1 048564015\n        Adresse : 546, boulevard de Buisson, 51719 Perret-sur-Roger\n        \n        MONTANTS :\n        Total HT : 375.76 €\n        TVA : 23.57 €\n        Total TTC : 405.67 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2015-2083.json",
+        "document_id": "FA-2015-2083",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.217415",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "048564015",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.173563"
+    }
+}

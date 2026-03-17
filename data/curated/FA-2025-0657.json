@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "32345925501093",
+        "siren": "323459255",
+        "numero_document": "FA-2025-0657",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "1464.49",
+        "montant_ht": "1372.3",
+        "tva_montant": "92.19",
+        "tva_taux": null,
+        "document_id": "FA-2025-0657",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2025-0657\n        Date de facturation : 2025-02-16\n        Echéance : 2028-04-10\n        \n        EMETTEUR :\n        Rousset Émilie\n        SIRET : 32345925501093\n        TVA : FR52 323459255\n        Adresse : 82, boulevard Élise Pons, 26731 Dumasnec\n        \n        MONTANTS :\n        Total HT : 1372.3 €\n        TVA : 92.19 €\n        Total TTC : 1464.49 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2025-0657.json",
+        "document_id": "FA-2025-0657",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.635625",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "323459255",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.510712"
+    }
+}

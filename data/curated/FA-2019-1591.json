@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "11884364991589",
+        "siren": "118843649",
+        "numero_document": "FA-2019-1591",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "693.51",
+        "montant_ht": "649.09",
+        "tva_montant": "44.42",
+        "tva_taux": null,
+        "document_id": "FA-2019-1591",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2019-1591\n        Date de facturation : 2019-04-01\n        Echéance : 2027-02-14\n        \n        EMETTEUR :\n        Normand Marcelle\n        SIRET : 11884364991589\n        TVA : FR92 118843649\n        Adresse : 78, rue Petit, 80978 Lucas-sur-Bernard\n        \n        MONTANTS :\n        Total HT : 649.09 €\n        TVA : 44.42 €\n        Total TTC : 693.51 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2019-1591.json",
+        "document_id": "FA-2019-1591",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.399930",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "118843649",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.312064"
+    }
+}

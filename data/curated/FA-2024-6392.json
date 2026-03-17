@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "84091764864957",
+        "siren": "840917648",
+        "numero_document": "FA-2024-6392",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8021.55",
+        "montant_ht": "7966.18",
+        "tva_montant": "55.37",
+        "tva_taux": null,
+        "document_id": "FA-2024-6392",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2024-6392\n        Date de facturation : 2024-06-28\n        Echéance : 2027-10-20\n        \n        EMETTEUR :\n        Goncalves Isabelle\n        SIRET : 84091764864957\n        TVA : FR67 840917648\n        Adresse : boulevard de Besnard, 46891 Hebert\n        \n        MONTANTS :\n        Total HT : 7966.18 €\n        TVA : 55.37 €\n        Total TTC : 8021.55 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2024-6392.json",
+        "document_id": "FA-2024-6392",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.608884",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "840917648",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.488212"
+    }
+}

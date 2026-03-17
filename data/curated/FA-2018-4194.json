@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "55159420079724",
+        "siren": "551594200",
+        "numero_document": "FA-2018-4194",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "2622.39",
+        "montant_ht": "2523.16",
+        "tva_montant": "99.23",
+        "tva_taux": null,
+        "document_id": "FA-2018-4194",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2018-4194\n        Date de facturation : 2018-04-14\n        Echéance : 2024-03-26\n        \n        EMETTEUR :\n        Becker Vincent\n        SIRET : 55159420079724\n        TVA : FR29 551594200\n        Adresse : 75, chemin Simon, 21357 Sanchez\n        \n        MONTANTS :\n        Total HT : 2523.16 €\n        TVA : 99.23 €\n        Total TTC : 2622.39 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2018-4194.json",
+        "document_id": "FA-2018-4194",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.359447",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "551594200",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.281917"
+    }
+}

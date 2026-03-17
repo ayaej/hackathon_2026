@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "50116860308964",
+        "siren": "501168603",
+        "numero_document": "FA-2017-5422",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "860.69",
+        "montant_ht": "795.26",
+        "tva_montant": "47.07",
+        "tva_taux": null,
+        "document_id": "FA-2017-5422",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2017-5422\n        Date de facturation : 2017-04-04\n        Echéance : 2034-08-20\n        \n        EMETTEUR :\n        Reynaud Maggie\n        SIRET : 50116860308964\n        TVA : FR3 501168603\n        Adresse : 488, chemin Michaud, 26164 BlinVille\n        \n        MONTANTS :\n        Total HT : 795.26 €\n        TVA : 47.07 €\n        Total TTC : 860.69 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2017-5422.json",
+        "document_id": "FA-2017-5422",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.307461",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "501168603",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.248246"
+    }
+}

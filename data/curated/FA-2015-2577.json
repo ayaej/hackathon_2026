@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "32276235788970",
+        "siren": "322762357",
+        "numero_document": "FA-2015-2577",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "190.16",
+        "montant_ht": "175.02",
+        "tva_montant": "12.98",
+        "tva_taux": null,
+        "document_id": "FA-2015-2577",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2015-2577\n        Date de facturation : 2015-03-01\n        Echéance : 2026-01-31\n        \n        EMETTEUR :\n        Pons Raymond\n        SIRET : 32276235788970\n        TVA : FR24 322762357\n        Adresse : 7, avenue de Breton, 20844 Saint Chantal\n        \n        MONTANTS :\n        Total HT : 175.02 €\n        TVA : 12.98 €\n        Total TTC : 190.16 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2015-2577.json",
+        "document_id": "FA-2015-2577",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.224020",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "322762357",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.184170"
+    }
+}

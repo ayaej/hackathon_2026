@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "48727741662323",
+        "siren": "487277416",
+        "numero_document": "FA-2016-5703",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "10837.83",
+        "montant_ht": "9991.01",
+        "tva_montant": "846.82",
+        "tva_taux": null,
+        "document_id": "FA-2016-5703",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2016-5703\n        Date de facturation : 2016-01-16\n        Echéance : 2033-08-17\n        \n        EMETTEUR :\n        Jean Nicole\n        SIRET : 48727741662323\n        TVA : FR51 487277416\n        Adresse : 725, avenue de Da Costa, 57835 Moreau\n        \n        MONTANTS :\n        Total HT : 9991.01 €\n        TVA : 846.82 €\n        Total TTC : 10837.83 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2016-5703.json",
+        "document_id": "FA-2016-5703",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.258494",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "487277416",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.211900"
+    }
+}

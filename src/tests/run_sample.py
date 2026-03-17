@@ -12,7 +12,9 @@ from src.mapper_dataset import prepare_raw_dataset
 
 print("[INFO] Generation des donnees...")
 os.system("python data/generateDataset.py")
-print("[INFO] Fichier dataset.json genere.")
+print("[INFO] Generation des PDFs...")
+os.system("python data/generatePDF.py")
+print("[INFO] Fichiers generes.")
 
 print("[INFO] Mapping data vers format Raw...")
 nb_fichiers = prepare_raw_dataset("dataset.json", "data/raw/")

@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "51468213189548",
+        "siren": "514682131",
+        "numero_document": "FA-2024-8793",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "10296.74",
+        "montant_ht": "9366.48",
+        "tva_montant": "930.26",
+        "tva_taux": null,
+        "document_id": "FA-2024-8793",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2024-8793\n        Date de facturation : 2024-12-31\n        Echéance : 2031-07-12\n        \n        EMETTEUR :\n        Paris Renée\n        SIRET : 51468213189548\n        TVA : FR43 514682131\n        Adresse : 370, chemin Claudine Carre, 87373 Breton-sur-Mer\n        \n        MONTANTS :\n        Total HT : 9366.48 €\n        TVA : 930.26 €\n        Total TTC : 10296.74 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2024-8793.json",
+        "document_id": "FA-2024-8793",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.626234",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "514682131",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.503921"
+    }
+}

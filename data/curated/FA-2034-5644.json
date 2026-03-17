@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "94845963343086",
+        "siren": "948459633",
+        "numero_document": "FA-2034-5644",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8376.52",
+        "montant_ht": "8270.7",
+        "tva_montant": "105.82",
+        "tva_taux": null,
+        "document_id": "FA-2034-5644",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2034-5644\n        Date de facturation : 2034-05-09\n        Echéance : 2034-07-25\n        \n        EMETTEUR :\n        Launay Amélie\n        SIRET : 94845963343086\n        TVA : FR72 948459633\n        Adresse : rue de Ramos, 67816 Coulon-sur-Martins\n        \n        MONTANTS :\n        Total HT : 8270.7 €\n        TVA : 105.82 €\n        Total TTC : 8376.52 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2034-5644.json",
+        "document_id": "FA-2034-5644",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.138549",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "948459633",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.838531"
+    }
+}

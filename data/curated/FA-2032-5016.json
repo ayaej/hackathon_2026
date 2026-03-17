@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "36292056891437",
+        "siren": "362920568",
+        "numero_document": "FA-2032-5016",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "780.62",
+        "montant_ht": "725.45",
+        "tva_montant": "54.04",
+        "tva_taux": null,
+        "document_id": "FA-2032-5016",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2032-5016\n        Date de facturation : 2032-07-03\n        Echéance : 2033-07-10\n        \n        EMETTEUR :\n        Parent Charlotte\n        SIRET : 36292056891437\n        TVA : FR53 362920568\n        Adresse : 67, boulevard Pottier, 48215 Saint Julie\n        \n        MONTANTS :\n        Total HT : 725.45 €\n        TVA : 54.04 €\n        Total TTC : 780.62 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2032-5016.json",
+        "document_id": "FA-2032-5016",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.066114",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "362920568",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.773377"
+    }
+}

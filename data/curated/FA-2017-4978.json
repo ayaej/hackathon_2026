@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "98748251045038",
+        "siren": "987482510",
+        "numero_document": "FA-2017-4978",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "8157.35",
+        "montant_ht": "8142.97",
+        "tva_montant": "14.38",
+        "tva_taux": null,
+        "document_id": "FA-2017-4978",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2017-4978\n        Date de facturation : 2017-07-30\n        Echéance : 2021-10-12\n        \n        EMETTEUR :\n        Noël Alfred\n        SIRET : 98748251045038\n        TVA : FR11 987482510\n        Adresse : boulevard Techer, 32588 Carlier\n        \n        MONTANTS :\n        Total HT : 8142.97 €\n        TVA : 14.38 €\n        Total TTC : 8157.35 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2017-4978.json",
+        "document_id": "FA-2017-4978",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.295107",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "987482510",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.239268"
+    }
+}

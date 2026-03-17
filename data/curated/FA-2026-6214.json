@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "78794980289923",
+        "siren": "787949802",
+        "numero_document": "FA-2026-6214",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "4994.01",
+        "montant_ht": "4519.6",
+        "tva_montant": "173.77",
+        "tva_taux": null,
+        "document_id": "FA-2026-6214",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2026-6214\n        Date de facturation : 2026-11-07\n        Echéance : 2034-10-27\n        \n        EMETTEUR :\n        Hamel Paulette\n        SIRET : 78794980289923\n        TVA : FR46 787949802\n        Adresse : 60, chemin de Guérin, 97664 Laporte-les-Bains\n        \n        MONTANTS :\n        Total HT : 4519.6 €\n        TVA : 173.77 €\n        Total TTC : 4994.01 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2026-6214.json",
+        "document_id": "FA-2026-6214",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:17.703080",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "787949802",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.556758"
+    }
+}

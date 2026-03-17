@@ -1,0 +1,45 @@
+{
+    "extraction": {
+        "siret": "48840978403631",
+        "siren": "488409784",
+        "numero_document": "FA-2032-2824",
+        "date": null,
+        "date_expiration": null,
+        "fournisseur": null,
+        "iban": null,
+        "montant_ttc": "3295.63",
+        "montant_ht": "3126.35",
+        "tva_montant": "169.28",
+        "tva_taux": null,
+        "document_id": "FA-2032-2824",
+        "type_document": "facture"
+    },
+    "texte_brut": "\n        FACTURE N° FA-2032-2824\n        Date de facturation : 2032-12-11\n        Echéance : 2034-02-23\n        \n        EMETTEUR :\n        Marion Victor\n        SIRET : 48840978403631\n        TVA : FR34 488409784\n        Adresse : 367, avenue de Couturier, 20113 Langlois\n        \n        MONTANTS :\n        Total HT : 3126.35 €\n        TVA : 169.28 €\n        Total TTC : 3295.63 €\n        ",
+    "meta": {
+        "fichier_source": "FA-2032-2824.json",
+        "document_id": "FA-2032-2824",
+        "type_document": "facture",
+        "date_traitement": "2026-03-17T13:18:18.059526",
+        "statut": "succes"
+    },
+    "verification_metier": {
+        "sirene": {
+            "incoherences": [
+                "SIRET invalide ou inconnu : SIREN introuvable dans la base"
+            ],
+            "verification_sirene": {
+                "valide": false,
+                "siren": "488409784",
+                "erreur": "SIREN introuvable dans la base"
+            }
+        },
+        "expiration": {
+            "statut": "inconnu",
+            "details": "Aucune date (d'émission ou d'expiration) détectée, impossible de vérifier.",
+            "expire": null
+        },
+        "statut_final": "valide",
+        "alertes": [],
+        "traite_le": "2026-03-17T13:18:18.770166"
+    }
+}
