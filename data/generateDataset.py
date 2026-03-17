@@ -52,7 +52,7 @@ class Facture :
 
         # Génération d'articles
         self.articles = []
-        for i in range(random.randint(1,10)) :
+        for _ in range(random.randint(1,10)) :
             article = random.choice(article_descriptions)
             if random.random()>.2 :
                 article += random.choice(article_connecteurs) + random.choice(article_domaines)
