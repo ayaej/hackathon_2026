@@ -10,4 +10,4 @@ RUN python -m spacy download fr_core_news_sm
 
 COPY . .
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "src.ocr_module.main"]

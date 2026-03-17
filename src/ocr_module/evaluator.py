@@ -1,11 +1,10 @@
 from difflib import SequenceMatcher
-import json
-import os
 
 
+# -------- OCR QUALITY --------
 def taux_similarite(texte_ocr, texte_reference):
     if not texte_reference:
-        raise ValueError("Le texte de reference est vide.")
+        return 0  # 👈 FIX
     return SequenceMatcher(None, texte_ocr, texte_reference).ratio()
 
 
@@ -30,28 +29,38 @@ def rapport_qualite(texte_ocr, texte_reference, nom_fichier=""):
         "fichier": nom_fichier,
         "taux_similarite": round(similarite, 4),
         "taux_erreur_pct": erreur,
-        "note": note,
-        "longueur_ocr": len(texte_ocr),
-        "longueur_reference": len(texte_reference)
+        "note_ocr": note
     }
 
 
-def evaluer_depuis_json(chemin_json, texte_reference):
-    if not os.path.exists(chemin_json):
-        raise FileNotFoundError(f"Fichier JSON introuvable : {chemin_json}")
+# -------- EXTRACTION --------
+def evaluate_extraction(data):
 
-    with open(chemin_json, "r", encoding="utf-8") as f:
-        donnees = json.load(f)
+    score = 0
+    total = 4
 
-    texte_ocr = donnees.get("texte_brut", "")
-    nom = donnees.get("meta", {}).get("fichier_source", chemin_json)
+    if data.get("siret"):
+        score += 1
+    if data.get("tva"):
+        score += 1
+    if data.get("montants"):
+        score += 1
+    if data.get("dates"):
+        score += 1
 
-    return rapport_qualite(texte_ocr, texte_reference, nom_fichier=nom)
+    return score / total
 
 
-if __name__ == "__main__":
-    texte_ocr = "Facture N FAC-2025-001 SIRET 83234019000017 Montant TTC 1200.50 EUR"
-    texte_ref = "Facture N FAC-2025-001 SIRET 83234019000017 Montant TTC 1200.50 EUR"
+# -------- GLOBAL --------
+def evaluate_global(texte_ocr, texte_reference, data, filename=""):
 
-    rapport = rapport_qualite(texte_ocr, texte_ref, nom_fichier="exemple.jpg")
-    print(json.dumps(rapport, indent=4, ensure_ascii=False))
+    ocr_eval = rapport_qualite(texte_ocr, texte_reference, filename)
+    extraction_score = evaluate_extraction(data)
+
+    return {
+        "ocr": ocr_eval,
+        "extraction_score": extraction_score,
+        "score_global": round(
+            (ocr_eval["taux_similarite"] + extraction_score) / 2, 4
+        )
+    }
