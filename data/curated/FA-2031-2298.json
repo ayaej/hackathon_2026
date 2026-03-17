@@ -19,7 +19,7 @@
         "fichier_source": "FA-2031-2298.json",
         "document_id": "FA-2031-2298",
         "type_document": "facture",
-        "date_traitement": "2026-03-17T13:18:17.983169",
+        "date_traitement": "2026-03-17T14:25:06.382211",
         "statut": "succes"
     },
     "verification_metier": {
@@ -40,6 +40,6 @@
         },
         "statut_final": "valide",
         "alertes": [],
-        "traite_le": "2026-03-17T13:18:18.723247"
+        "traite_le": "2026-03-17T14:25:07.070537"
     }
 }

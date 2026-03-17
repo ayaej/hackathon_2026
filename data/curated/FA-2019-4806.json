@@ -19,7 +19,7 @@
         "fichier_source": "FA-2019-4806.json",
         "document_id": "FA-2019-4806",
         "type_document": "facture",
-        "date_traitement": "2026-03-17T13:18:17.410890",
+        "date_traitement": "2026-03-17T14:25:05.859286",
         "statut": "succes"
     },
     "verification_metier": {
@@ -40,6 +40,6 @@
         },
         "statut_final": "valide",
         "alertes": [],
-        "traite_le": "2026-03-17T13:18:18.323298"
+        "traite_le": "2026-03-17T14:25:06.688717"
     }
 }

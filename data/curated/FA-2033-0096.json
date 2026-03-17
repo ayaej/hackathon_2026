@@ -19,7 +19,7 @@
         "fichier_source": "FA-2033-0096.json",
         "document_id": "FA-2033-0096",
         "type_document": "facture",
-        "date_traitement": "2026-03-17T13:18:18.084983",
+        "date_traitement": "2026-03-17T14:25:06.461853",
         "statut": "succes"
     },
     "verification_metier": {
@@ -40,6 +40,6 @@
         },
         "statut_final": "valide",
         "alertes": [],
-        "traite_le": "2026-03-17T13:18:18.790902"
+        "traite_le": "2026-03-17T14:25:07.133066"
     }
 }

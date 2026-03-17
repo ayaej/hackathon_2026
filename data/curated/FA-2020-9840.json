@@ -19,7 +19,7 @@
         "fichier_source": "FA-2020-9840.json",
         "document_id": "FA-2020-9840",
         "type_document": "facture",
-        "date_traitement": "2026-03-17T13:18:17.445546",
+        "date_traitement": "2026-03-17T14:25:05.899815",
         "statut": "succes"
     },
     "verification_metier": {
@@ -40,6 +40,6 @@
         },
         "statut_final": "valide",
         "alertes": [],
-        "traite_le": "2026-03-17T13:18:18.356412"
+        "traite_le": "2026-03-17T14:25:06.712137"
     }
 }
