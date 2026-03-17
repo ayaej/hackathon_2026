@@ -27,6 +27,7 @@ ARTICLE_DOMAINES = [
 
 
 
+
 class Facture :
     def __init__(self) :
         self._dictkeys = ("document_id", "date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client","articles")
@@ -60,7 +61,6 @@ class Facture :
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
         # Génération des montants
-        self.montant_ht = 0
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
         self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
         self.tva = round(random.random()/10 * self.montant_ht, 2)
