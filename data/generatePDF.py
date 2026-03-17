@@ -43,11 +43,12 @@ for i in range(5) :
     creancier = facture["creancier"]
     nom_creancier = f"{creancier['prenom']} {creancier['prenom_2']} {creancier['prenom_3']} {creancier['nom']}"
     adresse_creancier_1 = f"{creancier['adresse']}"
-    adresse_creancier_2 = f"{creancier["code_postal"]} {creancier['commune']}"
+    adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
     siren_creancier = f"{creancier['siren']}"
 
 
     # Génération du PDF
+    
     doc = SimpleDocTemplate(f"pdf/facture_{i}.pdf",
                             pagesize=A4,
                             rightMargin=random.randint(20,40),
@@ -121,11 +122,13 @@ for i in range(5) :
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), random.randint(9,15)),
         ('BACKGROUND', (0, -3), (-1, -1), couleur_footer),
-        ('INNERGRID', (0, 0), (-1, -3), 1, couleur_grille_int),
+        ('INNERGRID', (0, 0), (-1, -4), 1, couleur_grille_int),
         ('GRID', (0, 0), (-1, -3), 1, couleur_grille),
     ]))
 
     story.append(table)
+
+    ## Footer
 
     story.append(Spacer(1, random.randint(6,18)))
     story.append(Paragraph(f"Date de prestation : {date_prestation}", styles["Normal"]))
@@ -134,7 +137,10 @@ for i in range(5) :
     story.append(Spacer(1, random.randint(12,36)))
 
 
+    # Enregistrement
+
     doc.build(story)
 
     image = convert_from_path(f"pdf/facture_{i}.pdf")
-    image[0].save('pdf/facture_image_'+ str(i) +'.pdf', 'PDF')
+    format = random.choice(['jpeg','png','pdf'])
+    image[0].save(f"pdf/facture_image_{i}.{format}", format.upper())
