@@ -1,11 +1,7 @@
-import json
 import os
+import json
 
 def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
-    """
-    Lit le fichier dataset.json et le convertit en fichiers JSON 
-    locaux dans data/raw/.
-    """
     
     if not os.path.exists(chemin_dataset):
         print(f"[ERROR] {chemin_dataset} introuvable.")
@@ -39,7 +35,6 @@ def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
         Total TTC : {facture.get("montant_ttc")} €
         """
         
-        # Format attendu
         json_a_sauvegarder = {
             "document_id": doc_id,
             "type_document": "facture",

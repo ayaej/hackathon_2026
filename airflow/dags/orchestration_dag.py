@@ -150,19 +150,14 @@ with DAG(
         python_callable=basculer_documents_en_processing,
     )
 
-    # branchement futur du vrai OCR
     extraire_ocr = EmptyOperator(task_id="extraire_ocr")
 
-    # sauvegarde future en zone clean
     persister_clean = EmptyOperator(task_id="persister_clean")
 
-    # validation et enrichissement futurs en zone curated
     valider_curated = EmptyOperator(task_id="valider_curated")
 
-    # envoi futur vers CRM
     envoyer_crm = EmptyOperator(task_id="envoyer_crm")
 
-    # envoi futur vers conformite
     envoyer_conformite = EmptyOperator(task_id="envoyer_conformite")
 
     finaliser_documents = PythonOperator(

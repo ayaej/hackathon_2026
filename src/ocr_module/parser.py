@@ -1,11 +1,24 @@
 import re
+import os
+
+def luhn_check(number):
+    """Vérifie un numéro via l'algorithme de Luhn."""
+    if not number or not number.isdigit():
+        return False
+    digits = [int(d) for d in str(number)]
+    odd_digits = digits[-1::-2]
+    even_digits = digits[-2::-2]
+    checksum = sum(odd_digits)
+    for d in even_digits:
+        checksum += sum(divmod(d * 2, 10))
+    return checksum % 10 == 0
 
 PATTERN_SIRET = r'\b(\d{3}[\s\-]?\d{3}[\s\-]?\d{3}[\s\-]?\d{5}|\d{14})\b'
-PATTERN_DATE = r'\b(\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})\b'
+PATTERN_DATE = r'\b(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})\b'
 PATTERN_NUMERO_DOC = r'\b([A-Z]{2,5}[\-_]?\d{4}[\-_]?\d{2,6})\b'
 PATTERN_TVA_TAUX = r'\bTVA\s*:?\s*(\d{1,2}(?:[,\.]\d{1,2})?)\s*%'
 PATTERN_IBAN = r'\bFR\d{2}[\s\d]{23,30}\b'
-PATTERN_DATE_EXPIRATION = r'(?:échéance|echeance|valable jusqu\'au|expiration|expire le|date limite|fin de validité)[^\d]*(\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})'
+PATTERN_DATE_EXPIRATION = r'(?:échéance|echeance|valable jusqu\'au|expiration|expire le|date limite|fin de validité)[^\d]*(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})'
 
 
 def nettoyer_siret(valeur):
@@ -13,10 +26,10 @@ def nettoyer_siret(valeur):
 
 
 def extraire_siret(texte):
-    match = re.search(PATTERN_SIRET, texte)
-    if match:
+    matches = re.finditer(PATTERN_SIRET, texte)
+    for match in matches:
         siret = nettoyer_siret(match.group())
-        if len(siret) == 14:
+        if len(siret) == 14 and luhn_check(siret):
             return siret
     return None
 
@@ -43,28 +56,49 @@ def extraire_montants(texte):
         "tva_taux": None
     }
 
-    pattern_montant = r'(\d[\d\s]*([,\.]\d{1,2})?)\s*(€|EUR|euros?)'
+    def clean_amount(val):
+        if not val: return None
+        # Remplacement agressif des erreurs d'OCR courantes dans les nombres
+        cleansed = val.replace(" ", "").replace(",", ".")
+        cleansed = cleansed.replace("o", "0").replace("O", "0")
+        cleansed = cleansed.replace("B", "8").replace("S", "5").replace("s", "5")
+        cleansed = cleansed.replace("I", "1").replace("l", "1").replace("Z", "2")
+        # Garder uniquement les chiffres et le point
+        cleansed = "".join([c for c in cleansed if c.isdigit() or c == "."])
+        return cleansed
 
-    match_ttc = re.search(r'(?:TTC|total\s+ttc|total\s+à\s+payer)[^\d]*' + pattern_montant, texte, re.IGNORECASE)
+    # Pattern pour les nombres avec décimales (2 chiffres)
+    pattern_numeric = r'([0-9BBSZloO]+[\s\.,][0-9BBSZloO]{2})(?!\d)'
+    
+    # prioritiser les labels de total (plus specifique pour eviter Total HT)
+    ttc_labels = r'(?:TTC|Net\s+à\s+payer|Net\s+a\s+payer|A\s+payer|Tcial\s+TTC|Total\s+TTC|Total\s+D\?)'
+    
+    match_ttc = re.search(ttc_labels + r'[^0-9BBSZloO]{0,40}' + pattern_numeric, texte, re.IGNORECASE)
     if match_ttc:
-        montants["montant_ttc"] = match_ttc.group(1).replace(" ", "")
+        montants["montant_ttc"] = clean_amount(match_ttc.group(1))
 
-    match_ht = re.search(r'(?:HT|hors\s+taxe)[^\d]*' + pattern_montant, texte, re.IGNORECASE)
+    # HT (plus specifique)
+    match_ht = re.search(r'(?:HT|Hors\s+Taxe|Total\s+HT)[^0-9BBSZloO]{0,40}' + pattern_numeric, texte, re.IGNORECASE)
     if match_ht:
-        montants["montant_ht"] = match_ht.group(1).replace(" ", "")
+        montants["montant_ht"] = clean_amount(match_ht.group(1))
 
-    match_tva = re.search(r'(?:TVA)[^\d]*' + pattern_montant, texte, re.IGNORECASE)
-    if match_tva:
-        montants["tva_montant"] = match_tva.group(1).replace(" ", "")
-
-    match_taux = re.search(PATTERN_TVA_TAUX, texte, re.IGNORECASE)
-    if match_taux:
-        montants["tva_taux"] = match_taux.group(1) + "%"
-
+    # Fallback : si TTC non trouve via label, on prend le plus gros nombre SAUF si c'est deja pris par le HT
     if not montants["montant_ttc"]:
-        match_any = re.search(pattern_montant, texte)
-        if match_any:
-            montants["montant_ttc"] = match_any.group(1).replace(" ", "")
+        all_numeric = re.findall(pattern_numeric, texte)
+        if all_numeric:
+            valid_vals = []
+            for n in all_numeric:
+                try: 
+                    v = float(clean_amount(n))
+                    # Eviter de reprendre le HT si c'est la seule valeur
+                    if str(v) != montants["montant_ht"] and v < 1000000:
+                        valid_vals.append(v)
+                except: continue
+            if valid_vals:
+                montants["montant_ttc"] = str(max(valid_vals))
+            elif montants["montant_ht"]:
+                # Si un seul montant trouve et marque HT, on l'utilise faute de mieux
+                montants["montant_ttc"] = montants["montant_ht"]
 
     return montants
 

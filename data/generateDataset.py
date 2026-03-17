@@ -50,9 +50,9 @@ class Facture :
 
         self.articles = []
         for _ in range(random.randint(1,10)) :
-            article = random.choice(article_descriptions)
+            article = random.choice(ARTICLE_DESCRIPTIONS)
             if random.random()>.2 :
-                article += random.choice(article_connecteurs) + random.choice(article_domaines)
+                article += random.choice(ARTICLE_CONNECTEURS) + random.choice(ARTICLE_DOMAINES)
             prix = round(1/(random.random()*200+1)*1000, 2)
             quantite = random.randint(1,10)
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
@@ -144,10 +144,6 @@ class Personne :
     APE / NAF : {self.ape}
     """)
 
-
-# facture = Facture()
-# facture.generateRandom()
-# facture.display()
 
 liste = []
 for _ in range(100) :

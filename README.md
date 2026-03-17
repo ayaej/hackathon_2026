@@ -1,16 +1,16 @@
 # HACKATHON 2026
 ## GROUPE 28
 
-## Étudiants
+## Équipe
 
-| Étudiant   | Prénom           | Dossiers |
-| ---------- | ---------------- | -------- |
-| ÉTUDIANT 1 | Corentin         |          |
-| ÉTUDIANT 2 | Monica, Danielle |          |
-| ÉTUDIANT 3 | Elliot           | `/backend`  |
-| ÉTUDIANT 4 | Aya              |          |
-| ÉTUDIANT 5 | Sara             |          |
-| ÉTUDIANT 6 | Matis            | `/airflow`  |
+| Nom | Rôle / Focus |
+| --- | --- |
+| Corentin | Génération de données |
+| Monica, Danielle | Module OCR & Extraction |
+| Elliot | Backend |
+| Aya | Intégration |
+| Sara | Validation |
+| Matis | Airflow / Orchestration |
 
 ## Groupes
 
