@@ -108,7 +108,7 @@ with DAG(
     schedule="*/2 * * * *",
     catchup=False,
     default_args={
-        "owner": "m2-orchestration",
+        "owner": "GROUPE 28",
         "retries": 2,
         "retry_delay": timedelta(seconds=30),
     },

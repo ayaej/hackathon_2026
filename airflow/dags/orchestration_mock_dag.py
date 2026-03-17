@@ -2,81 +2,108 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from airflow import DAG
+from airflow.models.taskinstance import TaskInstance
 from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
+from airflow.operators.python import PythonOperator, get_current_context
 
 # chemins des fichiers de simulation dans le conteneur airflow
-# (le dossier simu/ local est monte via docker-compose)
-SIMU_INPUT = Path("/opt/airflow/simu/input/mock_ocr.json")
-SIMU_OUTPUT = Path("/opt/airflow/simu/output/curated_payload.json")
-SIMU_ARCHIVE = Path("/opt/airflow/simu/archive")
+# (le dossier data/ local est monte via docker-compose)
+DATASET_INPUT = Path("/opt/airflow/data/dataset.json")
+DATA_OUTPUT = Path("/opt/airflow/data/output/curated_payload.json")
+DATA_ARCHIVE = Path("/opt/airflow/data/archive")
 
- 
-# simule la lecture du resultat OCR (ETUDIANT 2)
-# xcom_push = mecanisme airflow pour passer une valeur d'une tache a l'autre
-def lire_mock_ocr(**context) -> None:
-    if not SIMU_INPUT.exists():
-        raise FileNotFoundError(f"Fichier de simulation introuvable: {SIMU_INPUT}")
+# charge le dataset mock depuis le fichier JSON et retourne la liste des documents et le chemin source
+def charger_documents_input() -> tuple[list[dict], Path]:
+    chemin_source = DATASET_INPUT
+    if not chemin_source.exists():
+        raise FileNotFoundError(f"Fichier dataset introuvable: {DATASET_INPUT}")
 
-    with SIMU_INPUT.open("r", encoding="utf-8") as fichier:
+    with chemin_source.open("r", encoding="utf-8") as fichier:
         contenu = json.load(fichier)
 
-    # on stocke le contenu dans xcom pour que la tache suivante puisse le lire
-    context["ti"].xcom_push(key="ocr_mock", value=contenu)
-    logging.info("Simulation OCR lue avec succes pour le document %s", contenu.get("document_id"))
+    if isinstance(contenu, dict):
+        documents = [contenu]
+    elif isinstance(contenu, list):
+        documents = [doc for doc in contenu if isinstance(doc, dict)]
+    else:
+        raise ValueError("Le contenu du fichier de simulation doit etre un objet ou une liste JSON")
+
+    if not documents:
+        raise ValueError("Le fichier de simulation est vide ou invalide")
+
+    return documents, chemin_source
+
+
+# simule la lecture OCR batch (ETUDIANT 2) sur tout le dataset
+# xcom_push = mecanisme airflow pour passer une valeur d'une tache a l'autre
+def lire_mock_ocr() -> None:
+    context = get_current_context()
+    ti: TaskInstance = context["ti"]
+    documents, chemin_source = charger_documents_input()
+
+    # on conserve seulement des metadonnees dans xcom pour eviter un payload trop volumineux
+    ti.xcom_push(key="ocr_total", value=len(documents))
+    ti.xcom_push(key="ocr_source", value=str(chemin_source))
+    logging.info("Simulation OCR lue avec succes: %s document(s) depuis %s", len(documents), chemin_source)
 
 
 # construit le payload "curated" : donnees propres et structurees pret a etre envoyes au CRM
 # c'est la zone curated du data lake (Raw > Clean > Curated)
-def construire_curated(**context) -> None:
-    # recupere les donnees posees par la tache precedente via xcom
-    ocr_mock = context["ti"].xcom_pull(task_ids="simuler_ocr", key="ocr_mock")
-    if not ocr_mock:
-        raise ValueError("Aucune donnee OCR mock disponible dans XCom")
+def construire_curated() -> None:
+    context = get_current_context()
+    ti: TaskInstance = context["ti"]
+    documents, _ = charger_documents_input()
 
-    curated = {
-        "document_id": ocr_mock["document_id"],
-        "type_document": ocr_mock.get("type_document"),
-        "fournisseur": ocr_mock.get("fournisseur"),
-        "siret": ocr_mock.get("siret"),
-        "montant_ttc": ocr_mock.get("montant_ttc"),
-        "devise": ocr_mock.get("devise"),
-        "date_facture": ocr_mock.get("date_facture"),
-        # statut et source par l'ETUDIANT 5 (validation)
-        "statut_validation": "valide_mock",
-        "source": "simulation",
-        "date_traitement": datetime.now().isoformat(timespec="seconds") + "Z",
-    }
+    curated: list[dict] = []
+    for document in documents:
+        creancier = document.get("creancier", {}) if isinstance(document.get("creancier"), dict) else {}
 
-    SIMU_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    with SIMU_OUTPUT.open("w", encoding="utf-8") as fichier:
+        curated.append(
+            {
+                "document_id": document.get("document_id"),
+                "type_document": "facture",
+                "fournisseur": creancier.get("nom") or creancier.get("raison_sociale"),
+                "siret": creancier.get("siret"),
+                "montant_ttc": document.get("montant_ttc"),
+                "devise": "EUR",
+                "date_facture": document.get("date_facturation") or document.get("date_facture"),
+                # TODO: statut et source par l'ETUDIANT 5 (validation)
+                "statut_validation": "valide_mock",
+                "source": "simulation_dataset",
+                "date_traitement": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
+        )
+
+    DATA_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    with DATA_OUTPUT.open("w", encoding="utf-8") as fichier:
         json.dump(curated, fichier, ensure_ascii=False, indent=2)
 
-    logging.info("Payload Curated de simulation ecrit dans %s", SIMU_OUTPUT)
+    ti.xcom_push(key="curated_total", value=len(curated))
+    logging.info("Payload Curated de simulation ecrit dans %s (%s document(s))", DATA_OUTPUT, len(curated))
 
 
 # conserve une copie horodatee du payload curated apres chaque run
 # permet de tracer l'historique des executions sans ecraser le fichier precedent
 def archiver_resultat() -> None:
-    SIMU_ARCHIVE.mkdir(parents=True, exist_ok=True)
-    horodatage = datetime.now().strftime("%Y%m%d_%H%M%S")
-    destination = SIMU_ARCHIVE / f"curated_payload_{horodatage}.json"
+    DATA_ARCHIVE.mkdir(parents=True, exist_ok=True)
+    horodatage = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    destination = DATA_ARCHIVE / f"curated_payload_{horodatage}.json"
 
-    if not SIMU_OUTPUT.exists():
-        raise FileNotFoundError(f"Fichier Curated introuvable: {SIMU_OUTPUT}")
+    if not DATA_OUTPUT.exists():
+        raise FileNotFoundError(f"Fichier Curated introuvable: {DATA_OUTPUT}")
 
-    destination.write_text(SIMU_OUTPUT.read_text(encoding="utf-8"), encoding="utf-8")
+    destination.write_text(DATA_OUTPUT.read_text(encoding="utf-8"), encoding="utf-8")
     logging.info("Archive de simulation creee: %s", destination)
 
 
 # schedule=None signifie qu'on le declenche manuellement (pas de cron)
 with DAG(
     dag_id="orchestration_mock_dag",
-    start_date=datetime(2026, 3, 16),
+    start_date=datetime(2026, 3, 17),
     schedule=None,
     catchup=False,
     tags=["mock", "matis"],
