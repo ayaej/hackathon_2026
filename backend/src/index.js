@@ -16,7 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/crm', require('./routes/crm'));
-app.use('/api/conformite', require('./routes/conformite'));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
