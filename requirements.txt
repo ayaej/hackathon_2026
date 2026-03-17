@@ -1,2 +1,11 @@
 faker==40.11.0
 reportlab==4.4.10
+
+easyocr
+spacy
+pandas
+Pillow
+python-docx
+PyPDF2
+pdf2image
+pytesseract
