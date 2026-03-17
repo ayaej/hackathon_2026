@@ -3,6 +3,9 @@ import random
 import datetime
 import json
 
+
+faker = Faker('fr_FR')
+
 class Facture :
     def __init__(self) :
         self._dictkeys = ("document_id", "date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client")
@@ -12,7 +15,6 @@ class Facture :
             yield key, getattr(self, key)
 
     def generateRandom(self) :
-        faker = Faker('fr_FR')
 
         # Génération des dates
         min_date = datetime.date(year=2015, month=1, day=1)
@@ -23,8 +25,8 @@ class Facture :
         self.date_facturation = str(self.date_facturation)
         self.date_echeance = str(self.date_echeance)
         self.date_prestation = str(self.date_prestation)
-
-        self.document_id = f"FA-{self.date_facturation[:4]}-{round(random.random()*1000):04d}"
+        
+        self.document_id = f"FA-{self.date_facturation[:4]}-{random.randint(0, 9999):04d}"
 
         # Génération des montants
         self.montant_ht = round(random.random()*10000, 2)
@@ -64,37 +66,33 @@ class Facture :
 
 class Personne :
     def __init__(self) :
-        self._dictkeys = ["siren","nic","siret","n_tva","nom","prenom","prenom_2","prenom_3","sexe","adresse","code_postal","commune","ape"]
+        self._dictkeys = ("siren","nic","siret","n_tva","nom","prenom","prenom_2","prenom_3","sexe","adresse","code_postal","commune","ape")
 
     def __iter__(self):
         for key in self._dictkeys :
             yield key, getattr(self, key)
 
     def generateRandom(self) :
-        faker = Faker('fr_FR')
 
         # Génération du SIRET (SIREN + NIC)
-        siret = random.random()*1e14
-        siret = f"{round(siret):014d}"
+        siret = random.randint(0, 10**14 - 1)
+        siret = f"{siret:014d}"
         self.siret = siret
         self.siren = siret[:9]
         self.nic = siret[9:]
         self.n_tva = 'FR' + str(round(random.random()*100)) + ' ' + self.siren
 
-        # Génération de la personne
-        nom = faker.name()
-        self.prenom = nom.split(' ')[0]
-        self.prenom_2 = '' if random.random() < .75 else faker.name().split(' ')[0]
-        self.prenom_3 = '' if random.random() < .9 or self.prenom_2 == '' else faker.name().split(' ')[0]
-        self.nom = nom[nom.find(' ')+1:]
-        self.sexe = ['M','F',''][int(3*random.random())]
+        # Génération de la personnes
+        self.prenom = faker.first_name()
+        self.prenom_2 = '' if random.random() < .75 else faker.first_name()
+        self.prenom_3 = '' if random.random() < .9 or self.prenom_2 == '' else faker.first_name()
+        self.nom = faker.last_name()
+        self.sexe = random.choice(['M','F',''])
 
         # Génération de l'adresse
-        adresse = faker.address()
-        adr_endl = adresse.find('\n')
-        self.adresse = adresse[:adr_endl]
-        self.code_postal = adresse[adr_endl+1:adr_endl+adresse[adr_endl+1:].find(' ')+1]
-        self.commune = adresse[adr_endl+adresse[adr_endl+1:].find(' ')+2:]
+        self.adresse = faker.street_address()
+        self.code_postal = faker.postcode()
+        self.commune = faker.city()
 
         # Génération de l'activité
         self.ape = f"{int(random.random()*5700):04d}" + ['A','B','C','D','Z'][int(random.random()*5)]
@@ -130,6 +128,5 @@ for _ in range(100) :
     facture.generateRandom()
     liste.append(dict(facture))
 
-json_list = json.dumps(liste)
-with open("dataset.json", "w") as f:
-    f.write(json_list)
+with open("dataset.json", "w", encoding="utf-8") as f:
+    json.dump(liste, f, ensure_ascii=False, indent=4)
