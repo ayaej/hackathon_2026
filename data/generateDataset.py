@@ -97,7 +97,7 @@ class Facture :
         self.obj_client.display()
         print("# ARTICLES :")
         for article in self.articles :
-            print(f"    - {article['quantite']} {article['nom']} ({article['prix']} €) : {article['quantite']*article['prix']} €")
+            print(f"    - {article['quantite']} {article['nom']} ({article['prix']} €) : {(article['quantite']*article['prix']):.2f} €")
 
 
 class Personne :
