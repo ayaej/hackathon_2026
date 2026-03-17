@@ -22,7 +22,6 @@ def extraire_siret(texte):
             return siret
     return None
 
-
 def extraire_siren(siret):
     if siret and len(siret) == 14:
         return siret[:9]
@@ -37,8 +36,6 @@ def extraire_date(texte):
 def extraire_date_expiration(texte):
     match = re.search(PATTERN_DATE_EXPIRATION, texte, re.IGNORECASE)
     return match.group(1).strip() if match else None
-
-
 
 def extraire_montants(texte):
     montants = {

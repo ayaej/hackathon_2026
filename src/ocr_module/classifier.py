@@ -49,7 +49,6 @@ def classifier_document(texte):
 
     return type_detected
 
-
 def classifier_avec_confiance(texte):
     texte_lower = texte.lower()
     scores = {}

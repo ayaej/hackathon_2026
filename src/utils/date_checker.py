@@ -3,7 +3,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse as date_parse
 
-# Mois en français pour aider le parsing si format texte (ex: "15 mars 2026")
 MOIS_FR = {
     "janvier": "January", "février": "February", "fevrier": "February",
     "mars": "March", "avril": "April", "mai": "May", "juin": "June",
@@ -30,14 +29,8 @@ def standardiser_date(date_str):
 
 
 def verifier_expiration(date_emission_str, date_expiration_str=None, type_document=None):
-    """
-    Vérifie si un document est périmé.
-    - Soit la 'date_expiration_str' est fournie et dépassée à la date du jour.
-    - Soit on applique une règle métier basée sur la date d'émission et le type du document.
-    """
     aujourd_hui = datetime.now()
 
-    # Si on a explicitement une date d'échéance/expiration dans le texte
     if date_expiration_str:
         date_exp_obj = standardiser_date(date_expiration_str)
         if date_exp_obj:
@@ -54,7 +47,6 @@ def verifier_expiration(date_emission_str, date_expiration_str=None, type_docume
                     "expire": False
                 }
 
-    # Sinon, on vérifie via les règles de validité métier sur la date d'émission
     if not date_emission_str:
         return {
             "statut": "inconnu",
@@ -70,13 +62,12 @@ def verifier_expiration(date_emission_str, date_expiration_str=None, type_docume
             "expire": None
         }
 
-    # Règles métier (à ajuster selon les besoins du hackathon)
     if type_document == "devis":
         date_limite = date_em_obj + relativedelta(months=1)
         if aujourd_hui > date_limite:
             return {"statut": "expire", "details": "Devis de plus d'un mois", "expire": True}
         
-    elif type_document == "attestation": # ex: attestation URSSAF
+    elif type_document == "attestation":
         date_limite = date_em_obj + relativedelta(months=6)
         if aujourd_hui > date_limite:
             return {"statut": "expire", "details": "Attestation de plus de 6 mois", "expire": True}
@@ -86,7 +77,6 @@ def verifier_expiration(date_emission_str, date_expiration_str=None, type_docume
         if aujourd_hui > date_limite:
             return {"statut": "expire", "details": "K-bis de plus de 3 mois", "expire": True}
     
-    # Par défaut, valide
     return {
         "statut": "valide",
         "details": f"Date d'émission validee selon type: {type_document}",
@@ -94,7 +84,6 @@ def verifier_expiration(date_emission_str, date_expiration_str=None, type_docume
     }
 
 if __name__ == "__main__":
-    # Test simple
-    print(verifier_expiration("15/01/2026", None, "devis")) # Devrait expirer le 15/02/2026
+    print(verifier_expiration("15/01/2026", None, "devis"))
     print(verifier_expiration("15/05/2026", None, "attestation"))
     print(verifier_expiration("15/01/2026", "25 fevrier 2026", "facture"))
