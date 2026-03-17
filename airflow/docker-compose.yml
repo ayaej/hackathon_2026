@@ -4,12 +4,15 @@ x-airflow-common:
   environment:
     &airflow-common-env
 
-    # LocalExecutor   : le scheduler execute les taches directement, sans worker externe
-    # CeleryExecutor  : le scheduler utilise un pool de workers (Redis)
-    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    # LocalExecutor   : le scheduler execute les taches directement, sans worker externe (pour le mock)
+    # CeleryExecutor  : le scheduler distribue les taches aux workers via redis
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
 
     # connexion a la base Postgres qui stocke l'etat des DAGs et des runs
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: 8
 
     # ne charge pas les DAGs d'exemple fournis par Airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
@@ -37,13 +40,28 @@ x-airflow-common:
     # dossier de simulation locale via les taches mock
     - ../simu:/opt/airflow/simu
 
+    # dataset de test genere localement
+    - ../data:/opt/airflow/data
+
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
+    redis:
+      condition: service_healthy
     postgres:
       condition: service_healthy
 
 services:
+  # broker redis pour celery
+  redis:
+    image: redis:7.2-bookworm
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+
   # BDD Airflow : DAGs, runs, logs metadonnees, XCom
   postgres:
     image: postgres:16
@@ -87,7 +105,7 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
-  # scheduler : detecte les DAG + planifie et execute les taches (LocalExecutor)
+  # scheduler : detecte les DAG + planifie les taches (CeleryExecutor)
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
@@ -97,6 +115,14 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # worker celery : execute les taches distribuees
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
     depends_on:
       airflow-init:
         condition: service_completed_successfully
