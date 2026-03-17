@@ -142,5 +142,5 @@ for i in range(5) :
     doc.build(story)
 
     image = convert_from_path(f"pdf/facture_{i}.pdf")
-    format = random.choice(['jpg','png','pdf'])
+    format = random.choice(['jpeg','png','pdf'])
     image[0].save(f"pdf/facture_image_{i}.{format}", format.capitalize())
