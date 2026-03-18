@@ -72,7 +72,7 @@ for i in range(5) :
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
 
-        rn.seed(seed)
+        if rnc()>.05 : rn.seed(seed)
 
 
         # Génération du PDF
