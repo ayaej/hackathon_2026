@@ -26,7 +26,6 @@ class DocumentValidator:
         self.anomaly = AnomalyDetector()
 
         
-       import logging
 
         try:
             self.anomaly.load()

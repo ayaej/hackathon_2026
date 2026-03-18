@@ -2,7 +2,9 @@ name: hackathon_2026_G28
 
 x-airflow-common:
   &airflow-common
-  image: apache/airflow:2.10.5
+  build:
+    context: ../
+    dockerfile: airflow/Dockerfile
   environment:
     &airflow-common-env
 
@@ -26,7 +28,7 @@ x-airflow-common:
 
     # Active l'authentification basique pour l'API REST Airflow
     AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
-    PYTHONPATH: /opt/airflow/src
+    PYTHONPATH: /opt/airflow/src:/opt/airflow/val
 
     AIRFLOW_UID: ${AIRFLOW_UID:-50000}
   volumes:
@@ -51,6 +53,12 @@ x-airflow-common:
     # modules python OCR/validation du projet
     - ../src:/opt/airflow/src
 
+    # modules de validation ETUDIANT 5 (rules, risk_scoring, anomaly_model)
+    - ../val:/opt/airflow/val
+
+    # fichiers uploades du backend pour OCR reel ETUDIANT 2
+    - ../backend/uploads:/opt/airflow/backend_uploads
+
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
@@ -74,7 +82,7 @@ services:
       retries: 5
       start_period: 10s
 
-  # backend api node/express
+  # backend api node/express (ETUDIANT 3)
   backend:
     build:
       context: ../backend
@@ -87,6 +95,26 @@ services:
       - "5000:5000"
     volumes:
       - ../backend/uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # api data-lake node/express (ETUDIANT 4)
+  datalake:
+    build:
+      context: ../data-lake
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/document_processing_datalake
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_USE_SSL: "false"
+    ports:
+      - "3000:3000"
     depends_on:
       mongo:
         condition: service_healthy
@@ -126,6 +154,8 @@ services:
       - |
         airflow db migrate
         airflow users create --username admin --firstname Matis --lastname Admin --role Admin --email admin@example.com --password admin
+        airflow variables set backend_base_url http://backend:5000
+        airflow variables set datalake_base_url http://datalake:3000
     restart: "no"
 
   # interface web Airflow : http://localhost:8080 (admin-admin)
@@ -166,7 +196,27 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  # minio : stockage objet pour le data-lake (ETUDIANT 4)
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+
 # vol persistant pour la base Postgres (docker compose down --volumes pour delete)
 volumes:
   postgres-db-volume:
   mongo-data:
+  minio-data:
