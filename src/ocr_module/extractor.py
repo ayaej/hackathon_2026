@@ -1,14 +1,20 @@
 import os
 import json
 import easyocr
+import tempfile
 from datetime import datetime
+from PIL import Image, ImageOps, ImageEnhance
+import PyPDF2
+from pdf2image import convert_from_path
+from docx import Document
+from src.ocr_module.parser import extraire_infos_cles
+from src.ocr_module.classifier import classifier_document
 
 reader = easyocr.Reader(['fr'], gpu=False)
 
 
 def pretraiter_image(chemin):
-    from PIL import Image, ImageOps, ImageEnhance
-    
+    """Prétraite l'image pour améliorer l'OCR et retourne le chemin d'un fichier temporaire."""
     with Image.open(chemin) as img:
         # Conversion en niveaux de gris
         img = ImageOps.grayscale(img)
@@ -19,22 +25,26 @@ def pretraiter_image(chemin):
         enhancer = ImageEnhance.Sharpness(img)
         img = enhancer.enhance(2.0)
         
-        tmp_preprocessed = f"preprocessed_{os.path.basename(chemin)}"
-        img.save(tmp_preprocessed)
-        return tmp_preprocessed
+        # Utilisation de tempfile pour un nom unique et sécurisé
+        fd, tmp_path = tempfile.mkstemp(suffix=".png", prefix="preprocessed_")
+        os.close(fd) # On ferme le descripteur, PIL s'occupera d'ouvrir le fichier par son chemin
+        img.save(tmp_path)
+        return tmp_path
 
 
 def lire_image(chemin):
+    """Lit le texte d'une image après prétraitement."""
     tmp = pretraiter_image(chemin)
-    resultats = reader.readtext(tmp, detail=0)
-    if os.path.exists(tmp):
-        os.remove(tmp)
-    return " ".join(resultats)
+    try:
+        resultats = reader.readtext(tmp, detail=0)
+        return " ".join(resultats)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
 
 
 def lire_pdf_numerique(chemin):
-    import PyPDF2
-
+    """Extrait le texte d'un PDF natif (non scanné)."""
     texte = ""
     with open(chemin, "rb") as f:
         lecteur = PyPDF2.PdfReader(f)
@@ -44,32 +54,36 @@ def lire_pdf_numerique(chemin):
 
 
 def lire_pdf_scanne(chemin):
-    from pdf2image import convert_from_path
-
-    poppler_path = os.environ.get("POPPLER_PATH", r"C:\poppler\Library\bin")
-    poppler_path = poppler_path if os.path.isdir(poppler_path) else None
+    """Convertit un PDF scanné en images puis effectue l'OCR sur chaque page."""
+    poppler_path = os.environ.get("POPPLER_PATH", None)
+    if poppler_path and not os.path.isdir(poppler_path):
+        poppler_path = None
 
     pages = convert_from_path(chemin, dpi=300, poppler_path=poppler_path)
-    texte_total = ""
+    texte_total = []
 
-    for i, page in enumerate(pages):
-        tmp = f"_tmp_{i}.png"
-        page.save(tmp, "PNG")
-        texte_total += lire_image(tmp) + "\n"
-        os.remove(tmp)
+    for page in pages:
+        # Utilisation de tempfile pour chaque page
+        fd, tmp_path = tempfile.mkstemp(suffix=".png", prefix="ocr_page_")
+        os.close(fd)
+        try:
+            page.save(tmp_path, "PNG")
+            texte_total.append(lire_image(tmp_path))
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
 
-    return texte_total.strip()
+    return "\n".join(texte_total).strip()
 
 
 def lire_docx(chemin):
-    from docx import Document
-
+    """Extrait le texte d'un fichier DOCX."""
     doc = Document(chemin)
     return "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
 
 
 def extraire_texte(chemin_fichier):
-
+    """Fonction principale d'extraction de texte selon l'extension du fichier."""
     extension = os.path.splitext(chemin_fichier)[1].lower()
 
     if extension in (".jpg", ".jpeg", ".png", ".tiff", ".bmp", ".webp"):
@@ -87,10 +101,9 @@ def extraire_texte(chemin_fichier):
     else:
         raise ValueError(f"Format non supporte : {extension}")
     
-def traiter_json_brut(chemin_json, chemin_sortie):
-    from src.ocr_module.parser import extraire_infos_cles
-    from src.ocr_module.classifier import classifier_document
 
+def traiter_json_brut(chemin_json, chemin_sortie):
+    """Traite un JSON contenant du texte OCR pour extraire les données structurées."""
     if not os.path.exists(chemin_json):
         raise FileNotFoundError(f"Fichier introuvable : {chemin_json}")
 
@@ -126,4 +139,4 @@ def traiter_json_brut(chemin_json, chemin_sortie):
         json.dump(donnees, f, indent=4, ensure_ascii=False)
 
     print(f"Sauvegarde : {chemin_sortie}")
-    return donnees
+    return donnees

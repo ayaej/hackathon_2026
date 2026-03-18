@@ -1,20 +1,25 @@
 import os
 import json
+import logging
 from datetime import datetime
 from src.utils.sirene_checker import detecter_incoherences
 from src.utils.date_checker import verifier_expiration
 
+# Configuration basique du logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 def folder_silver_to_curated(dossier_silver="data/silver/", dossier_curated="data/curated/"):
     if not os.path.exists(dossier_silver):
-        print(f"[ERROR] Dossier silver introuvable: {dossier_silver}")
+        logger.error(f"Dossier silver introuvable: {dossier_silver}")
         return
 
     os.makedirs(dossier_curated, exist_ok=True)
     fichiers = [f for f in os.listdir(dossier_silver) if f.endswith('.json')]
 
     if not fichiers:
-        print(f"[WARNING] Aucun fichier JSON trouve dans {dossier_silver}")
+        logger.warning(f"Aucun fichier JSON trouve dans {dossier_silver}")
         return
 
     resultats = []
@@ -23,7 +28,7 @@ def folder_silver_to_curated(dossier_silver="data/silver/", dossier_curated="dat
         chemin_entree = os.path.join(dossier_silver, fichier)
         chemin_sortie = os.path.join(dossier_curated, fichier)
 
-        print(f"Processing: {fichier}")
+        logger.info(f"Processing: {fichier}")
         try:
             with open(chemin_entree, "r", encoding="utf-8") as f:
                 donnees = json.load(f)
@@ -68,7 +73,7 @@ def folder_silver_to_curated(dossier_silver="data/silver/", dossier_curated="dat
             resultats.append(donnees)
 
         except Exception as e:
-            print(f"Erreur lors du traitement de {fichier} : {e}")
+            logger.error(f"Erreur lors du traitement de {fichier} : {e}")
 
     return resultats
 

@@ -21,19 +21,43 @@ PATTERN_IBAN = r'\bFR\d{2}[\s\d]{23,30}\b'
 PATTERN_DATE_EXPIRATION = r'(?:échéance|echeance|valable jusqu\'au|expiration|expire le|date limite|fin de validité)[^\d]*(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})'
 
 
-def nettoyer_siret(valeur):
-    return re.sub(r'[\s\-]', '', valeur)
-
-
 def extraire_siret(texte):
-    matches = re.finditer(PATTERN_SIRET, texte)
+    """
+    Extrait les numéros de SIRET valides et tente d'identifier 
+    le SIRET de l'émetteur via des indices contextuels.
+    """
+    matches = list(re.finditer(PATTERN_SIRET, texte))
+    candidats = []
+    
     for match in matches:
         siret = nettoyer_siret(match.group())
         if len(siret) == 14 and luhn_check(siret):
-            return siret
-    return None
+            # Recherche de contexte autour du match (50 caractères avant)
+            start = max(0, match.start() - 50)
+            contexte = texte[start:match.start()].lower()
+            
+            score = 0
+            if any(k in contexte for k in ["siret", "pdt", "vendeur", "fournisseur", "emetteur"]):
+                score += 2
+            if any(k in contexte for k in ["client", "destinataire", "facturé à", "facture a"]):
+                score -= 1 # Probablement le SIRET du client
+                
+            candidats.append({"valeur": siret, "score": score})
+
+    if not candidats:
+        return {"primaire": None, "tous": []}
+
+    # Trier par score décroissant
+    candidats.sort(key=lambda x: x["score"], reverse=True)
+    return {
+        "primaire": candidats[0]["valeur"],
+        "tous": [c["valeur"] for c in candidats]
+    }
 
 def extraire_siren(siret):
+    """Extrait le SIREN (9 premiers chiffres) d'un SIRET."""
+    if isinstance(siret, dict):
+        siret = siret.get("primaire")
     if siret and len(siret) == 14:
         return siret[:9]
     return None
@@ -130,12 +154,14 @@ def extraire_fournisseur_spacy(texte):
 
 
 def extraire_infos_cles(texte):
-    siret = extraire_siret(texte)
+    res_siret = extraire_siret(texte)
+    siret_primaire = res_siret["primaire"]
 
     return {
         "extraction": {
-            "siret": siret,
-            "siren": extraire_siren(siret),
+            "siret": siret_primaire,
+            "sirets_trouves": res_siret["tous"],
+            "siren": extraire_siren(siret_primaire),
             "numero_document": extraire_numero_document(texte),
             "date": extraire_date(texte),
             "date_expiration": extraire_date_expiration(texte),

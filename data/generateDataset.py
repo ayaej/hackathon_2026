@@ -1,8 +1,7 @@
-from faker import Faker
 import random
 import datetime
 import json
-
+from faker import Faker
 
 faker = Faker('fr_FR')
 
@@ -24,9 +23,6 @@ ARTICLE_DOMAINES = [
     " RH", " communication", " administration",
     " sécurité", " cloud", " data", " réseau"
 ]
-
-
-
 
 class Facture :
     def __init__(self) :
@@ -147,11 +143,18 @@ class Personne :
     """)
 
 
-liste = []
-for _ in range(100) :
-    facture = Facture()
-    facture.generateRandom()
-    liste.append(dict(facture))
+def generate_dataset(nb_factures=100, output_file="dataset.json"):
+    """Génère un dataset de factures aléatoires et le sauvegarde en JSON."""
+    liste = []
+    for _ in range(nb_factures):
+        facture = Facture()
+        facture.generateRandom()
+        liste.append(dict(facture))
 
-with open("dataset.json", "w", encoding="utf-8") as f:
-    json.dump(liste, f, ensure_ascii=False, indent=4)
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(liste, f, ensure_ascii=False, indent=4)
+    print(f"[INFO] Dataset de {nb_factures} factures généré dans {output_file}")
+
+
+if __name__ == "__main__":
+    generate_dataset()

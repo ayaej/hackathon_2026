@@ -1,5 +1,6 @@
 import os
 import json
+import textwrap
 
 def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
     
@@ -18,22 +19,22 @@ def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
         
         crea = facture.get("creancier", {})
         
-        texte_ocr = f"""
-        FACTURE N° {doc_id}
-        Date de facturation : {facture.get("date_facturation")}
-        Echéance : {facture.get("date_echeance")}
-        
-        EMETTEUR :
-        {crea.get("nom", "")} {crea.get("prenom", "")}
-        SIRET : {crea.get("siret", "")}
-        TVA : {crea.get("n_tva", "")}
-        Adresse : {crea.get("adresse", "")}, {crea.get("code_postal", "")} {crea.get("commune", "")}
-        
-        MONTANTS :
-        Total HT : {facture.get("montant_ht")} €
-        TVA : {facture.get("tva")} €
-        Total TTC : {facture.get("montant_ttc")} €
-        """
+        texte_ocr = textwrap.dedent(f"""\
+            FACTURE N° {doc_id}
+            Date de facturation : {facture.get("date_facturation")}
+            Echéance : {facture.get("date_echeance")}
+            
+            EMETTEUR :
+            {crea.get("nom", "")} {crea.get("prenom", "")}
+            SIRET : {crea.get("siret", "")}
+            TVA : {crea.get("n_tva", "")}
+            Adresse : {crea.get("adresse", "")}, {crea.get("code_postal", "")} {crea.get("commune", "")}
+            
+            MONTANTS :
+            Total HT : {facture.get("montant_ht")} €
+            TVA : {facture.get("tva")} €
+            Total TTC : {facture.get("montant_ttc")} €
+        """)
         
         json_a_sauvegarder = {
             "document_id": doc_id,

@@ -38,7 +38,7 @@ def check_expiration(date_exp):
         today = datetime.utcnow().date()
         expiration = datetime.strptime(date_exp, "%Y-%m-%d").date()
         return expiration > today
-    except Exception:
+    except (ValueError, TypeError):
         return False
 
 

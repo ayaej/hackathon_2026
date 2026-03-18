@@ -1,19 +1,25 @@
 import os
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
 import json
 import sys
-import os
+
+# Ajout du root au PYTHONPATH pour permettre les imports
 sys.path.insert(0, ".")
 
+# Configuration de l'environnement
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+from data.generateDataset import generate_dataset
+from data.generatePDF import generate_pdfs
 from src.ocr_module.extractor import traiter_json_brut
 from src.data_lake_pipeline import folder_silver_to_curated
 from src.mapper_dataset import prepare_raw_dataset
 
 print("[INFO] Generation des donnees...")
-os.system("python data/generateDataset.py")
+generate_dataset(nb_factures=100, output_file="dataset.json")
+
 print("[INFO] Generation des PDFs...")
-os.system("python data/generatePDF.py")
+generate_pdfs(input_file="dataset.json", output_dir="pdf", limit=5)
+
 print("[INFO] Fichiers generes.")
 
 print("[INFO] Mapping data vers format Raw...")

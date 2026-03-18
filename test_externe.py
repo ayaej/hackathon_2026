@@ -7,7 +7,7 @@ from src.ocr_module.parser import extraire_infos_cles
 from src.ocr_module.classifier import classifier_document
 
 # Configuration du fichier source
-chemin_fichier = r"C:\Users\Pc\Desktop\IPSSI\pdf\facture_image_3.pdf"    
+chemin_fichier = os.path.join("pdf", "facture_3.pdf") if os.path.exists(os.path.join("pdf", "facture_3.pdf")) else "pdf/facture_3.pdf"
 
 # Extraction du texte brut
 print(f"Extraction : {chemin_fichier}...")

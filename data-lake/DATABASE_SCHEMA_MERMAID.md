@@ -1,4 +1,4 @@
-<!-- filepath: c:\Users\pc\Documents\ipssi\hackathon\data-lake\DATABASE_SCHEMA_MERMAID.md -->
+# Project Database Schema
 
 # 📊 SCHÉMA BASE DE DONNÉES - DIAGRAMMES MERMAID
 

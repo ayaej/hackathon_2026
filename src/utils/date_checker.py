@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from dateutil.parser import parse as date_parse
+from dateutil.parser import parse as date_parse, ParserError
 
 MOIS_FR = {
     "janvier": "January", "février": "February", "fevrier": "February",
@@ -24,7 +24,7 @@ def standardiser_date(date_str):
         else:
             date_obj = date_parse(date_lower)
         return date_obj
-    except Exception:
+    except (ParserError, ValueError, TypeError):
         return None
 
 
