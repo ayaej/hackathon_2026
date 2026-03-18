@@ -100,7 +100,7 @@ for i in range(5) :
             titleStyle = ParagraphStyle(name="doc_title", fontSize=rni(10,15),
                                         alignment=rnc(['TA_LEFT', 'TA_CENTER', 'TA_CENTRE']),
                                         fontName=rnc(['Helvetica','Helvetica-Bold']))
-            story.append(Paragraph(f"{doctype.upper()}", style=titleStyle))
+            story.append(Paragraph(f"{doctype.upper()}", style=styles["Title"]))
             story.append(Spacer(1, rni(6,18)))
         else :
             reference_document = f"{doctype.capitalize()} {reference_document}"
