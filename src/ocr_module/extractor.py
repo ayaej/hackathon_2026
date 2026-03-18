@@ -14,7 +14,10 @@ reader = easyocr.Reader(['fr'], gpu=False)
 
 
 def pretraiter_image(chemin):
-    """Prétraite l'image pour améliorer l'OCR et retourne le chemin d'un fichier temporaire."""
+    """Prétraite l'image pour améliorer l'OCR.
+
+    Retourne le chemin d'un fichier temporaire.
+    """
     with Image.open(chemin) as img:
         # Conversion en niveaux de gris
         img = ImageOps.grayscale(img)
@@ -24,10 +27,10 @@ def pretraiter_image(chemin):
         # Augmentation de la netteté
         enhancer = ImageEnhance.Sharpness(img)
         img = enhancer.enhance(2.0)
-        
+
         # Utilisation de tempfile pour un nom unique et sécurisé
         fd, tmp_path = tempfile.mkstemp(suffix=".png", prefix="preprocessed_")
-        os.close(fd) # On ferme le descripteur, PIL s'occupera d'ouvrir le fichier par son chemin
+        os.close(fd)  # Ferme le descripteur, PIL l'ouvre via son chemin
         img.save(tmp_path)
         return tmp_path
 
@@ -54,7 +57,7 @@ def lire_pdf_numerique(chemin):
 
 
 def lire_pdf_scanne(chemin):
-    """Convertit un PDF scanné en images puis effectue l'OCR sur chaque page."""
+    """Convertit un PDF scanné en images, puis OCR chaque page."""
     poppler_path = os.environ.get("POPPLER_PATH", None)
     if poppler_path and not os.path.isdir(poppler_path):
         poppler_path = None
@@ -83,7 +86,7 @@ def lire_docx(chemin):
 
 
 def extraire_texte(chemin_fichier):
-    """Fonction principale d'extraction de texte selon l'extension du fichier."""
+    """Extraction de texte selon l'extension du fichier."""
     extension = os.path.splitext(chemin_fichier)[1].lower()
 
     if extension in (".jpg", ".jpeg", ".png", ".tiff", ".bmp", ".webp"):
@@ -100,10 +103,10 @@ def extraire_texte(chemin_fichier):
 
     else:
         raise ValueError(f"Format non supporte : {extension}")
-    
+
 
 def traiter_json_brut(chemin_json, chemin_sortie):
-    """Traite un JSON contenant du texte OCR pour extraire les données structurées."""
+    """Traite un JSON OCR pour extraire les données structurées."""
     if not os.path.exists(chemin_json):
         raise FileNotFoundError(f"Fichier introuvable : {chemin_json}")
 
@@ -112,14 +115,18 @@ def traiter_json_brut(chemin_json, chemin_sortie):
 
     texte = entree.get("texte_ocr", "")
     if not texte:
-        raise ValueError("Le champ 'texte_ocr' est absent ou vide dans le JSON.")
+        raise ValueError(
+            "Le champ 'texte_ocr' est absent ou vide dans le JSON."
+        )
 
     print(f"Traitement JSON : {chemin_json}")
 
     donnees = extraire_infos_cles(texte)
 
     champs_fournis = {k: v for k, v in entree.items() if k != "texte_ocr"}
-    donnees["extraction"].update({k: v for k, v in champs_fournis.items() if v is not None})
+    donnees["extraction"].update(
+        {k: v for k, v in champs_fournis.items() if v is not None}
+    )
 
     type_doc = entree.get("type_document") or classifier_document(texte)
 
@@ -139,4 +146,4 @@ def traiter_json_brut(chemin_json, chemin_sortie):
         json.dump(donnees, f, indent=4, ensure_ascii=False)
 
     print(f"Sauvegarde : {chemin_sortie}")
-    return donnees
+    return donnees

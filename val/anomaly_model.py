@@ -1,33 +1,30 @@
-import pandas as pd
-from sklearn.ensemble import IsolationForest
-import joblib
-
-
 class AnomalyDetector:
+    """Détecteur d'anomalies basé sur des seuils métier."""
 
-    def __init__(self):
-
-        self.model = IsolationForest(contamination=0.05)
-
-
-    def train(self,data):
-
-        features = data[["montant_ht","montant_ttc"]]
-
-        self.model.fit(features)
-
-        joblib.dump(self.model,"anomaly_model.pkl")
-
+    def train(self, data):
+        """Aucun entraînement requis, détection par seuils."""
+        pass
 
     def load(self):
+        """Aucune persistance requise."""
+        pass
 
-        self.model = joblib.load("anomaly_model.pkl")
+    def predict(self, ht, ttc):
+        """Retourne True si le document présente une anomalie."""
+        try:
+            ht = float(ht)
+            ttc = float(ttc)
+        except (TypeError, ValueError):
+            return False
 
+        if ht <= 0 or ttc <= 0:
+            return True
 
-    def predict(self,ht,ttc):
+        if ht > 100000 or ttc > 120000:
+            return True
 
-        df = pd.DataFrame([[ht,ttc]],columns=["montant_ht","montant_ttc"])
+        taux_tva = (ttc - ht) / ht
+        if taux_tva < 0 or taux_tva > 0.5:
+            return True
 
-        prediction = self.model.predict(df)
-
-        return prediction[0] == -1
+        return False

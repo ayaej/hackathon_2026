@@ -6,8 +6,14 @@ from src.ocr_module.parser import extraire_infos_cles
 from src.ocr_module.classifier import classifier_document
 from src.ocr_module.evaluator import evaluate_global
 
-def process_all(input_folder=config.RAW_DIR, output_folder=config.SILVER_DIR):
-    """Traite tous les documents OCR d'un dossier et sauvegarde les résultats."""
+
+def process_all(
+    input_folder=config.RAW_DIR, output_folder=config.SILVER_DIR
+):
+    """Traite tous les documents OCR d'un dossier.
+
+    Sauvegarde les résultats dans le dossier de sortie.
+    """
     if not os.path.exists(input_folder):
         print(f"[ERROR] Dossier d'entrée {input_folder} introuvable.")
         return
@@ -17,7 +23,9 @@ def process_all(input_folder=config.RAW_DIR, output_folder=config.SILVER_DIR):
 
     for filename in os.listdir(input_folder):
         path = os.path.join(input_folder, filename)
-        if not os.path.isfile(path) or not filename.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+        if not os.path.isfile(path) or not filename.lower().endswith(
+            ('.pdf', '.jpg', '.jpeg', '.png')
+        ):
             continue
 
         print("Processing:", filename)
@@ -28,7 +36,7 @@ def process_all(input_folder=config.RAW_DIR, output_folder=config.SILVER_DIR):
 
         evaluation = evaluate_global(
             texte_ocr=texte,
-            texte_reference=texte, 
+            texte_reference=texte,
             data={
                 "siret": extraction.get("siret"),
                 "tva": extraction.get("tva_taux"),
@@ -50,6 +58,7 @@ def process_all(input_folder=config.RAW_DIR, output_folder=config.SILVER_DIR):
         json.dump(results, f, indent=4, ensure_ascii=False)
 
     print(f"DONE → {output_path}")
+
 
 if __name__ == "__main__":
     process_all()

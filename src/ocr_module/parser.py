@@ -1,5 +1,5 @@
 import re
-import os
+
 
 def luhn_check(number):
     """Vérifie un numéro via l'algorithme de Luhn."""
@@ -13,46 +13,67 @@ def luhn_check(number):
         checksum += sum(divmod(d * 2, 10))
     return checksum % 10 == 0
 
+
 PATTERN_SIRET = r'\b(\d{3}[\s\-]?\d{3}[\s\-]?\d{3}[\s\-]?\d{5}|\d{14})\b'
-PATTERN_DATE = r'\b(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})\b'
+PATTERN_DATE = (
+    r'\b(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}'
+    r'|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}'
+    r'|\d{1,2}\s+\w+\s+\d{4})\b'
+)
 PATTERN_NUMERO_DOC = r'\b([A-Z]{2,5}[\-_]?\d{4}[\-_]?\d{2,6})\b'
 PATTERN_TVA_TAUX = r'\bTVA\s*:?\s*(\d{1,2}(?:[,\.]\d{1,2})?)\s*%'
 PATTERN_IBAN = r'\bFR\d{2}[\s\d]{23,30}\b'
-PATTERN_DATE_EXPIRATION = r'(?:échéance|echeance|valable jusqu\'au|expiration|expire le|date limite|fin de validité)[^\d]*(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})'
+PATTERN_DATE_EXPIRATION = (
+    r"(?:ech\u00e9ance|echeance|valable jusqu\'au"
+    r"|expiration|expire le|date limite|fin de validit\u00e9)"
+    r'[^\d]*(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}'
+    r'|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}'
+    r'|\d{1,2}\s+\w+\s+\d{4})'
+)
+
+
+def nettoyer_siret(valeur):
+    """Supprime espaces et tirets d'un SIRET brut."""
+    return re.sub(r'[\s\-]', '', valeur)
 
 
 def extraire_siret(texte):
     """
-    Extrait les numéros de SIRET valides et tente d'identifier 
+    Extrait les numéros de SIRET valides et identifie
     le SIRET de l'émetteur via des indices contextuels.
     """
     matches = list(re.finditer(PATTERN_SIRET, texte))
     candidats = []
-    
+
     for match in matches:
         siret = nettoyer_siret(match.group())
         if len(siret) == 14 and luhn_check(siret):
-            # Recherche de contexte autour du match (50 caractères avant)
             start = max(0, match.start() - 50)
             contexte = texte[start:match.start()].lower()
-            
+
             score = 0
-            if any(k in contexte for k in ["siret", "pdt", "vendeur", "fournisseur", "emetteur"]):
+            mots_emetteur = [
+                "siret", "pdt", "vendeur", "fournisseur", "emetteur"
+            ]
+            mots_client = [
+                "client", "destinataire", "facturé à", "facture a"
+            ]
+            if any(k in contexte for k in mots_emetteur):
                 score += 2
-            if any(k in contexte for k in ["client", "destinataire", "facturé à", "facture a"]):
-                score -= 1 # Probablement le SIRET du client
-                
+            if any(k in contexte for k in mots_client):
+                score -= 1  # Probablement le SIRET du client
+
             candidats.append({"valeur": siret, "score": score})
 
     if not candidats:
         return {"primaire": None, "tous": []}
 
-    # Trier par score décroissant
     candidats.sort(key=lambda x: x["score"], reverse=True)
     return {
         "primaire": candidats[0]["valeur"],
         "tous": [c["valeur"] for c in candidats]
     }
+
 
 def extraire_siren(siret):
     """Extrait le SIREN (9 premiers chiffres) d'un SIRET."""
@@ -72,6 +93,7 @@ def extraire_date_expiration(texte):
     match = re.search(PATTERN_DATE_EXPIRATION, texte, re.IGNORECASE)
     return match.group(1).strip() if match else None
 
+
 def extraire_montants(texte):
     montants = {
         "montant_ttc": None,
@@ -81,47 +103,57 @@ def extraire_montants(texte):
     }
 
     def clean_amount(val):
-        if not val: return None
-        # Remplacement agressif des erreurs d'OCR courantes dans les nombres
+        if not val:
+            return None
         cleansed = val.replace(" ", "").replace(",", ".")
         cleansed = cleansed.replace("o", "0").replace("O", "0")
-        cleansed = cleansed.replace("B", "8").replace("S", "5").replace("s", "5")
-        cleansed = cleansed.replace("I", "1").replace("l", "1").replace("Z", "2")
-        # Garder uniquement les chiffres et le point
+        cleansed = (
+            cleansed.replace("B", "8").replace("S", "5").replace("s", "5")
+        )
+        cleansed = (
+            cleansed.replace("I", "1").replace("l", "1").replace("Z", "2")
+        )
         cleansed = "".join([c for c in cleansed if c.isdigit() or c == "."])
         return cleansed
 
-    # Pattern pour les nombres avec décimales (2 chiffres)
     pattern_numeric = r'([0-9BBSZloO]+[\s\.,][0-9BBSZloO]{2})(?!\d)'
-    
-    # prioritiser les labels de total (plus specifique pour eviter Total HT)
-    ttc_labels = r'(?:TTC|Net\s+à\s+payer|Net\s+a\s+payer|A\s+payer|Tcial\s+TTC|Total\s+TTC|Total\s+D\?)'
-    
-    match_ttc = re.search(ttc_labels + r'[^0-9BBSZloO]{0,40}' + pattern_numeric, texte, re.IGNORECASE)
+
+    ttc_labels = (
+        r'(?:TTC|Net\s+à\s+payer|Net\s+a\s+payer'
+        r'|A\s+payer|Tcial\s+TTC|Total\s+TTC|Total\s+D\?)'
+    )
+
+    match_ttc = re.search(
+        ttc_labels + r'[^0-9BBSZloO]{0,40}' + pattern_numeric,
+        texte, re.IGNORECASE
+    )
     if match_ttc:
         montants["montant_ttc"] = clean_amount(match_ttc.group(1))
 
     # HT (plus specifique)
-    match_ht = re.search(r'(?:HT|Hors\s+Taxe|Total\s+HT)[^0-9BBSZloO]{0,40}' + pattern_numeric, texte, re.IGNORECASE)
+    match_ht = re.search(
+        r'(?:HT|Hors\s+Taxe|Total\s+HT)[^0-9BBSZloO]{0,40}'
+        + pattern_numeric,
+        texte, re.IGNORECASE
+    )
     if match_ht:
         montants["montant_ht"] = clean_amount(match_ht.group(1))
 
-    # Fallback : si TTC non trouve via label, on prend le plus gros nombre SAUF si c'est deja pris par le HT
+    # Fallback : si TTC non trouvé, on prend le plus gros nombre
     if not montants["montant_ttc"]:
         all_numeric = re.findall(pattern_numeric, texte)
         if all_numeric:
             valid_vals = []
             for n in all_numeric:
-                try: 
+                try:
                     v = float(clean_amount(n))
-                    # Eviter de reprendre le HT si c'est la seule valeur
                     if str(v) != montants["montant_ht"] and v < 1000000:
                         valid_vals.append(v)
-                except: continue
+                except (TypeError, ValueError):
+                    continue
             if valid_vals:
                 montants["montant_ttc"] = str(max(valid_vals))
             elif montants["montant_ht"]:
-                # Si un seul montant trouve et marque HT, on l'utilise faute de mieux
                 montants["montant_ttc"] = montants["montant_ht"]
 
     return montants
@@ -137,19 +169,16 @@ def extraire_iban(texte):
     return re.sub(r'\s', '', match.group()) if match else None
 
 
-def extraire_fournisseur_spacy(texte):
-    try:
-        import spacy
-        try:
-            nlp = spacy.load("fr_core_news_sm")
-        except OSError:
-            return None
-        doc = nlp(texte[:1000])
-        for entite in doc.ents:
-            if entite.label_ == "ORG":
-                return entite.text
-    except ImportError:
-        pass
+def extraire_fournisseur(texte):
+    """Extrait le nom du fournisseur via des indices contextuels."""
+    patterns = [
+        r'(?:emetteur|fournisseur|vendeur)\s*[:\-]?\s*([A-Z][^\n]{2,60})',
+        r'(?:SARL|SAS|SA|EURL|EI|SCI)\s+([A-Z][^\n]{2,50})',
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, texte, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
     return None
 
 
@@ -165,7 +194,7 @@ def extraire_infos_cles(texte):
             "numero_document": extraire_numero_document(texte),
             "date": extraire_date(texte),
             "date_expiration": extraire_date_expiration(texte),
-            "fournisseur": extraire_fournisseur_spacy(texte),
+            "fournisseur": extraire_fournisseur(texte),
             "iban": extraire_iban(texte),
             **extraire_montants(texte)
         },

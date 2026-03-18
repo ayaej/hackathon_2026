@@ -7,7 +7,7 @@ from rules import (
 )
 
 from anomaly_model import AnomalyDetector
-from risk_scoring import compute_risk,severity_level
+from risk_scoring import compute_risk, severity_level
 
 from datetime import datetime
 import logging
@@ -24,14 +24,9 @@ class DocumentValidator:
 
     def __init__(self):
         self.anomaly = AnomalyDetector()
+        self.anomaly.load()
 
-        try:
-            self.anomaly.load()
-        except FileNotFoundError:
-            logging.warning("Could not load anomaly model. Anomaly detection disabled.")
-            self.anomaly = None
-
-    def validate(self,facture,attestation):
+    def validate(self, facture, attestation):
 
         logging.info("Validation started")
 
@@ -40,7 +35,7 @@ class DocumentValidator:
         if not check_siret_format(facture["siret"]):
             errors.append("Format SIRET invalide")
 
-        if not check_siret(facture["siret"],attestation["siret"]):
+        if not check_siret(facture["siret"], attestation["siret"]):
             errors.append("SIRET mismatch")
 
         if not check_tva(
@@ -78,17 +73,11 @@ class DocumentValidator:
         status = "valid" if len(errors) == 0 else "invalid"
 
         report = {
-
-            "status":status,
-
-            "risk_score":risk_score,
-
-            "severity":severity,
-
-            "errors":errors,
-
-            "timestamp":str(datetime.now())
-
+            "status": status,
+            "risk_score": risk_score,
+            "severity": severity,
+            "errors": errors,
+            "timestamp": str(datetime.now())
         }
 
         logging.info(f"Validation result: {report}")
