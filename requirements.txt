@@ -14,4 +14,4 @@ Pillow
 python-docx
 PyPDF2
 pdf2image
-pytesseract
+

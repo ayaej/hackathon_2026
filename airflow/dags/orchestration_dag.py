@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from urllib import error, parse, request
@@ -11,9 +12,27 @@ from airflow.models import Variable
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
 
-# url de base du backend node/express (etudiant 3)
+<<<<<<< matis
+# /opt/airflow/src/ocr_module/classifier.py - ETUDIANT 2 (ocr - classification documents)
+from ocr_module.classifier import classifier_document
+=======
+# url de base du backend node/express
 DEFAULT_BACKEND_BASE_URL = "http://host.docker.internal:5000"
+>>>>>>> dev
 
+# /opt/airflow/src/ocr_module/parser.py - ETUDIANT 2 (ocr - extraction infos cles)
+from ocr_module.parser import extraire_infos_cles
+
+
+########################################################################################
+
+
+# url de base du backend node/express (ETUDIANT 3)
+# dans docker compose, le backend est joignable via son nom de service
+DEFAULT_BACKEND_BASE_URL = "http://backend:5000"
+
+
+########################################################################################
 
 def _get_backend_base_url() -> str:
     # airflow variable optionnelle pour eviter de modifier le code selon les environnements
@@ -39,6 +58,43 @@ def _http_json(method: str, url: str, payload: dict[str, Any] | None = None, tim
         raise RuntimeError(f"Erreur HTTP {exc.code} sur {url}: {details}") from exc
     except error.URLError as exc:
         raise RuntimeError(f"Erreur reseau sur {url}: {exc.reason}") from exc
+
+
+def _to_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        normalized = value.replace(" ", "").replace("€", "").replace("EUR", "").replace(",", ".")
+        try:
+            return float(normalized)
+        except ValueError:
+            return None
+    return None
+
+
+def _charger_outils_ocr() -> tuple[Any, Any] | tuple[None, None]:
+    if classifier_document is None or extraire_infos_cles is None:
+        logging.warning("outils OCR indisponibles dans le conteneur Airflow")
+        return None, None
+    return classifier_document, extraire_infos_cles
+
+
+def _extraire_depuis_texte(texte: str) -> dict[str, Any]:
+    siret_match = re.search(r"\\b\\d{14}\\b", texte)
+    date_match = re.search(r"\\b\\d{1,2}[\\-/\\.]\\d{1,2}[\\-/\\.]\\d{2,4}\\b", texte)
+    montant_match = re.search(r"(\\d[\\d\\s]*([,\\.]\\d{1,2})?)\\s*(€|EUR|euros?)", texte, re.IGNORECASE)
+
+    return {
+        "siret": siret_match.group(0) if siret_match else None,
+        "numero_document": None,
+        "date": date_match.group(0) if date_match else None,
+        "fournisseur": None,
+        "montant_ht": None,
+        "montant_ttc": montant_match.group(1).replace(" ", "") if montant_match else None,
+        "tva_taux": None,
+    }
 
 
 def recuperer_documents_en_attente(**context) -> None:
@@ -76,6 +132,158 @@ def recuperer_documents_en_attente(**context) -> None:
 
     context["ti"].xcom_push(key="documents_ids", value=documents_ids)
     logging.info("documents detectes en statut uploaded: %s (pages lues: %s)", len(documents_ids), pages_lues)
+
+
+def extraire_ocr_documents(**context) -> None:
+    base_url = _get_backend_base_url()
+    ti = context["ti"]
+    documents_ids: list[str] = ti.xcom_pull(task_ids="recuperer_documents_en_attente", key="documents_ids") or []
+
+    if not documents_ids:
+        logging.info("aucun document a extraire")
+        ti.xcom_push(key="curated_payload", value=[])
+        return
+
+    classifier_document, extraire_infos_cles = _charger_outils_ocr()
+    curated_payload: list[dict[str, Any]] = []
+
+    for document_id in documents_ids:
+        detail = _http_json("GET", f"{base_url}/api/documents/{document_id}")
+        document = detail.get("data", {}) if isinstance(detail, dict) else {}
+        if not isinstance(document, dict):
+            logging.warning("document %s ignore: format detail invalide", document_id)
+            continue
+
+        notes = document.get("notes") or ""
+        original_name = document.get("originalName") or ""
+        texte_source = " ".join([str(notes), str(original_name)]).strip()
+
+        if extraire_infos_cles and texte_source:
+            parsed = extraire_infos_cles(texte_source)
+            extraction = parsed.get("extraction", {}) if isinstance(parsed, dict) else {}
+        else:
+            extraction = _extraire_depuis_texte(texte_source)
+
+        type_document = document.get("type") or "inconnu"
+        if classifier_document and texte_source:
+            type_document = classifier_document(texte_source)
+
+        extracted_data = {
+            "siret": extraction.get("siret"),
+            "fournisseur": extraction.get("fournisseur"),
+            "numeroDocument": extraction.get("numero_document"),
+            "montantHT": _to_float(extraction.get("montant_ht")),
+            "montantTTC": _to_float(extraction.get("montant_ttc")),
+            "tva": extraction.get("tva_taux"),
+        }
+
+        patch_payload = {
+            "type": type_document,
+            "extractedData": extracted_data,
+            "storage": {
+                "rawPath": f"uploads/{document.get('filename') or ''}",
+                "cleanPath": f"clean/{document_id}.json",
+                "curatedPath": f"curated/{document_id}.json",
+            },
+        }
+        _http_json("PATCH", f"{base_url}/api/documents/{document_id}/status", patch_payload)
+
+        curated_payload.append(
+            {
+                "document_id": document_id,
+                "type_document": type_document,
+                "fournisseur": extracted_data.get("fournisseur"),
+                "siret": extracted_data.get("siret"),
+                "montant_ttc": extracted_data.get("montantTTC"),
+                "devise": "EUR",
+                "date_facture": extraction.get("date"),
+                "source": "backend_api",
+                "date_traitement": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
+        )
+
+    ti.xcom_push(key="curated_payload", value=curated_payload)
+    logging.info("documents OCR/extraction traites: %s", len(curated_payload))
+
+
+def valider_documents_curated(**context) -> None:
+    base_url = _get_backend_base_url()
+    ti = context["ti"]
+    curated_payload: list[dict[str, Any]] = ti.xcom_pull(task_ids="extraire_ocr", key="curated_payload") or []
+
+    if not curated_payload:
+        logging.info("aucun document curated a valider")
+        ti.xcom_push(key="curated_validated", value=[])
+        return
+
+    curated_validated: list[dict[str, Any]] = []
+    for item in curated_payload:
+        document_id = item.get("document_id")
+        siret = item.get("siret")
+        anomalies: list[dict[str, str]] = []
+
+        if not siret:
+            anomalies.append({"type": "missing_siret", "description": "SIRET absent", "severity": "high"})
+        elif not str(siret).isdigit() or len(str(siret)) != 14:
+            anomalies.append({"type": "invalid_siret", "description": "Format SIRET invalide", "severity": "medium"})
+
+        is_valid = len(anomalies) == 0
+        item["statut_validation"] = "valide" if is_valid else "anomaly"
+        validation_result = {
+            "isValid": is_valid,
+            "score": 100 if is_valid else 40,
+            "anomalies": anomalies,
+            "validatedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        }
+
+        if document_id:
+            _http_json(
+                "PATCH",
+                f"{base_url}/api/documents/{document_id}/status",
+                {
+                    "status": "validated" if is_valid else "anomaly",
+                    "validationResult": validation_result,
+                },
+            )
+
+        curated_validated.append(item)
+
+    ti.xcom_push(key="curated_validated", value=curated_validated)
+    logging.info("documents validates: %s", len(curated_validated))
+
+
+def envoyer_payload_crm(**context) -> None:
+    ti = context["ti"]
+    payload: list[dict[str, Any]] = ti.xcom_pull(task_ids="valider_curated", key="curated_validated") or []
+    crm_url = Variable.get("crm_autofill_url", default_var="").strip()
+
+    if not payload:
+        logging.info("aucun payload a envoyer au CRM")
+        return
+
+    if not crm_url:
+        logging.info("crm_autofill_url non configuree, envoi CRM ignore")
+        return
+
+    _http_json("POST", crm_url, {"documents": payload})
+    logging.info("payload envoye au CRM: %s", len(payload))
+
+
+def envoyer_payload_conformite(**context) -> None:
+    ti = context["ti"]
+    payload: list[dict[str, Any]] = ti.xcom_pull(task_ids="valider_curated", key="curated_validated") or []
+    conformite_url = Variable.get("conformite_autofill_url", default_var="").strip()
+
+    if not payload:
+        logging.info("aucun payload a envoyer a la conformite")
+        return
+
+    if not conformite_url:
+        logging.info("conformite_autofill_url non configuree, envoi conformite ignore")
+        return
+
+    _http_json("POST", conformite_url, {"documents": payload})
+    logging.info("payload envoye a la conformite: %s", len(payload))
 
 
 def basculer_documents_en_processing(**context) -> None:
@@ -150,20 +358,40 @@ with DAG(
         python_callable=basculer_documents_en_processing,
     )
 
-    # etudiant 2: branchement futur du vrai OCR
-    extraire_ocr = EmptyOperator(task_id="extraire_ocr")
+<<<<<<< matis
+    extraire_ocr = PythonOperator(
+        task_id="extraire_ocr",
+        python_callable=extraire_ocr_documents,
+    )
 
-    # etudiant 4: sauvegarde future en zone clean
+    # ETUDIANT 4: sauvegarde future en zone clean
     persister_clean = EmptyOperator(task_id="persister_clean")
 
-    # etudiant 5: validation et enrichissement futurs en zone curated
+    valider_curated = PythonOperator(
+        task_id="valider_curated",
+        python_callable=valider_documents_curated,
+    )
+
+    envoyer_crm = PythonOperator(
+        task_id="envoyer_crm",
+        python_callable=envoyer_payload_crm,
+    )
+
+    envoyer_conformite = PythonOperator(
+        task_id="envoyer_conformite",
+        python_callable=envoyer_payload_conformite,
+    )
+=======
+    extraire_ocr = EmptyOperator(task_id="extraire_ocr")
+
+    persister_clean = EmptyOperator(task_id="persister_clean")
+
     valider_curated = EmptyOperator(task_id="valider_curated")
 
-    # etudiant 3: envoi futur vers CRM
     envoyer_crm = EmptyOperator(task_id="envoyer_crm")
 
-    # etudiant 3: envoi futur vers conformite
     envoyer_conformite = EmptyOperator(task_id="envoyer_conformite")
+>>>>>>> dev
 
     finaliser_documents = PythonOperator(
         task_id="finaliser_documents",
