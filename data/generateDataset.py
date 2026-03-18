@@ -26,7 +26,19 @@ ARTICLE_DOMAINES = [
 
 class Facture :
     def __init__(self) :
-        self._dictkeys = ("document_id", "date_facturation","date_echeance","date_prestation","montant_ttc","tva","montant_ht","creancier","client","articles")
+        self._dictkeys = ("facture_id",
+                          "devis_id",
+                          "date_facturation",
+                          "date_echeance",
+                          "date_prestation",
+                          "date_emission",
+                          "date_expiration",
+                          "montant_ttc",
+                          "tva",
+                          "montant_ht",
+                          "creancier",
+                          "client",
+                          "articles")
 
     def __iter__(self):
         for key in self._dictkeys :
@@ -38,12 +50,17 @@ class Facture :
         self.date_facturation = faker.date_between(start_date = min_date, end_date = max_date)
         self.date_echeance = faker.date_between(start_date = self.date_facturation, end_date = max_date)
         self.date_prestation = self.date_facturation if random.random()>.5 else faker.date_between(start_date = self.date_facturation, end_date = max_date)
+        self.date_emission = faker.date_between(start_date = min_date, end_date = self.date_prestation)
+        self.date_expiration = faker.date_between(start_date = self.date_prestation, end_date = max_date)
         
-        self.document_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
+        self.facture_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
+        self.devis_id = f"D-{str(self.date_facturation)[:4]}-{random.randint(0,999):03d}"
         date_format = random.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
-        self.date_facturation = str(self.date_facturation.strftime(date_format))
-        self.date_echeance = str(self.date_echeance.strftime(date_format))
-        self.date_prestation = str(self.date_prestation.strftime(date_format))
+        self.date_facturation = self.date_facturation.strftime(date_format)
+        self.date_echeance = self.date_echeance.strftime(date_format)
+        self.date_prestation = self.date_prestation.strftime(date_format)
+        self.date_emission = self.date_emission.strftime(date_format)
+        self.date_expiration = self.date_expiration.strftime(date_format)
         
 
         self.articles = []
@@ -74,7 +91,7 @@ class Facture :
         print(f"""
 # FACTURE
               
-    ID : {self.document_id}
+    ID : {self.facture_id}
               
     DATE FACTURATION : {self.date_facturation}
     DATE PRESTATION  : {self.date_prestation}
