@@ -31,7 +31,6 @@ def check_tva_format(tva):
 
 
 
-from datetime import datetime
 
 def check_expiration(date_exp):
     try:

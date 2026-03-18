@@ -8,8 +8,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 from pdf2image import convert_from_path
+from src import config
 
-def generate_pdfs(input_file="dataset.json", output_dir="pdf", limit=5):
+def generate_pdfs(input_file=config.DATASET_JSON, output_dir=config.PDF_DIR, limit=5):
     """Génère des fichiers PDF et images à partir d'un dataset JSON."""
     if not os.path.exists(input_file):
         print(f"[ERROR] Fichier d'entrée {input_file} introuvable.")
@@ -163,7 +164,6 @@ def generate_pdfs(input_file="dataset.json", output_dir="pdf", limit=5):
         image[0].save(image_path, format_img.upper())
 
     print(f"[INFO] {actual_limit} PDFs et images générés dans {output_dir}")
-
 
 if __name__ == "__main__":
     generate_pdfs()

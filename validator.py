@@ -11,10 +11,11 @@ from risk_scoring import compute_risk,severity_level
 
 from datetime import datetime
 import logging
+from src import config
 
 
 logging.basicConfig(
-    filename="validation.log",
+    filename=config.VALIDATION_LOG,
     level=logging.INFO
 )
 
@@ -22,11 +23,7 @@ logging.basicConfig(
 class DocumentValidator:
 
     def __init__(self):
-
         self.anomaly = AnomalyDetector()
-
-        
-       import logging
 
         try:
             self.anomaly.load()

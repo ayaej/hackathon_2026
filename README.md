@@ -33,6 +33,22 @@ Le module OCR nécessite **Poppler** pour la conversion des PDF scannés en imag
 
 Sur Linux et macOS, si `pdftocairo` est dans votre PATH, la configuration du `.env` n'est pas nécessaire.
 
+### Variables d'Environnement
+
+Le projet est entièrement configurable via les variables suivantes :
+
+| Variable | Description | Valeur par défaut |
+| --- | --- | --- |
+| `POPPLER_PATH` | Chemin vers les binaires Poppler | (vide) |
+| `DATA_DIR` | Dossier racine des données | `BASE_DIR/data` |
+| `RAW_DIR` | Dossier des fichiers bruts | `DATA_DIR/raw` |
+| `SILVER_DIR` | Dossier des fichiers traités (Silver)| `DATA_DIR/silver` |
+| `CURATED_DIR` | Dossier des fichiers validés (Curated)| `DATA_DIR/curated` |
+| `PDF_DIR` | Dossier des PDFs générés | `BASE_DIR/pdf` |
+| `DATASET_JSON` | Fichier source du dataset | `BASE_DIR/dataset.json` |
+| `SIRENE_CSV` | Base locale SIRENE (échantillon) | `RAW_DIR/sirene_sample.csv` |
+| `VALIDATION_LOG` | Fichier de logs de validation | `validation.log` |
+
 ### Modèle spaCy
 Le module d'extraction nécessite le modèle français de spaCy :
 ```bash

@@ -1,8 +1,9 @@
 import pandas as pd
 import os
+from src import config
 
 _BASE_SIRENE = None
-_CHEMIN_DEFAUT = "data/raw/sirene_sample.csv"
+_CHEMIN_DEFAUT = config.SIRENE_CSV
 
 
 def charger_base(chemin_csv=None):

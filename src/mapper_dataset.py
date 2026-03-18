@@ -1,22 +1,31 @@
 import os
 import json
 import textwrap
+import logging
+from src import config
 
-def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
-    
+# Configuration du logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+def prepare_raw_dataset(chemin_dataset=config.DATASET_JSON, dossier_raw=config.RAW_DIR):
+    """Prépare un dossier de fichiers JSON bruts à partir d'un fichier dataset."""
     if not os.path.exists(chemin_dataset):
-        print(f"[ERROR] {chemin_dataset} introuvable.")
+        logger.error(f"{chemin_dataset} introuvable.")
         return 0
 
     os.makedirs(dossier_raw, exist_ok=True)
     
-    with open(chemin_dataset, "r", encoding="utf-8") as f:
-        factures = json.load(f)
+    try:
+        with open(chemin_dataset, "r", encoding="utf-8") as f:
+            factures = json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        logger.error(f"Erreur lors de la lecture du dataset : {e}")
+        return 0
 
     compteur = 0
     for facture in factures:
         doc_id = facture.get("document_id", f"DOC-{compteur}")
-        
         crea = facture.get("creancier", {})
         
         texte_ocr = textwrap.dedent(f"""\
@@ -34,7 +43,7 @@ def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
             Total HT : {facture.get("montant_ht")} €
             TVA : {facture.get("tva")} €
             Total TTC : {facture.get("montant_ttc")} €
-        """)
+        """).strip()
         
         json_a_sauvegarder = {
             "document_id": doc_id,
@@ -45,13 +54,15 @@ def prepare_raw_dataset(chemin_dataset="dataset.json", dossier_raw="data/raw/"):
         nom_fichier = f"{doc_id}.json"
         chemin_fichier = os.path.join(dossier_raw, nom_fichier)
         
-        with open(chemin_fichier, "w", encoding="utf-8") as f:
-            json.dump(json_a_sauvegarder, f, indent=4, ensure_ascii=False)
+        try:
+            with open(chemin_fichier, "w", encoding="utf-8") as f:
+                json.dump(json_a_sauvegarder, f, indent=4, ensure_ascii=False)
+            compteur += 1
+        except IOError as e:
+            logger.error(f"Erreur lors de l'ecriture de {nom_fichier} : {e}")
             
-        compteur += 1
-
-    print(f"[INFO] {compteur} fichiers Raw generes.")
+    logger.info(f"{compteur} fichiers Raw generes dans {dossier_raw}.")
     return compteur
 
 if __name__ == "__main__":
-    prepare_raw_dataset("dataset.json", "data/raw/")
+    prepare_raw_dataset()

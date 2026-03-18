@@ -141,9 +141,9 @@ class Personne :
 
     APE / NAF : {self.ape}
     """)
+from src import config
 
-
-def generate_dataset(nb_factures=100, output_file="dataset.json"):
+def generate_dataset(nb_factures=100, output_file=config.DATASET_JSON):
     """Génère un dataset de factures aléatoires et le sauvegarde en JSON."""
     liste = []
     for _ in range(nb_factures):

@@ -5,12 +5,14 @@ from datetime import datetime
 from src.utils.sirene_checker import detecter_incoherences
 from src.utils.date_checker import verifier_expiration
 
+from src import config
+
 # Configuration basique du logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
-def folder_silver_to_curated(dossier_silver="data/silver/", dossier_curated="data/curated/"):
+def folder_silver_to_curated(dossier_silver=config.SILVER_DIR, dossier_curated=config.CURATED_DIR):
     if not os.path.exists(dossier_silver):
         logger.error(f"Dossier silver introuvable: {dossier_silver}")
         return
