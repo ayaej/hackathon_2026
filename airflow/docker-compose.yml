@@ -1,3 +1,5 @@
+name: hackathon_2026_G28
+
 x-airflow-common:
   &airflow-common
   image: apache/airflow:2.10.5
@@ -45,6 +47,9 @@ x-airflow-common:
     # dataset de test genere localement
     - ../data:/opt/airflow/data
 
+    # modules python OCR/validation du projet
+    - ../src:/opt/airflow/src
+
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
@@ -54,6 +59,37 @@ x-airflow-common:
       condition: service_healthy
 
 services:
+  # base mongo pour le backend node/express
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  # backend api node/express
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    environment:
+      PORT: 5000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/hackathon_docs
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../backend/uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
   # broker redis pour celery
   redis:
     image: redis:7.2-bookworm
@@ -132,3 +168,4 @@ services:
 # vol persistant pour la base Postgres (docker compose down --volumes pour delete)
 volumes:
   postgres-db-volume:
+  mongo-data:
