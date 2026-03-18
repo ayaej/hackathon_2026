@@ -1,5 +1,11 @@
+pandas
+numpy
+scikit-learn
+python-dateutil
+
 faker==40.11.0
 reportlab==4.4.10
+pdf2image==1.17.0
 
 easyocr
 spacy

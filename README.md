@@ -3,14 +3,14 @@
 
 ## Équipe
 
-| Nom | Rôle / Focus |
-| --- | --- |
-| Corentin | Génération de données |
-| Monica, Danielle | Module OCR & Extraction |
-| Elliot | Backend |
-| Aya | Intégration |
-| Sara | Validation |
-| Matis | Airflow / Orchestration |
+| Étudiant   | Prénom           | Rôle / Focus             | Dossiers   |
+| ---------- | ---------------- | ------------------------ | ---------- |
+| ÉTUDIANT 1 | Corentin         | Génération de données    | `/data`    |
+| ÉTUDIANT 2 | Monica, Danielle | Module OCR & Extraction  | `/src`     |
+| ÉTUDIANT 3 | Elliot           | Backend                  | `/backend` |
+| ÉTUDIANT 4 | Aya              | Intégration              |            |
+| ÉTUDIANT 5 | Sara             | Validation               |            |
+| ÉTUDIANT 6 | Matis            | Airflow / Orchestration  | `/airflow` |
 
 ## Groupes
 
