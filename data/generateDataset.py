@@ -140,6 +140,8 @@ class Personne :
         self.sexe = random.choice(['M','F',''])
 
         self.adresse = faker.street_address()
+        if self.adresse[0] not in ['1','2','3','4','5','6','7','8','9'] :
+            self.adresse = str(random.randint(1,9)) + ', ' + self.adresse
         self.code_postal = faker.postcode()
         self.commune = faker.city()
 
@@ -166,11 +168,15 @@ class Personne :
     """)
 
 
-liste = []
-for _ in range(100) :
-    facture = Facture()
-    facture.generateRandom()
-    liste.append(dict(facture))
+def generateDataset() :
+    liste = []
+    for _ in range(100) :
+        facture = Facture()
+        facture.generateRandom()
+        liste.append(dict(facture))
 
-with open("dataset.json", "w", encoding="utf-8") as f:
-    json.dump(liste, f, ensure_ascii=False, indent=4)
+    with open("dataset.json", "w", encoding="utf-8") as f:
+        json.dump(liste, f, ensure_ascii=False, indent=4)
+
+if __name__ == "__main__" :
+    generateDataset()

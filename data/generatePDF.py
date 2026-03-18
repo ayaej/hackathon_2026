@@ -12,13 +12,18 @@ from reportlab.lib.styles import ParagraphStyle
 
 from pdf2image import convert_from_path
 
+
+if not os.path.exists("dataset.json") :
+    from generateDataset import generateDataset
+    generateDataset()
+
+
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
 
 if os.path.isdir("pdf") :
     shutil.rmtree("pdf")
 os.mkdir("pdf")
-
 
 
 for i in range(5) :
@@ -125,7 +130,8 @@ for i in range(5) :
         deux_colonnes = True if rn.random()>.25 else False
         if deux_colonnes :
             taille_col = rn.randint(70,90)
-            table_header = Table([[header_client, '', header_creancier]] if creancier_visible else [[header_client, '', Paragraph("")]], colWidths=[taille_col*mm, (largeur_page-2*taille_col)*mm, taille_col*mm])
+            espace_droite = 0 if rn.random()>.5 else rn.randint(0,30)
+            table_header = Table([[header_client, '', header_creancier, '']] if creancier_visible else [[header_client, '', Paragraph(""), '']], colWidths=[taille_col*mm, max((largeur_page-2*taille_col-espace_droite)*mm,0), taille_col*mm, espace_droite*mm])
             table_header.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP'),
                                               ('BOX', (0,0), (0,0), largeur_box, couleur_box),
                                               ('BOX', (2,0), (2,0), largeur_box, couleur_box if creancier_visible else colors.white),]))
@@ -203,18 +209,19 @@ for i in range(5) :
 
         if doctype == "devis" :
 
-            signatures = [['', '', '', '']]
-            signatures[0][0] = Paragraph(f"Signature du client{' précédée de la mention ' + rn.choice(['«\xA0Lu et approuvé\xA0»','«\xA0Bon pour commande\xA0»','«\xA0Bon pour accord\xA0»']) if rn.random()>.5 else ''}{ddot}", style=wordWrap)
-            signatures[0][2] = Paragraph(f"Signature {rn.choice(['et cachet ',''])}{rn.choice(['du créancier','de l\'entreprise','du vendeur','du prestataire'])}{ddot}", style=wordWrap)
+            signatures = [['', '', '', '', '']]
+            signatures[0][1] = Paragraph(f"Signature du client{' précédée de la mention ' + rn.choice(['«\xA0Lu et approuvé\xA0»','«\xA0Bon pour commande\xA0»','«\xA0Bon pour accord\xA0»']) if rn.random()>.5 else ''}{ddot}", style=wordWrap)
+            signatures[0][3] = Paragraph(f"Signature {rn.choice(['et cachet ',''])}{rn.choice(['du créancier','de l\'entreprise','du vendeur','du prestataire'])}{ddot}", style=wordWrap)
 
+            aligne_a_gauche = True if rn.random() > .5 else False
             taille_col = [rn.randint(40,60), rn.randint(5,20), 0]
             taille_col[2] = largeur_page - 2*taille_col[0] - taille_col[1]
             couleur_box = rn.choice([colors.black, colors.gray, colors.white])
             largeur_box = rn.random()
-            table_signatures = Table(signatures, colWidths=[taille_col[0]*mm, taille_col[1]*mm, taille_col[0]*mm, taille_col[2]*mm])
+            table_signatures = Table(signatures, colWidths=[taille_col[2]*mm if not aligne_a_gauche else 0, taille_col[0]*mm, taille_col[1]*mm, taille_col[0]*mm, taille_col[2]*mm if aligne_a_gauche else 0])
             table_signatures.setStyle(TableStyle([
-                ('BOX', (0,0), (0,0), largeur_box, couleur_box),
-                ('BOX', (2,0), (2,0), largeur_box, couleur_box),
+                ('BOX', (1,0), (1,0), largeur_box, couleur_box),
+                ('BOX', (3,0), (3,0), largeur_box, couleur_box),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), taille_col[0]*mm*(rn.random()*.4 + .4)),
                 ('FONTSIZE', (0, 0), (-1, 0), rn.randint(6,10)),
                 ('VALIGN', (0, 0), (-1, -1), 'TOP'),
