@@ -12,8 +12,13 @@ from airflow.models import Variable
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
 
+<<<<<<< matis
 # /opt/airflow/src/ocr_module/classifier.py - ETUDIANT 2 (ocr - classification documents)
 from ocr_module.classifier import classifier_document
+=======
+# url de base du backend node/express
+DEFAULT_BACKEND_BASE_URL = "http://host.docker.internal:5000"
+>>>>>>> dev
 
 # /opt/airflow/src/ocr_module/parser.py - ETUDIANT 2 (ocr - extraction infos cles)
 from ocr_module.parser import extraire_infos_cles
@@ -353,6 +358,7 @@ with DAG(
         python_callable=basculer_documents_en_processing,
     )
 
+<<<<<<< matis
     extraire_ocr = PythonOperator(
         task_id="extraire_ocr",
         python_callable=extraire_ocr_documents,
@@ -375,6 +381,17 @@ with DAG(
         task_id="envoyer_conformite",
         python_callable=envoyer_payload_conformite,
     )
+=======
+    extraire_ocr = EmptyOperator(task_id="extraire_ocr")
+
+    persister_clean = EmptyOperator(task_id="persister_clean")
+
+    valider_curated = EmptyOperator(task_id="valider_curated")
+
+    envoyer_crm = EmptyOperator(task_id="envoyer_crm")
+
+    envoyer_conformite = EmptyOperator(task_id="envoyer_conformite")
+>>>>>>> dev
 
     finaliser_documents = PythonOperator(
         task_id="finaliser_documents",
