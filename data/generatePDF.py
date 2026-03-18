@@ -10,7 +10,7 @@ from reportlab.lib.units import mm
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 
-from pdf2image import convert_from_path
+from pdf2image.pdf2image import convert_from_path
 
 
 if not os.path.exists("dataset.json") :
@@ -235,6 +235,6 @@ for i in range(5) :
 
         doc.build(story)
 
-        image = convert_from_path(f"pdf/{doctype}_{i}.pdf")
+        image = convert_from_path(f"pdf/{doctype}_{i}.pdf", dpi = rn.randint(50,200))
         format = rn.choice(['jpeg','png','pdf'])
         image[0].save(f"pdf/{doctype}_image_{i}.{format}", format.upper())
