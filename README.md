@@ -5,7 +5,7 @@
 
 | Étudiant   | Prénom           | Dossiers   |
 | ---------- | ---------------- | ---------- |
-| ÉTUDIANT 1 | Corentin         |            |
+| ÉTUDIANT 1 | Corentin         | `/data`    |
 | ÉTUDIANT 2 | Monica, Danielle | `/src`     |
 | ÉTUDIANT 3 | Elliot           | `/backend` |
 | ÉTUDIANT 4 | Aya              |            |
