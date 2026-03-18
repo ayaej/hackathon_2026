@@ -58,8 +58,6 @@ for i in range(5) :
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
 
-    if not os.path.isdir("pdf"):
-        os.mkdir("pdf")
 
         # Génération du PDF
         
