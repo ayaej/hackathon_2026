@@ -84,7 +84,6 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -93,23 +92,20 @@ export default function UploadPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <span className="font-semibold text-gray-800 text-lg">DocValidator</span>
+            <span className="font-semibold text-gray-800 text-lg">Validateur de documents</span>
           </div>
           <span className="text-xs text-gray-400">Interface d'upload</span>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
-        {/* Stats */}
         <StatsBar stats={stats} loading={loadingStats} />
 
-        {/* Zone upload */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <h2 className="font-semibold text-gray-700">Déposer des documents</h2>
           <DropZone onFiles={handleFiles} uploading={uploading} />
         </section>
 
-        {/* Liste */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <h2 className="font-semibold text-gray-700">Documents</h2>
@@ -137,7 +133,6 @@ export default function UploadPage() {
         </section>
       </main>
 
-      {/* Toast */}
       {toast && (
         <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all
           ${toast.type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'}`}
