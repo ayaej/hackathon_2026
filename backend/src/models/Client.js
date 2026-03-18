@@ -10,7 +10,12 @@ const clientSchema = new mongoose.Schema(
     contact: {
       nom: String,
       prenom: String,
-      email: String,
+      email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'entrer une adresse email valide'],
+      },
       telephone: String,
     },
 
@@ -35,7 +40,7 @@ const clientSchema = new mongoose.Schema(
         documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
         type: String,
         description: String,
-        detectedAt: Date,
+        detectedAt: { type: Date, default: Date.now },
         resolved: { type: Boolean, default: false },
       },
     ],
