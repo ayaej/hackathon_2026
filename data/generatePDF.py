@@ -113,7 +113,7 @@ for i in range(5) :
 
         bold_1, bold_2 = ("<b>", "</b>") if rnd() > 0.5 else ("", "")
 
-        objet = Paragraph(f"{bold_1}{rnc(['Objet : ', ''])}{articles[rni(0,len(articles)-1)]["nom"]}{bold_2}")
+        objet = Paragraph(f"{bold_1}{rnc(['Objet : ', ''])}{articles[rni(0,len(articles)-1)]['nom']}{bold_2}")
         objet_haut = True if rnd()>.25 else False
         if rnd()>.75 and objet_haut :
             story.append(objet)
