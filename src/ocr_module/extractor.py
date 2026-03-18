@@ -46,10 +46,8 @@ def lire_pdf_numerique(chemin):
 def lire_pdf_scanne(chemin):
     from pdf2image import convert_from_path
 
-    poppler_path = os.environ.get("POPPLER_PATH", r"C:\poppler\Library\bin")
-    poppler_path = poppler_path if os.path.isdir(poppler_path) else None
 
-    pages = convert_from_path(chemin, dpi=300, poppler_path=poppler_path)
+    pages = convert_from_path(chemin, dpi=300)
     texte_total = ""
 
     for i, page in enumerate(pages):
