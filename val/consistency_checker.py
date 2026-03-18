@@ -1,16 +1,12 @@
-class AnomalyDetector:
-    """Détecteur d'anomalies basé sur des seuils métier."""
-
-    def train(self, data):
-        """Aucun entraînement requis, détection par seuils."""
-        pass
+class ConsistencyChecker:
+    """Contrôles de cohérence métier sur les montants."""
 
     def load(self):
-        """Aucune persistance requise."""
+        """Aucune persistance requise pour les contrôles de règles."""
         pass
 
     def predict(self, ht, ttc):
-        """Retourne True si le document présente une anomalie."""
+        """Retourne True si les montants sont incohérents."""
         try:
             ht = float(ht)
             ttc = float(ttc)

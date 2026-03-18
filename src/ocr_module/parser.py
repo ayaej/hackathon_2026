@@ -15,10 +15,16 @@ def luhn_check(number):
 
 
 PATTERN_SIRET = r'\b(\d{3}[\s\-]?\d{3}[\s\-]?\d{3}[\s\-]?\d{5}|\d{14})\b'
+
+MOIS_FR_PATTERN = (
+    r'(?:janvier|février|fevrier|mars|avril|mai|juin|juillet'
+    r'|août|aout|septembre|octobre|novembre|décembre|decembre)'
+)
+
 PATTERN_DATE = (
-    r'\b(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}'
-    r'|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}'
-    r'|\d{1,2}\s+\w+\s+\d{4})\b'
+    r'\b(\d{4}[\s]*[\-/][\s]*\d{1,2}[\s]*[\-/][\s]*\d{1,2}'
+    r'|\d{1,2}[\s]*[\-/\.][\s]*\d{1,2}[\s]*[\-/\.][\s]*\d{2,4}'
+    r'|\d{1,2}\s+' + MOIS_FR_PATTERN + r'\s+\d{4})\b'
 )
 PATTERN_NUMERO_DOC = r'\b([A-Z]{2,5}[\-_]?\d{4}[\-_]?\d{2,6})\b'
 PATTERN_TVA_TAUX = r'\bTVA\s*:?\s*(\d{1,2}(?:[,\.]\d{1,2})?)\s*%'
@@ -26,9 +32,9 @@ PATTERN_IBAN = r'\bFR\d{2}[\s\d]{23,30}\b'
 PATTERN_DATE_EXPIRATION = (
     r"(?:ech\u00e9ance|echeance|valable jusqu\'au"
     r"|expiration|expire le|date limite|fin de validit\u00e9)"
-    r'[^\d]*(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}'
-    r'|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}'
-    r'|\d{1,2}\s+\w+\s+\d{4})'
+    r'[^\d]*(\d{4}[\s]*[\-/][\s]*\d{1,2}[\s]*[\-/][\s]*\d{1,2}'
+    r'|\d{1,2}[\s]*[\-/\.][\s]*\d{1,2}[\s]*[\-/\.][\s]*\d{2,4}'
+    r'|\d{1,2}\s+' + MOIS_FR_PATTERN + r'\s+\d{4})'
 )
 
 

@@ -6,7 +6,7 @@ from rules import (
     check_siret_format
 )
 
-from anomaly_model import AnomalyDetector
+from consistency_checker import ConsistencyChecker
 from risk_scoring import compute_risk, severity_level
 
 from datetime import datetime
@@ -23,8 +23,8 @@ logging.basicConfig(
 class DocumentValidator:
 
     def __init__(self):
-        self.anomaly = AnomalyDetector()
-        self.anomaly.load()
+        self.consistency = ConsistencyChecker()
+        self.consistency.load()
 
     def validate(self, facture, attestation):
 
@@ -56,15 +56,14 @@ class DocumentValidator:
         if amount_issue:
             errors.append(amount_issue)
 
-        if self.anomaly:
-
-            anomaly = self.anomaly.predict(
+        if self.consistency:
+            incoherent_amount = self.consistency.predict(
                 facture["montant_ht"],
                 facture["montant_ttc"]
             )
 
-            if anomaly:
-                errors.append("Montant anormal détecté")
+            if incoherent_amount:
+                errors.append("Montants incohérents détectés")
 
         risk_score = compute_risk(errors)
 

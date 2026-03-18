@@ -1,13 +1,17 @@
 import os
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
 import json
 from src.ocr_module.extractor import extraire_texte
 from src.ocr_module.parser import extraire_infos_cles
 from src.ocr_module.classifier import classifier_document
 
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 # Configuration du fichier source
-chemin_fichier = os.path.join("pdf", "facture_3.pdf") if os.path.exists(os.path.join("pdf", "facture_3.pdf")) else "pdf/facture_3.pdf"
+chemin_pdf = os.path.join("pdf", "facture_3.pdf")
+if os.path.exists(chemin_pdf):
+    chemin_fichier = chemin_pdf
+else:
+    chemin_fichier = "pdf/facture_3.pdf"
 
 # Extraction du texte brut
 print(f"Extraction : {chemin_fichier}...")

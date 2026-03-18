@@ -13,7 +13,7 @@ const documentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['uploaded', 'processing', 'processed', 'validated', 'rejected', 'anomaly'],
+      enum: ['uploaded', 'processing', 'processed', 'validated', 'rejected', 'invalid'],
       default: 'uploaded',
     },
     extractedData: {

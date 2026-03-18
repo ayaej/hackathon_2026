@@ -107,13 +107,13 @@ exports.getStats = async (req, res) => {
       Document.aggregate([{ $group: { _id: '$type', count: { $sum: 1 } } }]),
     ]);
 
-    const anomalies = await Document.countDocuments({ status: 'anomaly' });
+    const invalids = await Document.countDocuments({ status: 'invalid' });
 
     res.json({
       success: true,
       data: {
         total,
-        anomalies,
+        invalids,
         byStatus: Object.fromEntries(byStatus.map((s) => [s._id, s.count])),
         byType: Object.fromEntries(byType.map((t) => [t._id, t.count])),
       },

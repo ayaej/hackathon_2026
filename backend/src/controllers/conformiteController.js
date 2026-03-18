@@ -5,7 +5,7 @@ exports.getAnomalies = async (req, res) => {
   try {
     const { severity, page = 1, limit = 20 } = req.query;
 
-    const filter = { status: 'anomaly' };
+    const filter = { status: 'invalid' };
     if (severity) {
       filter['validationResult.anomalies.severity'] = severity;
     }
@@ -44,7 +44,7 @@ exports.submitValidationResult = async (req, res) => {
   try {
     const { isValid, score, anomalies } = req.body;
 
-    const status = isValid ? 'validated' : 'anomaly';
+    const status = isValid ? 'validated' : 'invalid';
 
     const doc = await Document.findByIdAndUpdate(
       req.params.documentId,
@@ -92,10 +92,10 @@ exports.submitValidationResult = async (req, res) => {
 
 exports.getStats = async (req, res) => {
   try {
-    const [total, validated, anomalies, pending] = await Promise.all([
-      Document.countDocuments({ status: { $in: ['validated', 'anomaly', 'processed'] } }),
+    const [total, validated, invalids, pending] = await Promise.all([
+      Document.countDocuments({ status: { $in: ['validated', 'invalid', 'processed'] } }),
       Document.countDocuments({ status: 'validated' }),
-      Document.countDocuments({ status: 'anomaly' }),
+      Document.countDocuments({ status: 'invalid' }),
       Document.countDocuments({ status: { $in: ['uploaded', 'processing'] } }),
     ]);
 
@@ -103,7 +103,7 @@ exports.getStats = async (req, res) => {
 
     res.json({
       success: true,
-      data: { total, validated, anomalies, pending, tauxConformite },
+      data: { total, validated, invalids, pending, tauxConformite },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

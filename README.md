@@ -48,9 +48,3 @@ Le projet est entièrement configurable via les variables suivantes :
 | `DATASET_JSON` | Fichier source du dataset | `BASE_DIR/dataset.json` |
 | `SIRENE_CSV` | Base locale SIRENE (échantillon) | `RAW_DIR/sirene_sample.csv` |
 | `VALIDATION_LOG` | Fichier de logs de validation | `validation.log` |
-
-### Modèle spaCy
-Le module d'extraction nécessite le modèle français de spaCy :
-```bash
-python -m spacy download fr_core_news_sm
-```

@@ -5,6 +5,7 @@ from src.ocr_module.extractor import extraire_texte
 from src.ocr_module.parser import extraire_infos_cles
 from src.ocr_module.classifier import classifier_document
 from src.ocr_module.evaluator import evaluate_global
+from src.utils.date_checker import comparer_validite_documents
 
 
 def process_all(
@@ -33,6 +34,7 @@ def process_all(
         parsed = extraire_infos_cles(texte)
         extraction = parsed["extraction"]
         type_doc = classifier_document(texte)
+        extraction["type_document"] = type_doc
 
         evaluation = evaluate_global(
             texte_ocr=texte,
@@ -53,9 +55,19 @@ def process_all(
             "evaluation": evaluation
         })
 
+    comparaison = comparer_validite_documents(results)
+
     output_path = os.path.join(output_folder, "results.json")
     with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=4, ensure_ascii=False)
+        json.dump(
+            {
+                "results": results,
+                "comparison": comparaison,
+            },
+            f,
+            indent=4,
+            ensure_ascii=False,
+        )
 
     print(f"DONE → {output_path}")
 
