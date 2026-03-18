@@ -1,2 +1,5 @@
 dataset.json
-pdf
+pdf/
+raw/*.json
+silver/*.json
+curated/*.json

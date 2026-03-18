@@ -33,8 +33,14 @@ TYPES_DOCUMENTS = {
 
 def classifier_document(texte):
     texte_lower = texte.lower()
-    scores = {}
+    
+    # Priority check for explicit markers
+    if "devis" in texte_lower:
+        return "devis"
+    if "facture" in texte_lower or "invoice" in texte_lower:
+        return "facture"
 
+    scores = {}
     for type_doc, mots_cles in TYPES_DOCUMENTS.items():
         score = sum(
             len(re.findall(re.escape(mot.lower()), texte_lower))
@@ -43,12 +49,10 @@ def classifier_document(texte):
         scores[type_doc] = score
 
     type_detected = max(scores, key=scores.get)
-
     if scores[type_detected] == 0:
         return "inconnu"
 
     return type_detected
-
 
 def classifier_avec_confiance(texte):
     texte_lower = texte.lower()

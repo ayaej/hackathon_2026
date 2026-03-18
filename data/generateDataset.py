@@ -21,7 +21,7 @@ ARTICLE_DESCRIPTIONS = [
 ARTICLE_CONNECTEURS = [" en"," de"," pour","",""]
 ARTICLE_DOMAINES = [
     " informatique", " marketing", " comptabilité",
-    " ressources humaines", " communication", " administration",
+    " RH", " communication", " administration",
     " sécurité", " cloud", " data", " réseau"
 ]
 
@@ -37,36 +37,33 @@ class Facture :
             yield key, getattr(self, key)
 
     def generateRandom(self) :
-
-        # Génération des dates
         min_date = datetime.date(year=2015, month=1, day=1)
         max_date = datetime.date(year=2035, month=1, day=1)
         self.date_facturation = faker.date_between(start_date = min_date, end_date = max_date)
         self.date_echeance = faker.date_between(start_date = self.date_facturation, end_date = max_date)
         self.date_prestation = self.date_facturation if random.random()>.5 else faker.date_between(start_date = self.date_facturation, end_date = max_date)
-        self.date_facturation = str(self.date_facturation)
-        self.date_echeance = str(self.date_echeance)
-        self.date_prestation = str(self.date_prestation)
         
-        self.document_id = f"FA-{self.date_facturation[:4]}-{random.randint(0, 9999):04d}"
+        self.document_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
+        date_format = random.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
+        self.date_facturation = str(self.date_facturation.strftime(date_format))
+        self.date_echeance = str(self.date_echeance.strftime(date_format))
+        self.date_prestation = str(self.date_prestation.strftime(date_format))
+        
 
-        # Génération d'articles
         self.articles = []
         for _ in range(random.randint(1,10)) :
-            article = random.choice(article_descriptions)
+            article = random.choice(ARTICLE_DESCRIPTIONS)
             if random.random()>.2 :
-                article += random.choice(article_connecteurs) + random.choice(article_domaines)
+                article += random.choice(ARTICLE_CONNECTEURS) + random.choice(ARTICLE_DOMAINES)
             prix = round(1/(random.random()*200+1)*1000, 2)
             quantite = random.randint(1,10)
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
-        # Génération des montants
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
         self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
         self.tva = round(random.random()/10 * self.montant_ht, 2)
         self.montant_ttc = round(self.montant_ht + self.tva, 2) if random.random()>.95 else round((self.montant_ht + self.tva)*(1+random.random()/10),2)
 
-        # Génération des parties prenantes
         creancier = Personne()
         creancier.generateRandom()
         self.obj_creancier = creancier
@@ -110,7 +107,6 @@ class Personne :
 
     def generateRandom(self) :
 
-        # Génération du SIRET (SIREN + NIC)
         siret = random.randint(0, 10**14 - 1)
         siret = f"{siret:014d}"
         self.siret = siret
@@ -118,19 +114,16 @@ class Personne :
         self.nic = siret[9:]
         self.n_tva = 'FR' + str(round(random.random()*100)) + ' ' + self.siren
 
-        # Génération de la personnes
         self.prenom = faker.first_name()
         self.prenom_2 = '' if random.random() < .75 else faker.first_name()
         self.prenom_3 = '' if random.random() < .9 or self.prenom_2 == '' else faker.first_name()
         self.nom = faker.last_name()
         self.sexe = random.choice(['M','F',''])
 
-        # Génération de l'adresse
         self.adresse = faker.street_address()
         self.code_postal = faker.postcode()
         self.commune = faker.city()
 
-        # Génération de l'activité
         self.ape = f"{int(random.random()*5700):04d}" + ['A','B','C','D','Z'][int(random.random()*5)]
 
     def display(self) :
@@ -153,10 +146,6 @@ class Personne :
     APE / NAF : {self.ape}
     """)
 
-
-# facture = Facture()
-# facture.generateRandom()
-# facture.display()
 
 liste = []
 for _ in range(100) :

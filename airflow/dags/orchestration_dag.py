@@ -11,7 +11,7 @@ from airflow.models import Variable
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
 
-# url de base du backend node/express (etudiant 3)
+# url de base du backend node/express
 DEFAULT_BACKEND_BASE_URL = "http://host.docker.internal:5000"
 
 
@@ -150,19 +150,14 @@ with DAG(
         python_callable=basculer_documents_en_processing,
     )
 
-    # etudiant 2: branchement futur du vrai OCR
     extraire_ocr = EmptyOperator(task_id="extraire_ocr")
 
-    # etudiant 4: sauvegarde future en zone clean
     persister_clean = EmptyOperator(task_id="persister_clean")
 
-    # etudiant 5: validation et enrichissement futurs en zone curated
     valider_curated = EmptyOperator(task_id="valider_curated")
 
-    # etudiant 3: envoi futur vers CRM
     envoyer_crm = EmptyOperator(task_id="envoyer_crm")
 
-    # etudiant 3: envoi futur vers conformite
     envoyer_conformite = EmptyOperator(task_id="envoyer_conformite")
 
     finaliser_documents = PythonOperator(

@@ -38,21 +38,16 @@ def charger_documents_input() -> tuple[list[dict], Path]:
     return documents, chemin_source
 
 
-# simule la lecture OCR batch (ETUDIANT 2) sur tout le dataset
-# xcom_push = mecanisme airflow pour passer une valeur d'une tache a l'autre
 def lire_mock_ocr() -> None:
     context = get_current_context()
     ti: TaskInstance = context["ti"]
     documents, chemin_source = charger_documents_input()
 
-    # on conserve seulement des metadonnees dans xcom pour eviter un payload trop volumineux
     ti.xcom_push(key="ocr_total", value=len(documents))
     ti.xcom_push(key="ocr_source", value=str(chemin_source))
     logging.info("Simulation OCR lue avec succes: %s document(s) depuis %s", len(documents), chemin_source)
 
 
-# construit le payload "curated" (prêt à etre envoyes au CRM)
-# c'est la zone curated du data lake (Raw > Clean > Curated)
 def construire_curated() -> None:
     context = get_current_context()
     ti: TaskInstance = context["ti"]
@@ -71,7 +66,6 @@ def construire_curated() -> None:
                 "montant_ttc": document.get("montant_ttc"),
                 "devise": "EUR",
                 "date_facture": document.get("date_facturation") or document.get("date_facture"),
-                # TODO: statut et source par l'ETUDIANT 5 (validation)
                 "statut_validation": "valide_mock",
                 "source": "simulation_dataset",
                 "date_traitement": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -86,8 +80,6 @@ def construire_curated() -> None:
     logging.info("Payload Curated de simulation ecrit dans %s (%s document(s))", DATA_OUTPUT, len(curated))
 
 
-# conserve une copie horodatee du payload curated apres chaque run
-# permet de tracer l'historique des executions sans ecraser le fichier precedent
 def archiver_resultat() -> None:
     DATA_ARCHIVE.mkdir(parents=True, exist_ok=True)
     horodatage = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -100,7 +92,6 @@ def archiver_resultat() -> None:
     logging.info("Archive de simulation creee: %s", destination)
 
 
-# schedule=None signifie qu'on le declenche manuellement (pas de cron)
 with DAG(
     dag_id="orchestration_mock_dag",
     start_date=datetime(2026, 3, 17),
@@ -108,45 +99,33 @@ with DAG(
     catchup=False,
     tags=["mock", "matis"],
 ) as dag:
-    # marqueur de debut (EmptyOperator = tache vide, juste pour structurer le graphe)
     debut = EmptyOperator(task_id="debut_pipeline")
 
-    # represente la recuperation du document brut (zone Raw) (ETUDIANT 4)
     ingestion_raw = EmptyOperator(task_id="ingestion_raw")
 
-    # lit le fichier mock OCR et le passe a la tache suivante via xcom
     simuler_ocr = PythonOperator(
         task_id="simuler_ocr",
         python_callable=lire_mock_ocr,
     )
 
-    # represente la sauvegarde du texte OCR brut en zone Clean
-    # sera remplace par l'ecriture reelle dans MinIO/stockage ETUDIANT 4
     persister_clean = EmptyOperator(task_id="persister_clean")
 
-    # transforme les donnees OCR en payload structure pret pour le CRM (zone Curated)
     construire_zone_curated = PythonOperator(
         task_id="construire_zone_curated",
         python_callable=construire_curated,
     )
 
-    # envoi vers l'API CRM de l'ETUDIANT 3 (placeholder, sera remplace par un vrai appel HTTP)
     envoyer_crm_mock = EmptyOperator(task_id="envoyer_crm_mock")
 
-    # envoi vers l'outil de conformite de l'ETUDIANT 3 (idem, placeholder pour l'instant)
     envoyer_conformite_mock = EmptyOperator(task_id="envoyer_conformite_mock")
 
-    # sauvegarde une copie horodatee du payload pour la tracabilite
     archiver_trace = PythonOperator(
         task_id="archiver_trace",
         python_callable=archiver_resultat,
     )
 
-    # marqueur de fin
     fin = EmptyOperator(task_id="fin_pipeline")
 
-    # ordre d'execution des taches ( ">>" signifie "puis")
-    # envoyer_crm_mock et envoyer_conformite_mock sont en parallele (liste [])
     (
         debut
         >> ingestion_raw

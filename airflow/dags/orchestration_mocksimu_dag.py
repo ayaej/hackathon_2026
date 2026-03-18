@@ -17,8 +17,6 @@ SIMU_OUTPUT = Path("/opt/airflow/simu/output/curated_payload.json")
 SIMU_ARCHIVE = Path("/opt/airflow/simu/archive")
 
  
-# simule la lecture du resultat OCR (ETUDIANT 2)
-# xcom_push = mecanisme airflow pour passer une valeur d'une tache a l'autre
 def lire_mock_ocr() -> None:
     context = get_current_context()
     ti: TaskInstance = context["ti"]
@@ -28,18 +26,14 @@ def lire_mock_ocr() -> None:
     with SIMU_INPUT.open("r", encoding="utf-8-sig") as fichier:
         contenu = json.load(fichier)
 
-    # on stocke seulement des metadonnees dans xcom pour eviter un payload trop volumineux
     ti.xcom_push(key="ocr_source", value=str(SIMU_INPUT))
     ti.xcom_push(key="ocr_document_id", value=contenu.get("document_id"))
     logging.info("Simulation OCR lue avec succes pour le document %s", contenu.get("document_id"))
 
 
-# construit le payload "curated" (prêt à etre envoyes au CRM)
-# c'est la zone curated du data lake (Raw > Clean > Curated)
 def construire_curated() -> None:
     context = get_current_context()
     ti: TaskInstance = context["ti"]
-    # recupere le chemin du fichier OCR pose par la tache precedente via xcom
     source_path = ti.xcom_pull(task_ids="simuler_ocr", key="ocr_source")
     if not source_path:
         raise ValueError("Aucun chemin OCR mock disponible dans XCom")
@@ -59,7 +53,6 @@ def construire_curated() -> None:
         "montant_ttc": ocr_mock.get("montant_ttc"),
         "devise": ocr_mock.get("devise"),
         "date_facture": ocr_mock.get("date_facture"),
-        # TODO: statut et source par l'ETUDIANT 5 (validation)
         "statut_validation": "valide_mock",
         "source": "simulation",
         "date_traitement": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -72,8 +65,6 @@ def construire_curated() -> None:
     logging.info("Payload Curated de simulation ecrit dans %s", SIMU_OUTPUT)
 
 
-# conserve une copie horodatee du payload curated apres chaque run
-# permet de tracer l'historique des executions sans ecraser le fichier precedent
 def archiver_resultat() -> None:
     SIMU_ARCHIVE.mkdir(parents=True, exist_ok=True)
     horodatage = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -86,7 +77,6 @@ def archiver_resultat() -> None:
     logging.info("Archive de simulation creee: %s", destination)
 
 
-# schedule=None signifie qu'on le declenche manuellement (pas de cron)
 with DAG(
     dag_id="orchestration_mocksimu_dag",
     start_date=datetime(2026, 3, 16),
@@ -94,45 +84,33 @@ with DAG(
     catchup=False,
     tags=["mock", "simu", "matis"],
 ) as dag:
-    # marqueur de debut (EmptyOperator = tache vide, juste pour structurer le graphe)
     debut = EmptyOperator(task_id="debut_pipeline")
 
-    # represente la recuperation du document brut (zone Raw) (ETUDIANT 4)
     ingestion_raw = EmptyOperator(task_id="ingestion_raw")
 
-    # lit le fichier mock OCR et le passe a la tache suivante via xcom
     simuler_ocr = PythonOperator(
         task_id="simuler_ocr",
         python_callable=lire_mock_ocr,
     )
 
-    # represente la sauvegarde du texte OCR brut en zone Clean
-    # sera remplace par l'ecriture reelle dans MinIO/stockage ETUDIANT 4
     persister_clean = EmptyOperator(task_id="persister_clean")
 
-    # transforme les donnees OCR en payload structure pret pour le CRM (zone Curated)
     construire_zone_curated = PythonOperator(
         task_id="construire_zone_curated",
         python_callable=construire_curated,
     )
 
-    # envoi vers l'API CRM de l'ETUDIANT 3 (placeholder, sera remplace par un vrai appel HTTP)
     envoyer_crm_mock = EmptyOperator(task_id="envoyer_crm_mock")
 
-    # envoi vers l'outil de conformite de l'ETUDIANT 3 (idem, placeholder pour l'instant)
     envoyer_conformite_mock = EmptyOperator(task_id="envoyer_conformite_mock")
 
-    # sauvegarde une copie horodatee du payload pour la tracabilite
     archiver_trace = PythonOperator(
         task_id="archiver_trace",
         python_callable=archiver_resultat,
     )
 
-    # marqueur de fin
     fin = EmptyOperator(task_id="fin_pipeline")
 
-    # ordre d'execution des taches ( ">>" signifie "puis")
-    # envoyer_crm_mock et envoyer_conformite_mock sont en parallele (liste [])
     (
         debut
         >> ingestion_raw
