@@ -7,7 +7,7 @@ import os
 import shutil
 
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.units import mm
 from reportlab.lib import colors
@@ -97,10 +97,10 @@ for i in range(5) :
 
         reference_document = f"{rnc(['Numéro :', 'N°', ''])} {facture_id if doctype=='facture' else devis_id}"
         if rnd() > .5 :
-            titleStyle = ParagraphStyle(name="doc_title", fontSize=rni(10,15),
-                                        alignment=rnc(['TA_LEFT', 'TA_CENTER', 'TA_CENTRE']),
+            titleStyle = ParagraphStyle(name="doc_title", fontSize=rni(10,20),
+                                        alignment=rnc([TA_LEFT, TA_CENTER, TA_CENTER]),
                                         fontName=rnc(['Helvetica','Helvetica-Bold']))
-            story.append(Paragraph(f"{doctype.upper()}", style=styles["Title"]))
+            story.append(Paragraph(f"{doctype.upper()}", style=titleStyle))
             story.append(Spacer(1, rni(6,18)))
         else :
             reference_document = f"{doctype.capitalize()} {reference_document}"
