@@ -76,10 +76,10 @@ class Facture :
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
-        self.montant_ht = round(self.montant_ht,2) if rn.random()>.95 else round(self.montant_ht*(1+rn.random()/10),2)
+        self.montant_ht = round(self.montant_ht,2) if rn.random()<.95 else round(self.montant_ht*(1+rn.random()/10),2)
         self.tva_taux = round(rn.random()/5, 2)
-        self.tva_montant = round(self.tva_taux * self.montant_ht, 2)
-        self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if rn.random()>.95 else round((self.montant_ht + self.tva_montant)*(1+rn.random()/10),2)
+        self.tva_montant = round(self.tva_taux * self.montant_ht, 2) if rn.random()<.95 else round(self.tva_taux*(1+rn.random()/10) * self.montant_ht, 2)
+        self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if rn.random()<.95 else round((self.montant_ht + self.tva_montant)*(1+rn.random()/10),2)
 
         creancier = Personne()
         creancier.generateRandom()
