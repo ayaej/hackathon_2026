@@ -38,7 +38,8 @@ class Facture :
                           "date_emission",
                           "date_expiration",
                           "montant_ttc",
-                          "tva",
+                          "tva_montant",
+                          "tva_taux",
                           "montant_ht",
                           "creancier",
                           "client",
@@ -82,8 +83,9 @@ class Facture :
         # Génération des montants
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
         self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
-        self.tva = round(random.random()/10 * self.montant_ht, 2)
-        self.montant_ttc = round(self.montant_ht + self.tva, 2) if random.random()>.95 else round((self.montant_ht + self.tva)*(1+random.random()/10),2)
+        self.tva_taux = round(random.random()/5, 2)
+        self.tva_montant = round(self.tva_taux * self.montant_ht, 2)
+        self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if random.random()>.95 else round((self.montant_ht + self.tva_montant)*(1+random.random()/10),2)
 
         # Génération des parties prenantes
         creancier = Personne()
@@ -107,7 +109,7 @@ class Facture :
     DATE ECHEANCE    : {self.date_echeance}
 
     MONTANT HT  : {self.montant_ht} €
-    TVA         : {self.tva} €
+    TVA         : {self.tva_montant} €
     MONTANT TTC : {self.montant_ttc} €
     """)
         print("# CREANCIER :")

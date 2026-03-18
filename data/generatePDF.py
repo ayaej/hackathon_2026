@@ -44,7 +44,8 @@ for i in range(5) :
         date_expiration = document["date_expiration"]
         date_echeance = document["date_echeance"]
         montant_ht = document["montant_ht"]
-        tva = document["tva"]
+        tva_montant = document["tva_montant"]
+        tva_taux = document["tva_taux"]
         montant_ttc = document["montant_ttc"]
 
         articles = document["articles"]
@@ -142,7 +143,7 @@ for i in range(5) :
             tableau.append([article["nom"], str(article["quantite"]), f"{article['prix']:.2f} €", f"{(article['quantite']*article['prix']):.2f} €"])
 
         tableau.append(["", "", f"{random.choice(['Total ', 'Montant total '])}{random.choice(['HT', '(HT)', ''])}{ddot}", f"{montant_ht:.2f} €"])
-        tableau.append(["", "", f"{random.choice(['TVA ', 'Montant TVA ', 'Montant de la TVA '])}{ddot}", f"{tva:.2f} €"])
+        tableau.append(["", "", f"{random.choice(['TVA ', 'Montant TVA ', 'Montant de la TVA '])}{'('+str(int(tva_taux*100))+' %) ' if random.random()>.5 else ''}{ddot}", f"{tva_montant:.2f} €"])
         tableau.append(["", "", f"{random.choice(['Total ', 'Montant total '])}{random.choice(['TTC', '(TTC)'])}{ddot}", f"{montant_ttc:.2f} €"])
 
         largeur_tableau = random.randint(160,200)
@@ -167,6 +168,8 @@ for i in range(5) :
             ('TOPPADDING', (0, 0), (-1, 0), top_padding),
             ('BOTTOMPADDING', (0, 1), (-1, -1), padding),
             ('TOPPADDING', (0, 1), (-1, -1), padding),
+            ('LEFTPADDING', (0, 0), (-1, -1), 5),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 5),
             ('BACKGROUND', (0, -3), (-1, -1), couleur_footer),
             ('INNERGRID', (0, 1), (-1, extension_grille), 1, couleur_grille_int),
             (random.choice(['BOX','GRID']), (0, 0), (-1, extension_grille), 1, couleur_grille),
