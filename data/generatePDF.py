@@ -27,11 +27,15 @@ for i in range(5) :
 
     for doctype in ["facture","devis"] :
 
-        random.seed(seed)
-
         # Récupération des données
 
         document = data[i]
+
+        perturbateur = random.randint(0, len(data)-1)
+        for key in document :
+            if random.random() > .995 :
+                document[key] = data[perturbateur][key]
+
         facture_id = document["facture_id"]
         devis_id = document["devis_id"]
         date_facturation = document["date_facturation"]
@@ -58,13 +62,16 @@ for i in range(5) :
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
 
+        random.seed(seed)
+
 
         # Génération du PDF
         
+        sideMargin = random.randint(30,50)
         doc = SimpleDocTemplate(f"pdf/{doctype}_{i}.pdf",
                                 pagesize=A4,
-                                rightMargin=random.randint(30,50),
-                                leftMargin=random.randint(30,50),
+                                rightMargin=sideMargin,
+                                leftMargin=sideMargin,
                                 topMargin=random.randint(30,60),
                                 bottomMargin=random.randint(12,24))
         styles = getSampleStyleSheet()
@@ -80,7 +87,7 @@ for i in range(5) :
         if doctype == "facture" :
             story.append(Paragraph(f"{bold_1}Date{' de facturation' if random.random()>.5 else ''} :{bold_2} {date_facturation}", styles["Normal"]))
         elif doctype == "devis" :
-            story.append(Paragraph(f"{bold_1}{random.choice(['Émission', 'Date d\'émmission', 'Émis le'])} :{bold_2} {date_emission}", styles["Normal"]))
+            story.append(Paragraph(f"{bold_1}{random.choice(['Émission', 'Date d\'émission', 'Émis le'])} :{bold_2} {date_emission}", styles["Normal"]))
         story.append(Spacer(1, random.randint(12,24)))
 
         bold_1, bold_2 = ("<b>", "</b>") if random.random() > 0.5 else ("", "")
@@ -174,7 +181,7 @@ for i in range(5) :
         story.append(Paragraph(f"Date de {random.choice(['prestation', 'livraison', 'résolution'])}{' prévue' if doctype=='devis' and random.random()>.5 else ''} : {date_prestation}", styles["Normal"]))
 
         if doctype == "facture" :
-            story.append(Paragraph(f"{random.choice(['Date d\'échéance', 'Échéance'])}{random.choice(['du paiement', ''])} : {date_echeance}", styles["Normal"]))
+            story.append(Paragraph(f"{random.choice(['Date d\'échéance', 'Échéance'])}{random.choice([' du paiement', ''])} : {date_echeance}", styles["Normal"]))
         elif doctype == "devis" :
             story.append(Paragraph(f"{random.choice(['Date d\'expiration', 'Expiration', 'Date de limite de validité'])} : {date_expiration}", styles["Normal"]))
         
