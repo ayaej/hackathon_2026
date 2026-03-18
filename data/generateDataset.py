@@ -59,7 +59,7 @@ class Facture :
         self.date_expiration = faker.date_between(start_date = self.date_prestation, end_date = max_date)
         
         self.facture_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
-        self.devis_id = f"D-{str(self.date_facturation)[:4]}-{random.randint(0,999):03d}"
+        self.devis_id = f"D-{str(self.date_emission)[:4]}-{random.randint(0,999):03d}"
         date_format = random.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
         self.date_facturation = self.date_facturation.strftime(date_format)
         self.date_echeance = self.date_echeance.strftime(date_format)

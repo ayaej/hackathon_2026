@@ -103,6 +103,12 @@ for i in range(5) :
 
         bold_1, bold_2 = ("<b>", "</b>") if rn.random() > 0.5 else ("", "")
 
+        objet = Paragraph(f"{bold_1}{rn.choice(['Objet : ', ''])}{articles[rn.randint(0,len(articles)-1)]["nom"]}{bold_2}")
+        objet_haut = True if rn.random()>.25 else False
+        if rn.random()>.75 and objet_haut :
+            story.append(objet)
+            story.append(Spacer(1, rn.randint(6,18)))
+
         header_client = f"{nom_client}<br/>{adresse_client_1}<br/>{adresse_client_2}"
         header_creancier = f"{nom_creancier}<br/>{adresse_creancier_1}<br/>{adresse_creancier_2}"
 
@@ -142,6 +148,10 @@ for i in range(5) :
                 story.append(Spacer(1, rn.randint(6,18)))
                 story.append(header_creancier)
 
+        if rn.random()>.75 and not objet_haut :
+            story.append(Spacer(1, rn.randint(6,18)))
+            story.append(objet)
+
         story.append(Spacer(1, rn.randint(12,36)))
 
         ## Tableau d'articles
@@ -151,7 +161,10 @@ for i in range(5) :
         couleur_grille = rn.choice([colors.black, colors.black, colors.lightslategray, colors.gray])
         couleur_grille_int = rn.choice([couleur_grille, couleur_grille, colors.lightslategray, colors.gray, colors.whitesmoke, colors.white])
 
-        tableau = [["Description", "Quantité", "Prix unitaire", "Total"]]
+        tableau = [[f"{rn.choice(['Description','Produits','Désignation','Libellé'])}",
+                    f"{rn.choice(['Quantité', 'Qté', 'Compte'])}",
+                    f"Prix {rn.choice(['unitaire', 'unité', 'à l\'unité'])}",
+                    f"{rn.choice(['Total', 'Montant', 'Montant total'])}{rn.choice([' HT', ''])}"]]
 
         ddot = rn.choice([' :',''])
 
@@ -193,11 +206,14 @@ for i in range(5) :
             ('FONTNAME', (0, -3), (-1, -1), 'Helvetica-Bold' if rn.random()>.5 else 'Helvetica'),
         ]))
 
-        story.append(table)
+        table_apres_footer = True if rn.random()>.8 else False
+
+        if not table_apres_footer :
+            story.append(table)
+            story.append(Spacer(1, rn.randint(6,18)))
 
         ## Footer
 
-        story.append(Spacer(1, rn.randint(6,18)))
         story.append(Paragraph(f"Date de {rn.choice(['prestation', 'livraison', 'résolution'])}{' prévue' if doctype=='devis' and rn.random()>.5 else ''} : {date_prestation}", styles["Normal"]))
 
         if doctype == "facture" :
@@ -205,6 +221,11 @@ for i in range(5) :
         elif doctype == "devis" :
             story.append(Paragraph(f"{rn.choice(['Date d\'expiration', 'Expiration', 'Date de limite de validité'])} : {date_expiration}", styles["Normal"]))
         
+        if table_apres_footer :
+            story.append(Spacer(1, rn.randint(6,18)))
+            story.append(table)
+            story.append(Spacer(1, rn.randint(6,18)))
+
         story.append(Spacer(1, rn.randint(12,96)))
 
         if doctype == "devis" :
