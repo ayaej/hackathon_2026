@@ -1,5 +1,5 @@
 from faker import Faker
-import random
+import random as rn
 import datetime
 import json
 
@@ -24,8 +24,6 @@ ARTICLE_DOMAINES = [
     " RH", " communication", " administration",
     " sécurité", " cloud", " data", " réseau"
 ]
-
-
 
 
 class Facture :
@@ -54,13 +52,13 @@ class Facture :
         max_date = datetime.date(year=2035, month=1, day=1)
         self.date_facturation = faker.date_between(start_date = min_date, end_date = max_date)
         self.date_echeance = faker.date_between(start_date = self.date_facturation, end_date = max_date)
-        self.date_prestation = self.date_facturation if random.random()>.5 else faker.date_between(start_date = self.date_facturation, end_date = max_date)
+        self.date_prestation = self.date_facturation if rn.random()>.5 else faker.date_between(start_date = self.date_facturation, end_date = max_date)
         self.date_emission = faker.date_between(start_date = min_date, end_date = self.date_prestation)
         self.date_expiration = faker.date_between(start_date = self.date_prestation, end_date = max_date)
         
-        self.facture_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
-        self.devis_id = f"D-{str(self.date_emission)[:4]}-{random.randint(0,999):03d}"
-        date_format = random.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
+        self.facture_id = f"FA-{str(self.date_facturation)[:4]}-{rn.randint(0, 9999):04d}"
+        self.devis_id = f"D-{str(self.date_emission)[:4]}-{rn.randint(0,999):03d}"
+        date_format = rn.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
         self.date_facturation = self.date_facturation.strftime(date_format)
         self.date_echeance = self.date_echeance.strftime(date_format)
         self.date_prestation = self.date_prestation.strftime(date_format)
@@ -69,19 +67,19 @@ class Facture :
         
 
         self.articles = []
-        for _ in range(random.randint(1,10)) :
-            article = random.choice(ARTICLE_DESCRIPTIONS)
-            if random.random()>.2 :
-                article += random.choice(ARTICLE_CONNECTEURS) + random.choice(ARTICLE_DOMAINES)
-            prix = round(1/(random.random()*200+1)*1000, 2)
-            quantite = random.randint(1,10)
+        for _ in range(rn.randint(1,10)) :
+            article = rn.choice(ARTICLE_DESCRIPTIONS)
+            if rn.random()>.2 :
+                article += rn.choice(ARTICLE_CONNECTEURS) + rn.choice(ARTICLE_DOMAINES)
+            prix = round(1/(rn.random()*200+1)*1000, 2)
+            quantite = rn.randint(1,10)
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
-        self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
-        self.tva_taux = round(random.random()/5, 2)
+        self.montant_ht = round(self.montant_ht,2) if rn.random()>.95 else round(self.montant_ht*(1+rn.random()/10),2)
+        self.tva_taux = round(rn.random()/5, 2)
         self.tva_montant = round(self.tva_taux * self.montant_ht, 2)
-        self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if random.random()>.95 else round((self.montant_ht + self.tva_montant)*(1+random.random()/10),2)
+        self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if rn.random()>.95 else round((self.montant_ht + self.tva_montant)*(1+rn.random()/10),2)
 
         creancier = Personne()
         creancier.generateRandom()
@@ -126,26 +124,26 @@ class Personne :
 
     def generateRandom(self) :
 
-        siret = random.randint(0, 10**14 - 1)
+        siret = rn.randint(0, 10**14 - 1)
         siret = f"{siret:014d}"
         self.siret = siret
         self.siren = siret[:9]
         self.nic = siret[9:]
-        self.n_tva = 'FR' + str(round(random.random()*100)) + ' ' + self.siren
+        self.n_tva = 'FR' + str(round(rn.random()*100)) + ' ' + self.siren
 
         self.prenom = faker.first_name()
-        self.prenom_2 = '' if random.random() < .75 else faker.first_name()
-        self.prenom_3 = '' if random.random() < .9 or self.prenom_2 == '' else faker.first_name()
+        self.prenom_2 = '' if rn.random() < .75 else faker.first_name()
+        self.prenom_3 = '' if rn.random() < .9 or self.prenom_2 == '' else faker.first_name()
         self.nom = faker.last_name()
-        self.sexe = random.choice(['M','F',''])
+        self.sexe = rn.choice(['M','F',''])
 
         self.adresse = faker.street_address()
         if self.adresse[0] not in ['1','2','3','4','5','6','7','8','9'] :
-            self.adresse = str(random.randint(1,9)) + ', ' + self.adresse
+            self.adresse = str(rn.randint(1,9)) + ', ' + self.adresse
         self.code_postal = faker.postcode()
         self.commune = faker.city()
 
-        self.ape = f"{int(random.random()*5700):04d}" + ['A','B','C','D','Z'][int(random.random()*5)]
+        self.ape = f"{int(rn.random()*5700):04d}" + ['A','B','C','D','Z'][int(rn.random()*5)]
 
     def display(self) :
         print(f"""
