@@ -21,6 +21,8 @@ airflow/dags/__pycache__/
 backend/node_modules/
 backend/.env
 backend/uploads/
+frontend/node_modules/
+frontend/dist/
 .DS_Store
 
 data/*.json
