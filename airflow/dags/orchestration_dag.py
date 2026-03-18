@@ -38,7 +38,7 @@ from ocr_module.evaluator import evaluate_extraction
 # monté dans /opt/airflow/val via docker-compose
 
 # validateur metier (utilise rules et risk_scoring en interne)
-from validator import DocumentValidator
+from val.validator import DocumentValidator
 
 ########################################################################################
 # constantes de configuration reseau
