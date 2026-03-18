@@ -26,6 +26,7 @@ x-airflow-common:
 
     # Active l'authentification basique pour l'API REST Airflow
     AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+    PYTHONPATH: /opt/airflow/src
 
     AIRFLOW_UID: ${AIRFLOW_UID:-50000}
   volumes:

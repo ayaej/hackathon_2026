@@ -50,8 +50,6 @@ class Facture :
             yield key, getattr(self, key)
 
     def generateRandom(self) :
-
-        # Génération des dates
         min_date = datetime.date(year=2015, month=1, day=1)
         max_date = datetime.date(year=2035, month=1, day=1)
         self.date_facturation = faker.date_between(start_date = min_date, end_date = max_date)
@@ -70,7 +68,6 @@ class Facture :
         self.date_expiration = self.date_expiration.strftime(date_format)
         
 
-        # Génération d'articles
         self.articles = []
         for _ in range(random.randint(1,10)) :
             article = random.choice(ARTICLE_DESCRIPTIONS)
@@ -80,14 +77,12 @@ class Facture :
             quantite = random.randint(1,10)
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
-        # Génération des montants
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
         self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
         self.tva_taux = round(random.random()/5, 2)
         self.tva_montant = round(self.tva_taux * self.montant_ht, 2)
         self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if random.random()>.95 else round((self.montant_ht + self.tva_montant)*(1+random.random()/10),2)
 
-        # Génération des parties prenantes
         creancier = Personne()
         creancier.generateRandom()
         self.obj_creancier = creancier
@@ -131,7 +126,6 @@ class Personne :
 
     def generateRandom(self) :
 
-        # Génération du SIRET (SIREN + NIC)
         siret = random.randint(0, 10**14 - 1)
         siret = f"{siret:014d}"
         self.siret = siret
@@ -139,19 +133,16 @@ class Personne :
         self.nic = siret[9:]
         self.n_tva = 'FR' + str(round(random.random()*100)) + ' ' + self.siren
 
-        # Génération de la personnes
         self.prenom = faker.first_name()
         self.prenom_2 = '' if random.random() < .75 else faker.first_name()
         self.prenom_3 = '' if random.random() < .9 or self.prenom_2 == '' else faker.first_name()
         self.nom = faker.last_name()
         self.sexe = random.choice(['M','F',''])
 
-        # Génération de l'adresse
         self.adresse = faker.street_address()
         self.code_postal = faker.postcode()
         self.commune = faker.city()
 
-        # Génération de l'activité
         self.ape = f"{int(random.random()*5700):04d}" + ['A','B','C','D','Z'][int(random.random()*5)]
 
     def display(self) :
@@ -174,10 +165,6 @@ class Personne :
     APE / NAF : {self.ape}
     """)
 
-
-# facture = Facture()
-# facture.generateRandom()
-# facture.display()
 
 liste = []
 for _ in range(100) :

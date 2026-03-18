@@ -6,8 +6,29 @@ from datetime import datetime
 reader = easyocr.Reader(['fr'], gpu=False)
 
 
+def pretraiter_image(chemin):
+    from PIL import Image, ImageOps, ImageEnhance
+    
+    with Image.open(chemin) as img:
+        # Conversion en niveaux de gris
+        img = ImageOps.grayscale(img)
+        # Augmentation du contraste
+        enhancer = ImageEnhance.Contrast(img)
+        img = enhancer.enhance(2.0)
+        # Augmentation de la netteté
+        enhancer = ImageEnhance.Sharpness(img)
+        img = enhancer.enhance(2.0)
+        
+        tmp_preprocessed = f"preprocessed_{os.path.basename(chemin)}"
+        img.save(tmp_preprocessed)
+        return tmp_preprocessed
+
+
 def lire_image(chemin):
-    resultats = reader.readtext(chemin, detail=0)
+    tmp = pretraiter_image(chemin)
+    resultats = reader.readtext(tmp, detail=0)
+    if os.path.exists(tmp):
+        os.remove(tmp)
     return " ".join(resultats)
 
 
@@ -24,6 +45,7 @@ def lire_pdf_numerique(chemin):
 
 def lire_pdf_scanne(chemin):
     from pdf2image import convert_from_path
+
 
     pages = convert_from_path(chemin, dpi=300)
     texte_total = ""
