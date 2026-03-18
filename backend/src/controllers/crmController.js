@@ -1,6 +1,11 @@
 const Client = require('../models/Client');
 const Document = require('../models/Document');
 
+const ALLOWED_CLIENT_FIELDS = ['siret', 'raisonSociale', 'siren', 'tva', 'contact', 'adresse', 'notes'];
+
+const pickAllowedFields = (payload = {}) =>
+  Object.fromEntries(Object.entries(payload).filter(([key]) => ALLOWED_CLIENT_FIELDS.includes(key)));
+
 exports.getClients = async (req, res) => {
   try {
     const { statut, search, page = 1, limit = 20 } = req.query;
@@ -26,7 +31,8 @@ exports.getClients = async (req, res) => {
       pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / limit) },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('CRM getClients error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
@@ -36,29 +42,38 @@ exports.getClient = async (req, res) => {
     if (!client) return res.status(404).json({ success: false, message: 'client introuvable' });
     res.json({ success: true, data: client });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('CRM getClient error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
 exports.createClient = async (req, res) => {
   try {
-    const client = await Client.create(req.body);
+    const clientData = pickAllowedFields(req.body);
+    const client = await Client.create(clientData);
     res.status(201).json({ success: true, data: client });
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({ success: false, message: 'Un client avec ce siret existe déjà' });
     }
-    res.status(500).json({ success: false, message: error.message });
+    console.error('CRM createClient error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
 exports.updateClient = async (req, res) => {
   try {
-    const client = await Client.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const updateData = pickAllowedFields(req.body);
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ success: false, message: 'Aucun champ autorisé à mettre à jour' });
+    }
+
+    const client = await Client.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
     if (!client) return res.status(404).json({ success: false, message: 'client introuvable' });
     res.json({ success: true, data: client });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('CRM updateClient error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
@@ -93,7 +108,8 @@ exports.createClientFromDocument = async (req, res) => {
 
     res.status(201).json({ success: true, data: client, created: true });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('CRM createClientFromDocument error:', error);
+    res.status(500).json({ success: false, message: 'erreur serveur' });
   }
 };
 
@@ -112,6 +128,7 @@ exports.getStats = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('CRM getStats error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
