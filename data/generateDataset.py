@@ -38,7 +38,8 @@ class Facture :
                           "date_emission",
                           "date_expiration",
                           "montant_ttc",
-                          "tva",
+                          "tva_montant",
+                          "tva_taux",
                           "montant_ht",
                           "creancier",
                           "client",
@@ -58,7 +59,7 @@ class Facture :
         self.date_expiration = faker.date_between(start_date = self.date_prestation, end_date = max_date)
         
         self.facture_id = f"FA-{str(self.date_facturation)[:4]}-{random.randint(0, 9999):04d}"
-        self.devis_id = f"D-{str(self.date_facturation)[:4]}-{random.randint(0,999):03d}"
+        self.devis_id = f"D-{str(self.date_emission)[:4]}-{random.randint(0,999):03d}"
         date_format = random.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
         self.date_facturation = self.date_facturation.strftime(date_format)
         self.date_echeance = self.date_echeance.strftime(date_format)
@@ -78,8 +79,9 @@ class Facture :
 
         self.montant_ht = sum(article["prix"] * article["quantite"] for article in self.articles)
         self.montant_ht = round(self.montant_ht,2) if random.random()>.95 else round(self.montant_ht*(1+random.random()/10),2)
-        self.tva = round(random.random()/10 * self.montant_ht, 2)
-        self.montant_ttc = round(self.montant_ht + self.tva, 2) if random.random()>.95 else round((self.montant_ht + self.tva)*(1+random.random()/10),2)
+        self.tva_taux = round(random.random()/5, 2)
+        self.tva_montant = round(self.tva_taux * self.montant_ht, 2)
+        self.montant_ttc = round(self.montant_ht + self.tva_montant, 2) if random.random()>.95 else round((self.montant_ht + self.tva_montant)*(1+random.random()/10),2)
 
         creancier = Personne()
         creancier.generateRandom()
@@ -102,7 +104,7 @@ class Facture :
     DATE ECHEANCE    : {self.date_echeance}
 
     MONTANT HT  : {self.montant_ht} €
-    TVA         : {self.tva} €
+    TVA         : {self.tva_montant} €
     MONTANT TTC : {self.montant_ttc} €
     """)
         print("# CREANCIER :")
@@ -138,6 +140,8 @@ class Personne :
         self.sexe = random.choice(['M','F',''])
 
         self.adresse = faker.street_address()
+        if self.adresse[0] not in ['1','2','3','4','5','6','7','8','9'] :
+            self.adresse = str(random.randint(1,9)) + ', ' + self.adresse
         self.code_postal = faker.postcode()
         self.commune = faker.city()
 
@@ -164,11 +168,15 @@ class Personne :
     """)
 
 
-liste = []
-for _ in range(100) :
-    facture = Facture()
-    facture.generateRandom()
-    liste.append(dict(facture))
+def generateDataset() :
+    liste = []
+    for _ in range(100) :
+        facture = Facture()
+        facture.generateRandom()
+        liste.append(dict(facture))
 
-with open("dataset.json", "w", encoding="utf-8") as f:
-    json.dump(liste, f, ensure_ascii=False, indent=4)
+    with open("dataset.json", "w", encoding="utf-8") as f:
+        json.dump(liste, f, ensure_ascii=False, indent=4)
+
+if __name__ == "__main__" :
+    generateDataset()
