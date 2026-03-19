@@ -19,7 +19,7 @@
 | ------ | ---------------------------------- |
 | M1     | Corentin, Danielle, Elliot, Monica |
 | M2     | Aya, Matis, Sara                   |
- 
+
 ## Étudiant 3 – Frontend + API
 
 En tant qu’étudiant 3, je me suis occupé de la couche **API pour le frontend** ainsi que de toute la partie **interface web** utilisée par les autres membres du groupe.
@@ -86,3 +86,77 @@ En tant qu’étudiant 3, je me suis occupé de la couche **API pour le frontend
   - effets de **blur / spotlight** sur les cartes de stats et les panneaux
   - bouton d’upload avec effet **magnet** au survol
 
+## Étudiant 2 – OCR & Extraction
+
+### Répartition du travail
+
+- Monica : + évaluation + traitement JSON
+- Danielle : extraction OCR + classification
+
+En tant qu’étudiantes 2, nous avons développé le module situé dans `/src/ocr_module` permettant de traiter des documents et d’en extraire des informations structurées.
+
+Le travail a été réparti entre deux parties :
+
+- classification & parsing
+- extraction & évaluation
+
+### Extraction de texte (OCR)
+
+Le module permet d’extraire du texte depuis plusieurs formats :
+
+- images via EasyOCR
+- PDF numériques via PyPDF2
+- PDF scannés via conversion en images puis OCR
+- fichiers DOCX
+
+Un prétraitement est appliqué aux images (grayscale, contraste, netteté) avant OCR.
+Le reader EasyOCR est initialisé une seule fois avec un système de lazy loading pour éviter les rechargements inutiles .
+
+### Classification des documents
+
+La classification repose sur un système de mots-clés associés à chaque type de document :
+
+- facture
+- devis
+- attestation
+- relevé
+- contrat
+- bon de commande
+
+Un score est calculé pour chaque type en comptant les occurrences de mots-clés, et le type avec le score le plus élevé est sélectionné .
+
+Des règles prioritaires sont appliquées pour certains mots explicites comme “facture” ou “devis”.
+
+### Parsing & Extraction d’informations
+
+Le module extrait plusieurs champs à partir du texte :
+
+- SIRET (avec validation Luhn) et SIREN
+- nom de l’entreprise
+- adresse
+- montants HT et TTC
+- taux de TVA
+- dates (émission, échéance, expiration)
+- IBAN et BIC
+- numéro de document
+
+L’extraction repose sur des expressions régulières et quelques règles simples de sélection .
+
+### Évaluation
+
+Deux types d’évaluation sont présents :
+
+- qualité OCR via un taux de similarité entre texte OCR et texte de référence (pour l'instant il n'est pas opérationel est sera toujours égal à 1)
+- qualité de l’extraction basée sur la présence de champs clés
+
+Un score global combine ces deux aspects .
+
+### Traitement JSON
+
+Le module permet aussi de traiter un fichier JSON contenant du texte OCR :
+
+- extraction des informations
+- fusion avec les champs déjà présents
+- classification du document
+- ajout de métadonnées (type, date, statut)
+- sauvegarde du résultat en JSON .
