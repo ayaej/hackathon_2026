@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 
 
+# ------------------ UTILS ------------------
 
 def to_float(val):
     if not val:
@@ -17,13 +18,21 @@ def to_float(val):
 def to_date(val):
     if not val:
         return None
-    try:
-        return datetime.strptime(val, "%d/%m/%Y").isoformat()
-    except:
+
+    formats = [
+        "%d/%m/%Y",
+        "%Y-%m-%d",
+        "%d-%m-%Y",
+        "%d.%m.%Y"
+    ]
+
+    for fmt in formats:
         try:
-            return datetime.strptime(val, "%Y-%m-%d").isoformat()
+            return datetime.strptime(val, fmt).isoformat()
         except:
-            return None
+            continue
+
+    return None
 
 
 def luhn_check(n):
@@ -35,31 +44,43 @@ def luhn_check(n):
     return s % 10 == 0
 
 
+def get_date(match):
+    return to_date(match.group(1)) if match else None
 
+
+# ------------------ PARSER ------------------
 
 def extraire_infos_cles(texte):
 
     texte_lower = texte.lower()
 
-    # --- SIRET ---
+    texte = re.sub(r"(Client|Vendeur|FACTURE|Description|Date)", r"\n\1", texte)
+
+    lignes = [l.strip() for l in texte.split("\n") if l.strip()]
+
+    # ------------------ SIRET ------------------
     siret = None
     for m in re.findall(r"\b\d{14}\b", texte):
         if luhn_check(m):
             siret = m
             break
 
-    # --- SIREN ---
+    if not siret:
+        match = re.search(r"SIRET\s*[:\-]?\s*(\d{14})", texte, re.IGNORECASE)
+        if match:
+            siret = match.group(1)
+
     siren = siret[:9] if siret else None
 
-    # --- NUMERO ---
-    numero = re.search(r"\b[A-Z]{2,5}[-_]?\d+\b", texte)
+    # ------------------ NUMERO ------------------
+    numero = re.search(r"\b[A-Z]{2,5}[-_]?\d{3,}\b", texte)
 
+    # ------------------ DATES ------------------
 
-
-    PATTERN_DATE = r"(\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4})"
+    PATTERN_DATE = r"(\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4}|\d{2}\.\d{2}\.\d{4})"
 
     date_emission = re.search(
-        r"(?:facturation|émission|date)[^\d]*" + PATTERN_DATE,
+        r"(?:facturation|émission)[^\d]*" + PATTERN_DATE,
         texte_lower
     )
 
@@ -73,22 +94,26 @@ def extraire_infos_cles(texte):
         texte_lower
     )
 
-    # --- IBAN / BIC ---
+    # fallback si rien trouvé
+    if not date_emission:
+        date_emission = re.search(PATTERN_DATE, texte)
+
+    # ------------------ IBAN / BIC ------------------
     iban = re.search(r"\bFR\d{2}[A-Z0-9]{10,30}\b", texte)
     bic = re.search(r"\b[A-Z]{6}[A-Z0-9]{2,5}\b", texte)
 
-    # --- TVA ---
+    # ------------------ TVA ------------------
     tva = re.search(r"TVA\s*:?\s*(\d{1,2}(?:[.,]\d{1,2})?)\s*%", texte)
 
-    # --- MONTANTS ---
+    # ------------------ MONTANTS ------------------
     montant_ht = None
     montant_ttc = None
 
-    match_ht = re.search(r"HT[^0-9]*(\d+[.,]\d{2})", texte, re.IGNORECASE)
+    match_ht = re.search(r"(?:HT|Hors\s+taxe)[^0-9]*(\d+[.,]\d{2})", texte, re.IGNORECASE)
     if match_ht:
         montant_ht = to_float(match_ht.group(1))
 
-    match_ttc = re.search(r"TTC[^0-9]*(\d+[.,]\d{2})", texte, re.IGNORECASE)
+    match_ttc = re.search(r"(?:TTC|Total\s*TTC)[^0-9]*(\d+[.,]\d{2})", texte, re.IGNORECASE)
     if match_ttc:
         montant_ttc = to_float(match_ttc.group(1))
 
@@ -97,43 +122,52 @@ def extraire_infos_cles(texte):
         if nums:
             montant_ttc = max([to_float(n) for n in nums if to_float(n)])
 
-    lignes = [l.strip() for l in texte.split("\n") if l.strip()]
+    # ------------------ COMPANY ------------------
 
     company = None
 
-    for l in lignes[:10]:
-        if any(x in l.lower() for x in ["sarl", "sas", "sa", "eurl"]):
-            company = l
-            break
+    # 1. après "Client"
+    match_client = re.search(r"Client\s+([A-Z][a-z]+\s+[A-Z][a-z]+)", texte)
+    if match_client:
+        company = match_client.group(1)
 
+    # 2. société
+    if not company:
+        for l in lignes[:10]:
+            if any(x in l.lower() for x in ["sarl", "sas", "sa", "eurl"]):
+                company = l
+                break
+
+    # 3. nom prénom
     if not company:
         for l in lignes[:10]:
             if re.match(r"^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+$", l):
                 company = l
                 break
 
-    if not company:
-        for l in lignes[:5]:
-            if not any(x in l.lower() for x in ["facture", "numero", "date", "tva"]):
-                company = l
-                break
+    # ------------------ ADDRESS ------------------
 
-    address = re.search(r"\d{1,4}\s*,?\s*(?:rue|avenue|bd|boulevard)\s+(?:de\s+|du\s+|des\s+)?[A-Za-z\s\-]+",texte_lower
-)
+    address = re.search(
+        r"\d{1,4}\s*,?\s*(?:rue|avenue|bd|boulevard)\s+(?:de\s+|du\s+|des\s+)?[A-Za-z\s\-]+",
+        texte_lower
+    )
+
+    # ------------------ RETURN ------------------
+
     return {
         "extraction": {
             "siret": siret,
             "siren": siren,
             "companyName": company,
-            "address": address.group() if address else None,
+            "address": address.group().strip() if address else None,
 
             "montantHT": montant_ht,
             "montantTTC": montant_ttc,
-            "tva": int(tva.group(1)) if tva else None,
+            "tva": float(tva.group(1).replace(",", ".")) if tva else None,
 
-            "dateEmission": to_date(date_emission.group()) if date_emission else None,
-            "dateExpiration": to_date(date_expiration.group(1)) if date_expiration else None,
-            "dateEcheance": to_date(date_echeance.group(1)) if date_echeance else None,
+            "dateEmission": get_date(date_emission),
+            "dateExpiration": get_date(date_expiration),
+            "dateEcheance": get_date(date_echeance),
 
             "numeroDocument": numero.group() if numero else None,
             "iban": iban.group() if iban else None,
