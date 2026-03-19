@@ -1,54 +1,76 @@
 import os
 import json
-
+from src import config
 from src.ocr_module.extractor import extraire_texte
 from src.ocr_module.parser import extraire_infos_cles
 from src.ocr_module.classifier import classifier_document
 from src.ocr_module.evaluator import evaluate_global
 
-INPUT_FOLDER = "data/raw"
-OUTPUT_FOLDER = "data/silver"
+# from src.utils.date_checker import comparer_validite_documents
 
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+def process_all(
+    input_folder=config.RAW_DIR, output_folder=config.SILVER_DIR
+):
+    """Traite tous les documents OCR d'un dossier.
+    Sauvegarde les résultats dans le dossier de sortie.
+    """
+    if not os.path.exists(input_folder):
+        print(f"[ERROR] Dossier d'entrée {input_folder} introuvable.")
+        return
 
-results = []
+    os.makedirs(output_folder, exist_ok=True)
+    results = []
 
-for filename in os.listdir(INPUT_FOLDER):
+    for filename in os.listdir(input_folder):
+        path = os.path.join(input_folder, filename)
+        if not os.path.isfile(path) or not filename.lower().endswith(
+            ('.pdf', '.jpg', '.jpeg', '.png')
+        ):
+            continue
 
-    path = os.path.join(INPUT_FOLDER, filename)
+        print("Processing:", filename)
+        texte = extraire_texte(path)
+        parsed = extraire_infos_cles(texte)
+        extraction = parsed["extraction"]
+        type_doc = classifier_document(texte)
+        extraction["type_document"] = type_doc
 
-    print("Processing:", filename)
+        evaluation = evaluate_global(
+            texte_ocr=texte,
+            texte_reference=texte,
+            data={
+                "siret": extraction.get("siret"),
+                "tva": extraction.get("tva_taux"),
+                "montants": extraction.get("montant_ttc"),
+                "dates": extraction.get("dateEmission")
+            },
+            filename=filename
+        )
 
-    texte = extraire_texte(path)
+        results.append({
+            "file": filename,
+            "type": type_doc,
+            "data": extraction,
+            "evaluation": evaluation
+        })
 
-    parsed = extraire_infos_cles(texte)
-    extraction = parsed["extraction"]
+    # comparaison = comparer_validite_documents(results)
+    comparaison = {"status": "skipped", "details": "Validation multi-docs non activée"}
 
-    
-    type_doc = classifier_document(texte)
+    output_path = os.path.join(output_folder, "results.json")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "results": results,
+                "comparison": comparaison,
+            },
+            f,
+            indent=4,
+            ensure_ascii=False,
+        )
 
-    evaluation = evaluate_global(
-        texte_ocr=texte,
-        texte_reference=texte, 
-        data={
-            "siret": extraction.get("siret"),
-            "tva": extraction.get("tva_taux"),
-            "montants": extraction.get("montant_ttc"),
-            "dates": extraction.get("date")
-        },
-        filename=filename
-    )
+    print(f"DONE → {output_path}")
 
-    results.append({
-        "file": filename,
-        "type": type_doc,
-        "data": extraction,
-        "evaluation": evaluation
-    })
 
-output_path = os.path.join(OUTPUT_FOLDER, "results.json")
-
-with open(output_path, "w", encoding="utf-8") as f:
-    json.dump(results, f, indent=4, ensure_ascii=False)
-
-print(f"DONE → {output_path}")
+if __name__ == "__main__":
+    process_all()
