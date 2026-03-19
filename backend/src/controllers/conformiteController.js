@@ -95,6 +95,93 @@ exports.submitValidationResult = async (req, res) => {
   }
 };
 
+// ETUDIANT 6 : auto-remplissage conformite depuis le pipeline airflow
+exports.autofillFromPipeline = async (req, res) => {
+  try {
+    const { documents } = req.body;
+    if (!Array.isArray(documents)) {
+      return res.status(400).json({ success: false, message: 'le champ documents est requis (array)' });
+    }
+
+    const results = [];
+
+    for (const doc of documents) {
+      const documentId = doc.documentId;
+      if (!documentId) {
+        results.push({ documentId: null, status: 'ignore', reason: 'documentId manquant' });
+        continue;
+      }
+
+      // construire les anomalies conformite a partir du payload dag
+      const isValid = doc.statutValidation === 'valide';
+      const severity = doc.severity || 'low';
+      const riskScore = doc.riskScore || 0;
+
+      const anomalies = [];
+      if (!isValid) {
+        // anomalie generique basee sur la severite
+        anomalies.push({
+          type: 'anomalie_pipeline',
+          description: `anomalie detectee par le pipeline (severity: ${severity}, score: ${riskScore})`,
+          severity: severity,
+        });
+      }
+
+      const validationResult = {
+        isValid,
+        score: 100 - riskScore,
+        anomalies,
+        validatedAt: new Date(),
+      };
+
+      const updated = await Document.findByIdAndUpdate(
+        documentId,
+        {
+          $set: {
+            validationResult,
+            status: isValid ? 'validated' : 'anomaly',
+          },
+        },
+        { new: true }
+      );
+
+      if (!updated) {
+        results.push({ documentId, status: 'ignore', reason: 'document introuvable' });
+        continue;
+      }
+
+      // propager les anomalies critiques vers le client crm si applicable
+      if (!isValid && updated.extractedData?.siret && (severity === 'high' || severity === 'critical')) {
+        await Client.findOneAndUpdate(
+          { siret: updated.extractedData.siret },
+          {
+            $set: { statut: 'en_verification', dernierControle: new Date() },
+            $push: {
+              anomaliesDetectees: {
+                documentId: updated._id,
+                type: 'anomalie_pipeline',
+                description: `risque ${severity} detecte (score: ${riskScore})`,
+                detectedAt: new Date(),
+              },
+            },
+          }
+        );
+      }
+
+      results.push({ documentId, status: 'ok' });
+    }
+
+    res.json({
+      success: true,
+      message: `${results.filter(r => r.status === 'ok').length} document(s) traite(s)`,
+      data: results,
+    });
+  } catch (error) {
+    console.error('Conformite autofillFromPipeline error:', error);
+    res.status(500).json({ success: false, message: 'erreur serveur' });
+  }
+};
+
 exports.getStats = async (req, res) => {
   try {
     const [total, validated, anomalies, pending] = await Promise.all([

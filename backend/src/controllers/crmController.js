@@ -1,5 +1,6 @@
 const Client = require('../models/Client');
 const Document = require('../models/Document');
+const mongoose = require('mongoose');
 
 const ALLOWED_CLIENT_FIELDS = ['siret', 'raisonSociale', 'siren', 'tva', 'contact', 'adresse', 'notes'];
 
@@ -122,6 +123,61 @@ exports.createClientFromDocument = async (req, res) => {
     res.status(201).json({ success: true, data: client, created: true });
   } catch (error) {
     console.error('CRM createClientFromDocument error:', error);
+    res.status(500).json({ success: false, message: 'erreur serveur' });
+  }
+};
+
+// ETUDIANT 6 : auto-remplissage CRM depuis le pipeline airflow
+exports.autofillFromPipeline = async (req, res) => {
+  try {
+    const { documents } = req.body;
+    if (!Array.isArray(documents)) {
+      return res.status(400).json({ success: false, message: 'le champ documents est requis (array)' });
+    }
+
+    const results = [];
+
+    for (const doc of documents) {
+      const siret = doc.siret;
+      if (!siret) {
+        results.push({ documentId: doc.documentId, status: 'ignore', reason: 'siret manquant' });
+        continue;
+      }
+
+      // upsert : creer ou mettre a jour le client par siret
+      const updateData = {
+        raisonSociale: doc.fournisseur || 'fournisseur inconnu',
+        siren: doc.siren || undefined,
+        tva: doc.tva || undefined,
+      };
+
+      // lier le document au client si documentId est un objectid valide
+      const pushOp = {};
+      if (doc.documentId && mongoose.Types.ObjectId.isValid(doc.documentId)) {
+        pushOp.documents = doc.documentId;
+      }
+
+      const updateQuery = { $set: updateData };
+      if (Object.keys(pushOp).length > 0) {
+        updateQuery.$addToSet = pushOp;
+      }
+
+      const client = await Client.findOneAndUpdate(
+        { siret },
+        updateQuery,
+        { new: true, upsert: true, runValidators: true }
+      );
+
+      results.push({ documentId: doc.documentId, status: 'ok', clientId: client._id });
+    }
+
+    res.json({
+      success: true,
+      message: `${results.filter(r => r.status === 'ok').length} client(s) mis a jour`,
+      data: results,
+    });
+  } catch (error) {
+    console.error('CRM autofillFromPipeline error:', error);
     res.status(500).json({ success: false, message: 'erreur serveur' });
   }
 };

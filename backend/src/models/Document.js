@@ -33,7 +33,7 @@ const documentSchema = new mongoose.Schema(
       score: Number,
       anomalies: [
         {
-          type: String,
+          type: { type: String }, // Mongoose "type" keyword escape
           description: String,
           severity: { type: String, enum: ['low', 'medium', 'high', 'critical'] },
         },

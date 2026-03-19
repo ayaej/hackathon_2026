@@ -423,26 +423,23 @@ def valider_documents_curated(**context) -> None:
             "date_expiration": item.get("date_expiration")
         }
 
-        try:
-            report = validator.validate(facture, attestation)
-        except TypeError:
-            logging.warning(
-                "typeerror lors de la validation du document %s, probablement a cause de montants nuls",
-                document_id,
-            )
-            report = {
-                "status": "invalid",
-                "risk_score": 100,
-                "severity": "high",
-                "errors": ["donnees invalides pour la validation (montants manquants)"],
-            }
+        report = validator.validate(facture, attestation)
         
         is_valid = report["status"] == "valid"
         item["statut_validation"] = "valide" if is_valid else "anomaly"
         item["risk_score"] = report.get("risk_score", 0)
-        item["severity"] = report.get("severity", "unknown")
+        # clamp severity aux valeurs autorisees par le schema mongoose
+        raw_severity = report.get("severity", "low")
+        item["severity"] = raw_severity if raw_severity in ("low", "medium", "high", "critical") else "low"
 
-        anomalies = [{"type": e.lower().replace(" ", "_"), "description": e, "severity": item["severity"]} for e in report.get("errors", [])]
+        anomalies = [
+            {
+                "type": e.lower().replace(" ", "_").replace("'", "").replace("(", "").replace(")", ""),
+                "description": e,
+                "severity": item["severity"],
+            }
+            for e in report.get("errors", [])
+        ]
 
         validation_result = {
             "isValid": is_valid,
@@ -526,14 +523,38 @@ def persister_documents_curated(**context) -> None:
 ########################################################################################
 # ETAPE 7 : envoi vers le CRM (ETUDIANT 6 - auto-remplissage)
 
+def _build_autofill_payload(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """construit le payload autofill a partir des documents valides.
+    transforme les cles internes en cles metier pour le CRM/conformite."""
+    result = []
+    for item in items:
+        result.append({
+            "documentId": item.get("document_id"),
+            "type": item.get("type_document", "inconnu"),
+            "fournisseur": item.get("fournisseur"),
+            "siret": item.get("siret"),
+            "siren": item.get("siren"),
+            "montantHT": item.get("montant_ht"),
+            "montantTTC": item.get("montant_ttc"),
+            "tva": item.get("tva"),
+            "dateDocument": item.get("date_facture"),
+            "dateExpiration": item.get("date_expiration"),
+            "iban": item.get("iban"),
+            "statutValidation": item.get("statut_validation"),
+            "riskScore": item.get("risk_score"),
+            "severity": item.get("severity"),
+        })
+    return result
+
+
 def envoyer_payload_crm(**context) -> None:
     """envoie le payload valide vers l'application CRM (ETUDIANT 3/6).
     l'url est configurable via la variable airflow 'crm_autofill_url'."""
     ti = context["ti"]
-    payload: list[dict[str, Any]] = ti.xcom_pull(task_ids="valider_curated", key="curated_validated") or []
+    curated: list[dict[str, Any]] = ti.xcom_pull(task_ids="valider_curated", key="curated_validated") or []
     crm_url = Variable.get("crm_autofill_url", default_var="").strip()
 
-    if not payload:
+    if not curated:
         logging.info("aucun payload a envoyer au CRM")
         return
 
@@ -541,6 +562,7 @@ def envoyer_payload_crm(**context) -> None:
         logging.info("crm_autofill_url non configuree, envoi CRM ignore")
         return
 
+    payload = _build_autofill_payload(curated)
     _http_json("POST", crm_url, {"documents": payload})
     logging.info("payload envoye au CRM: %s documents", len(payload))
 
@@ -552,10 +574,10 @@ def envoyer_payload_conformite(**context) -> None:
     """envoie le payload valide vers l'outil de conformite (ETUDIANT 3/6).
     l'url est configurable via la variable airflow 'conformite_autofill_url'."""
     ti = context["ti"]
-    payload: list[dict[str, Any]] = ti.xcom_pull(task_ids="valider_curated", key="curated_validated") or []
+    curated: list[dict[str, Any]] = ti.xcom_pull(task_ids="valider_curated", key="curated_validated") or []
     conformite_url = Variable.get("conformite_autofill_url", default_var="").strip()
 
-    if not payload:
+    if not curated:
         logging.info("aucun payload a envoyer a la conformite")
         return
 
@@ -563,6 +585,7 @@ def envoyer_payload_conformite(**context) -> None:
         logging.info("conformite_autofill_url non configuree, envoi conformite ignore")
         return
 
+    payload = _build_autofill_payload(curated)
     _http_json("POST", conformite_url, {"documents": payload})
     logging.info("payload envoye a la conformite: %s documents", len(payload))
 
