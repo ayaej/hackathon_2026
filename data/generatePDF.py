@@ -300,3 +300,6 @@ for i in range(documents_a_generer) :
         image = convert_from_path(f"pdf/{doctype}_{i}.pdf", dpi = rni(50,200))
         format = rnc(['jpeg','png','pdf'])
         image[0].save(f"pdf/{doctype}_image_{i}.{format}", format.upper())
+
+
+print(f"Les {documents_a_generer} documents ont été générés avec succès")

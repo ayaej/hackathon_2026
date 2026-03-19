@@ -7,7 +7,7 @@ import string
 
 ### METTRE A JOUR SELON LES BESOINS ### 
 
-elements_a_generer = 2
+elements_a_generer = 100
 
 #######################################
 
@@ -45,7 +45,7 @@ class Facture :
                           "erreur_montant",
                           "facture_id",
                           "devis_id",
-                          "numero_document",
+                          "numeroDocument",
                           "dateFacturation",
                           "dateEcheance",
                           "datePrestation",
@@ -84,7 +84,7 @@ class Facture :
             self.erreur_date = True
         self.facture_id = f"FA-{str(self.dateFacturation)[:4]}-{rn.randint(0, 9999):04d}"
         self.devis_id = f"D-{str(self.dateEmission)[:4]}-{rn.randint(0,999):03d}"
-        self.numero_document = rn.choice([self.facture_id, self.devis_id]) # Pour correspondance avec les normes du datalake
+        self.numeroDocument = rn.choice([self.facture_id, self.devis_id]) # Pour correspondance avec les normes du datalake
         date_format = rn.choice(["%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y", "%d / %m / %Y", "%d - %m - %Y", "%d / %m / %y", "%d - %m - %y"])
         self.dateFacturation = self.dateFacturation.strftime(date_format)
         self.dateEcheance = self.dateEcheance.strftime(date_format)
@@ -106,18 +106,18 @@ class Facture :
         if rn.random()<.9 :
             self.montantHT = round(self.montantHT,2)
         else :
-            self.montantHT = round(self.montantHT*(1+rn.random()/10),2)
+            self.montantHT = round(self.montantHT*(1+rn.random()*2-1),2)
             self.erreur_montant = True
         self.tva = round(rn.random()/5, 2) if rn.random()<.2 else .2
         if rn.random()<.9 :
             self.tva_montant = round(self.tva * self.montantHT, 2) 
         else :
-            self.tva_montant = round(self.tva*(1+rn.random()/10) * self.montantHT, 2)
+            self.tva_montant = round(self.tva*(1+rn.random()*2-1) * self.montantHT, 2)
             self.erreur_montant = True
         if rn.random()<.9 :
             self.montantTTC = round(self.montantHT + self.tva_montant, 2)
         else :
-            self.montantTTC = round((self.montantHT + self.tva_montant)*(1+rn.random()/10),2)
+            self.montantTTC = round((self.montantHT + self.tva_montant)*(1+rn.random()*2-1),2)
             self.erreur_montant = True
 
         creancier = Personne()
