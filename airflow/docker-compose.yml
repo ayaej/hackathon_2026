@@ -91,7 +91,7 @@ services:
   mongo:
     image: mongo:7
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -175,6 +175,8 @@ services:
         airflow users create --username admin --firstname Matis --lastname Admin --role Admin --email admin@example.com --password admin
         airflow variables set backend_base_url http://backend:5000
         airflow variables set datalake_base_url http://datalake:3000
+        airflow variables set crm_autofill_url http://backend:5000/api/crm/autofill
+        airflow variables set conformite_autofill_url http://backend:5000/api/conformite/autofill
     restart: "no"
 
   # interface web Airflow : http://localhost:8080 (admin-admin)
