@@ -5,6 +5,13 @@ import json
 import string
 
 
+### METTRE A JOUR SELON LES BESOINS ### 
+
+elements_a_generer = 2
+
+#######################################
+
+
 faker = Faker('fr_FR')
 
 ARTICLE_DESCRIPTIONS = [
@@ -66,12 +73,13 @@ class Facture :
         max_date = datetime.date(year=2035, month=1, day=1)
 
         self.dateFacturation = faker.date_between(start_date = min_date, end_date = max_date)
-        self.dateEcheance = faker.date_between(start_date = self.dateFacturation, end_date = max_date)
         self.datePrestation = self.dateFacturation if rn.random()>.5 else faker.date_between(start_date = self.dateFacturation, end_date = max_date)
         self.dateEmission = faker.date_between(start_date = min_date, end_date = self.datePrestation)
         if rn.random()<.75 :
+            self.dateEcheance = faker.date_between(start_date = self.dateFacturation, end_date = max_date)
             self.dateExpiration = faker.date_between(start_date = self.datePrestation, end_date = max_date)
         else :
+            self.dateEcheance = faker.date_between(start_date = min_date, end_date = self.dateFacturation)
             self.dateExpiration = faker.date_between(start_date = min_date, end_date = self.dateEmission)
             self.erreur_date = True
         self.facture_id = f"FA-{str(self.dateFacturation)[:4]}-{rn.randint(0, 9999):04d}"
@@ -224,9 +232,9 @@ class Personne :
     """)
 
 
-def generateDataset() :
+def generateDataset(n) :
     liste = []
-    for _ in range(100) :
+    for _ in range(n) :
         facture = Facture()
         facture.generateRandom()
         liste.append(dict(facture))
@@ -235,4 +243,4 @@ def generateDataset() :
         json.dump(liste, f, ensure_ascii=False, indent=4)
 
 if __name__ == "__main__" :
-    generateDataset()
+    generateDataset(elements_a_generer)

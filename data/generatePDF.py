@@ -15,22 +15,31 @@ from reportlab.lib.styles import ParagraphStyle
 
 from pdf2image.pdf2image import convert_from_path
 
+### METTRE A JOUR SELON LES BESOINS ### 
+
+documents_a_generer = 5
+
+#######################################
+
 
 if not os.path.exists("dataset.json") :
     from generateDataset import generateDataset
-    generateDataset()
-
+    generateDataset(documents_a_generer)
 
 with open("dataset.json", "r", encoding="utf-8") as f:
     data = json.load(f)
+
+if documents_a_generer > len(data) :
+    from generateDataset import generateDataset
+    generateDataset(documents_a_generer)
+    with open("dataset.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
 
 if os.path.isdir("pdf") :
     shutil.rmtree("pdf")
 os.mkdir("pdf")
 
-
-for i in range(5) :
-# for i in range(len(data)) :
+for i in range(documents_a_generer) :
 
     seed = rni(1,int(1e9))
 
