@@ -1,6 +1,7 @@
 from difflib import SequenceMatcher
 
 
+
 def taux_similarite(texte_ocr, texte_reference):
     if not texte_reference:
         return 0
@@ -31,26 +32,32 @@ def rapport_qualite(texte_ocr, texte_reference, nom_fichier=""):
         "note_ocr": note
     }
 
-
 def evaluate_extraction(data):
-
     score = 0
     total = 4
 
     if data.get("siret"):
         score += 1
+
     if data.get("tva"):
         score += 1
-    if data.get("montants"):
+
+    if data.get("montantHT") or data.get("montantTTC"):
         score += 1
-    if data.get("dates"):
+
+    if (
+        data.get("dateEmission") or
+        data.get("dateExpiration") or
+        data.get("dateEcheance")
+    ):
         score += 1
 
     return score / total
 
 
-def evaluate_global(texte_ocr, texte_reference, data, filename=""):
 
+
+def evaluate_global(texte_ocr, texte_reference, data, filename=""):
     ocr_eval = rapport_qualite(texte_ocr, texte_reference, filename)
     extraction_score = evaluate_extraction(data)
 

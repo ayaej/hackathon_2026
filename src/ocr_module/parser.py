@@ -1,147 +1,138 @@
 import re
-import os
-
-def luhn_check(number):
-    """Vérifie un numéro via l'algorithme de Luhn."""
-    if not number or not number.isdigit():
-        return False
-    digits = [int(d) for d in str(number)]
-    odd_digits = digits[-1::-2]
-    even_digits = digits[-2::-2]
-    checksum = sum(odd_digits)
-    for d in even_digits:
-        checksum += sum(divmod(d * 2, 10))
-    return checksum % 10 == 0
-
-PATTERN_SIRET = r'\b(\d{3}[\s\-]?\d{3}[\s\-]?\d{3}[\s\-]?\d{5}|\d{14})\b'
-PATTERN_DATE = r'\b(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})\b'
-PATTERN_NUMERO_DOC = r'\b([A-Z]{2,5}[\-_]?\d{4}[\-_]?\d{2,6})\b'
-PATTERN_TVA_TAUX = r'\bTVA\s*:?\s*(\d{1,2}(?:[,\.]\d{1,2})?)\s*%'
-PATTERN_IBAN = r'\bFR\d{2}[\s\d]{23,30}\b'
-PATTERN_DATE_EXPIRATION = r'(?:échéance|echeance|valable jusqu\'au|expiration|expire le|date limite|fin de validité)[^\d]*(\d{4}[\-/]\d{1,2}[\-/]\d{1,2}|\d{1,2}[\s\-/\.]\d{1,2}[\s\-/\.]\d{2,4}|\d{1,2}\s+\w+\s+\d{4})'
+from datetime import datetime
 
 
-def nettoyer_siret(valeur):
-    return re.sub(r'[\s\-]', '', valeur)
 
-
-def extraire_siret(texte):
-    matches = re.finditer(PATTERN_SIRET, texte)
-    for match in matches:
-        siret = nettoyer_siret(match.group())
-        if len(siret) == 14 and luhn_check(siret):
-            return siret
-    return None
-
-def extraire_siren(siret):
-    if siret and len(siret) == 14:
-        return siret[:9]
-    return None
-
-
-def extraire_date(texte):
-    match = re.search(PATTERN_DATE, texte)
-    return match.group().strip() if match else None
-
-
-def extraire_date_expiration(texte):
-    match = re.search(PATTERN_DATE_EXPIRATION, texte, re.IGNORECASE)
-    return match.group(1).strip() if match else None
-
-def extraire_montants(texte):
-    montants = {
-        "montant_ttc": None,
-        "montant_ht": None,
-        "tva_montant": None,
-        "tva_taux": None
-    }
-
-    def clean_amount(val):
-        if not val: return None
-        # Remplacement agressif des erreurs d'OCR courantes dans les nombres
-        cleansed = val.replace(" ", "").replace(",", ".")
-        cleansed = cleansed.replace("o", "0").replace("O", "0")
-        cleansed = cleansed.replace("B", "8").replace("S", "5").replace("s", "5")
-        cleansed = cleansed.replace("I", "1").replace("l", "1").replace("Z", "2")
-        # Garder uniquement les chiffres et le point
-        cleansed = "".join([c for c in cleansed if c.isdigit() or c == "."])
-        return cleansed
-
-    # Pattern pour les nombres avec décimales (2 chiffres)
-    pattern_numeric = r'([0-9BBSZloO]+[\s\.,][0-9BBSZloO]{2})(?!\d)'
-    
-    # prioritiser les labels de total (plus specifique pour eviter Total HT)
-    ttc_labels = r'(?:TTC|Net\s+à\s+payer|Net\s+a\s+payer|A\s+payer|Tcial\s+TTC|Total\s+TTC|Total\s+D\?)'
-    
-    match_ttc = re.search(ttc_labels + r'[^0-9BBSZloO]{0,40}' + pattern_numeric, texte, re.IGNORECASE)
-    if match_ttc:
-        montants["montant_ttc"] = clean_amount(match_ttc.group(1))
-
-    # HT (plus specifique)
-    match_ht = re.search(r'(?:HT|Hors\s+Taxe|Total\s+HT)[^0-9BBSZloO]{0,40}' + pattern_numeric, texte, re.IGNORECASE)
-    if match_ht:
-        montants["montant_ht"] = clean_amount(match_ht.group(1))
-
-    # Fallback : si TTC non trouve via label, on prend le plus gros nombre SAUF si c'est deja pris par le HT
-    if not montants["montant_ttc"]:
-        all_numeric = re.findall(pattern_numeric, texte)
-        if all_numeric:
-            valid_vals = []
-            for n in all_numeric:
-                try: 
-                    v = float(clean_amount(n))
-                    # Eviter de reprendre le HT si c'est la seule valeur
-                    if str(v) != montants["montant_ht"] and v < 1000000:
-                        valid_vals.append(v)
-                except: continue
-            if valid_vals:
-                montants["montant_ttc"] = str(max(valid_vals))
-            elif montants["montant_ht"]:
-                # Si un seul montant trouve et marque HT, on l'utilise faute de mieux
-                montants["montant_ttc"] = montants["montant_ht"]
-
-    return montants
-
-
-def extraire_numero_document(texte):
-    match = re.search(PATTERN_NUMERO_DOC, texte)
-    return match.group() if match else None
-
-
-def extraire_iban(texte):
-    match = re.search(PATTERN_IBAN, texte)
-    return re.sub(r'\s', '', match.group()) if match else None
-
-
-def extraire_fournisseur_spacy(texte):
+def to_float(val):
+    if not val:
+        return None
+    val = val.replace(" ", "").replace(",", ".")
+    val = re.sub(r"[^\d.]", "", val)
     try:
-        import spacy
+        return float(val)
+    except:
+        return None
+
+
+def to_date(val):
+    if not val:
+        return None
+    try:
+        return datetime.strptime(val, "%d/%m/%Y").isoformat()
+    except:
         try:
-            nlp = spacy.load("fr_core_news_sm")
-        except OSError:
+            return datetime.strptime(val, "%Y-%m-%d").isoformat()
+        except:
             return None
-        doc = nlp(texte[:1000])
-        for entite in doc.ents:
-            if entite.label_ == "ORG":
-                return entite.text
-    except ImportError:
-        pass
-    return None
+
+
+def luhn_check(n):
+    if not n or not n.isdigit():
+        return False
+    s = sum(int(d) for d in n[-1::-2])
+    for d in n[-2::-2]:
+        s += sum(divmod(int(d) * 2, 10))
+    return s % 10 == 0
+
+
 
 
 def extraire_infos_cles(texte):
-    siret = extraire_siret(texte)
 
+    texte_lower = texte.lower()
+
+    # --- SIRET ---
+    siret = None
+    for m in re.findall(r"\b\d{14}\b", texte):
+        if luhn_check(m):
+            siret = m
+            break
+
+    # --- SIREN ---
+    siren = siret[:9] if siret else None
+
+    # --- NUMERO ---
+    numero = re.search(r"\b[A-Z]{2,5}[-_]?\d+\b", texte)
+
+
+
+    PATTERN_DATE = r"(\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4})"
+
+    date_emission = re.search(
+        r"(?:facturation|émission|date)[^\d]*" + PATTERN_DATE,
+        texte_lower
+    )
+
+    date_echeance = re.search(
+        r"(?:échéance|paiement)[^\d]*" + PATTERN_DATE,
+        texte_lower
+    )
+
+    date_expiration = re.search(
+        r"(?:expire|expiration|valable)[^\d]*" + PATTERN_DATE,
+        texte_lower
+    )
+
+    # --- IBAN / BIC ---
+    iban = re.search(r"\bFR\d{2}[A-Z0-9]{10,30}\b", texte)
+    bic = re.search(r"\b[A-Z]{6}[A-Z0-9]{2,5}\b", texte)
+
+    # --- TVA ---
+    tva = re.search(r"TVA\s*:?\s*(\d{1,2})\s*%", texte)
+
+    # --- MONTANTS ---
+    montant_ht = None
+    montant_ttc = None
+
+    match_ht = re.search(r"HT[^0-9]*(\d+[.,]\d{2})", texte, re.IGNORECASE)
+    if match_ht:
+        montant_ht = to_float(match_ht.group(1))
+
+    match_ttc = re.search(r"TTC[^0-9]*(\d+[.,]\d{2})", texte, re.IGNORECASE)
+    if match_ttc:
+        montant_ttc = to_float(match_ttc.group(1))
+
+    if not montant_ttc:
+        nums = re.findall(r"\d+[.,]\d{2}", texte)
+        if nums:
+            montant_ttc = max([to_float(n) for n in nums if to_float(n)])
+
+    lignes = [l.strip() for l in texte.split("\n") if l.strip()]
+
+    company = None
+
+
+    for l in lignes[:10]:
+        if any(x in l.lower() for x in ["sarl", "sas", "sa", "eurl"]):
+            company = l
+            break
+
+    if not company:
+        for l in lignes[:5]:
+            if not any(x in l.lower() for x in ["facture", "numero", "date", "tva"]):
+                company = l
+                break
+
+    address = re.search(r"\d{1,4}\s*,?\s*(?:rue|avenue|bd|boulevard)\s+(?:de\s+|du\s+|des\s+)?[A-Za-z\s\-]+",texte_lower
+)
     return {
         "extraction": {
             "siret": siret,
-            "siren": extraire_siren(siret),
-            "numero_document": extraire_numero_document(texte),
-            "date": extraire_date(texte),
-            "date_expiration": extraire_date_expiration(texte),
-            "fournisseur": extraire_fournisseur_spacy(texte),
-            "iban": extraire_iban(texte),
-            **extraire_montants(texte)
+            "siren": siren,
+            "companyName": company,
+            "address": address.group() if address else None,
+
+            "montantHT": montant_ht,
+            "montantTTC": montant_ttc,
+            "tva": int(tva.group(1)) if tva else None,
+
+            "dateEmission": to_date(date_emission.group()) if date_emission else None,
+            "dateExpiration": to_date(date_expiration.group(1)) if date_expiration else None,
+            "dateEcheance": to_date(date_echeance.group(1)) if date_echeance else None,
+
+            "numeroDocument": numero.group() if numero else None,
+            "iban": iban.group() if iban else None,
+            "bic": bic.group() if bic else None
         },
         "texte_brut": texte
     }
