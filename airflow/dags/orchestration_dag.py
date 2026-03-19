@@ -295,14 +295,16 @@ def extraire_ocr_documents(**context) -> None:
         extracted_data = {
             "siret": extraction.get("siret"),
             "siren": extraction.get("siren"),
-            "fournisseur": extraction.get("fournisseur"),
-            "numeroDocument": extraction.get("numero_document"),
-            "dateDocument": _normaliser_date_iso(extraction.get("date")),
-            "dateExpiration": _normaliser_date_iso(extraction.get("date_expiration")),
-            "montantHT": _to_float(extraction.get("montant_ht")),
-            "montantTTC": _to_float(extraction.get("montant_ttc")),
-            "tva": extraction.get("tva_taux"),
+            "fournisseur": extraction.get("companyName"),
+            "numeroDocument": extraction.get("numeroDocument"),
+            "dateDocument": _normaliser_date_iso(extraction.get("dateEmission")),
+            "dateExpiration": _normaliser_date_iso(extraction.get("dateExpiration")),
+            "montantHT": _to_float(extraction.get("montantHT")),
+            "montantTTC": _to_float(extraction.get("montantTTC")),
+            "tva": extraction.get("tva"),
             "iban": extraction.get("iban"),
+            "address": extraction.get("address"),
+            "bic": extraction.get("bic"),
         }
 
         # mise a jour du document dans le backend (ETUDIANT 3)
@@ -322,6 +324,7 @@ def extraire_ocr_documents(**context) -> None:
             continue
 
         # payload curated pousse en xcom
+        # convertir extracted_data en snake_case pour usage interne du DAG
         curated_payload.append(
             {
                 "document_id": document_id,
@@ -332,9 +335,12 @@ def extraire_ocr_documents(**context) -> None:
                 "montant_ht": extracted_data.get("montantHT"),
                 "montant_ttc": extracted_data.get("montantTTC"),
                 "tva": extracted_data.get("tva"),
-                "date_facture": extraction.get("date"),
-                "date_expiration": extraction.get("date_expiration"),
+                "date_facture": extracted_data.get("dateDocument"),
+                "date_expiration": extracted_data.get("dateExpiration"),
                 "iban": extracted_data.get("iban"),
+                "address": extracted_data.get("address"),
+                "bic": extracted_data.get("bic"),
+                "numero_document": extracted_data.get("numeroDocument"),
                 "devise": "EUR",
                 "source": "backend_api",
                 "ocr_reel": ocr_reel,
@@ -496,9 +502,11 @@ def persister_documents_curated(**context) -> None:
             "montantHT": item.get("montant_ht"),
             "montantTTC": item.get("montant_ttc"),
             "tva": item.get("tva"),
-            "date": item.get("date_facture"),
+            "dateDocument": item.get("date_facture"),
             "dateExpiration": item.get("date_expiration"),
             "iban": item.get("iban"),
+            "address": item.get("address"),
+            "bic": item.get("bic"),
             "statut_validation": item.get("statut_validation"),
             "risk_score": item.get("risk_score"),
             "severity": item.get("severity"),
