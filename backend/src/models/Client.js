@@ -6,6 +6,8 @@ const clientSchema = new mongoose.Schema(
     raisonSociale: { type: String, required: true },
     siren: String,
     tva: String,
+    tvaId: String,
+    iban: String,
 
     contact: {
       nom: String,

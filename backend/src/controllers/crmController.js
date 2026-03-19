@@ -2,7 +2,7 @@ const Client = require('../models/Client');
 const Document = require('../models/Document');
 const mongoose = require('mongoose');
 
-const ALLOWED_CLIENT_FIELDS = ['siret', 'raisonSociale', 'siren', 'tva', 'contact', 'adresse', 'notes'];
+const ALLOWED_CLIENT_FIELDS = ['siret', 'raisonSociale', 'siren', 'tva', 'tvaId', 'contact', 'adresse', 'notes', 'iban'];
 
 const pickAllowedFields = (payload = {}) =>
   Object.fromEntries(Object.entries(payload).filter(([key]) => ALLOWED_CLIENT_FIELDS.includes(key)));
@@ -138,18 +138,33 @@ exports.autofillFromPipeline = async (req, res) => {
     const results = [];
 
     for (const doc of documents) {
-      const siret = doc.siret;
+      // deriver le siret depuis tvaId ou siren si absent
+      let siret = doc.siret;
+      if (!siret && doc.siren) {
+        siret = doc.siren + '00000';
+      }
+      if (!siret && doc.tvaId) {
+        const m = String(doc.tvaId).toUpperCase().match(/^FR[0-9A-Z]{2}(\d{9})$/);
+        if (m) siret = m[1] + '00000';
+      }
       if (!siret) {
-        results.push({ documentId: doc.documentId, status: 'ignore', reason: 'siret manquant' });
+        results.push({ documentId: doc.documentId, status: 'ignore', reason: 'aucun identifiant unique (siret/siren/tvaId)' });
         continue;
       }
 
       // upsert : creer ou mettre a jour le client par siret
       const updateData = {
-        raisonSociale: doc.fournisseur || 'fournisseur inconnu',
+        raisonSociale: doc.raisonSociale || doc.fournisseur || 'fournisseur inconnu',
         siren: doc.siren || undefined,
-        tva: doc.tva || undefined,
+        tva: doc.tva != null ? String(doc.tva) : undefined,
+        tvaId: doc.tvaId || undefined,
+        iban: doc.iban || undefined,
       };
+
+      // ajouter l'adresse si disponible
+      if (doc.adresse) {
+        updateData.adresse = { rue: doc.adresse, pays: 'France' };
+      }
 
       // lier le document au client si documentId est un objectid valide
       const pushOp = {};

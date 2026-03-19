@@ -1,9 +1,8 @@
 from rules import (
-    check_siret,
+    check_siret_format,
     check_tva,
-    check_date_coherence,
+    check_expiration,
     check_amount_limits,
-    check_siret_format
 )
 
 from anomaly_model import AnomalyDetector
@@ -26,59 +25,66 @@ class DocumentValidator:
 
         try:
             self.anomaly.load()
-        except FileNotFoundError:
-            logging.warning("Could not load anomaly model. Anomaly detection disabled.")
+        except Exception:
+            logging.warning("modele anomaly non disponible, detection desactivee")
             self.anomaly = None
 
-    def validate(self, facture, devis):
-        logging.info("Validation started: Facture vs Devis")
+    def validate(self, facture, attestation=None):
+        """valide un document unique (facture) et eventuellement un second document (attestation/devis).
+        accepte les cles dag: siret, montant_ht, montant_ttc, date_expiration"""
+        logging.info("validation demarree")
 
         errors = []
 
-        # Vérification format SIRET
-        if not check_siret_format(facture.get("siret_creancier", "")):
-            errors.append("Format SIRET créancier invalide")
+        siret = facture.get("siret") or ""
+        montant_ht = facture.get("montant_ht")
+        montant_ttc = facture.get("montant_ttc")
 
-        # Vérification cohérence SIRET entre facture et devis
-        if not check_siret(facture.get("siret_creancier"), devis.get("siret_creancier")):
-            errors.append("SIRET créancier mismatch entre facture et devis")
-        
-        if not check_siret(facture.get("siret_client"), devis.get("siret_client")):
-            errors.append("SIRET client mismatch entre facture et devis")
+        # conversion en float si necessaire
+        try:
+            montant_ht = float(montant_ht) if montant_ht is not None else None
+        except (ValueError, TypeError):
+            montant_ht = None
 
-        # Vérification TVA
-        if not check_tva(
-            facture.get("montant_ht", 0),
-            facture.get("montant_ttc", 0)
-        ):
-            errors.append("TVA incoherente")
+        try:
+            montant_ttc = float(montant_ttc) if montant_ttc is not None else None
+        except (ValueError, TypeError):
+            montant_ttc = None
 
-        # Vérification cohérence des dates (devis avant facture)
-        if not check_date_coherence(
-            devis.get("date_emission"),
-            facture.get("date_facturation")
-        ):
-            errors.append("Date devis posterieure a la facture")
+        # verification format siret
+        if not check_siret_format(siret):
+            errors.append("format siret invalide")
 
-        # Vérification des montants
-        amount_issue = check_amount_limits(
-            facture.get("montant_ht", 0)
-        )
+        # verification coherence tva (ht * 1.20 ~ ttc)
+        if montant_ht is not None and montant_ttc is not None and montant_ht > 0:
+            if not check_tva(montant_ht, montant_ttc):
+                errors.append("tva incoherente")
 
-        if amount_issue:
-            errors.append(amount_issue)
+        # verification montant dans les limites
+        if montant_ht is not None:
+            amount_issue = check_amount_limits(montant_ht)
+            if amount_issue:
+                errors.append(amount_issue.lower())
 
-        # Détection d'anomalies via ML
-        if self.anomaly:
-            anomaly = self.anomaly.predict(facture, devis)
+        # verification date expiration (attestation)
+        date_exp = None
+        if attestation and isinstance(attestation, dict):
+            date_exp = attestation.get("date_expiration")
+        if date_exp:
+            if not check_expiration(str(date_exp)):
+                errors.append("document expire")
 
-            if anomaly:
-                errors.append("Incohérence détectée entre facture et devis")
+        # detection anomalies via ml (si modele disponible et montants presents)
+        if self.anomaly and montant_ht is not None and montant_ttc is not None:
+            try:
+                anomaly = self.anomaly.predict_single(montant_ht, montant_ttc)
+                if anomaly:
+                    errors.append("anomalie detectee par le modele ml")
+            except Exception as exc:
+                logging.warning("erreur detection anomalie: %s", exc)
 
         risk_score = compute_risk(errors)
-
         severity = severity_level(risk_score)
-
         status = "valid" if len(errors) == 0 else "invalid"
 
         report = {
@@ -89,6 +95,5 @@ class DocumentValidator:
             "timestamp": str(datetime.now())
         }
 
-        logging.info(f"Validation result: {report}")
-
+        logging.info("resultat validation: %s", report)
         return report
