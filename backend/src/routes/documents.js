@@ -5,6 +5,7 @@ const {
   uploadDocuments,
   getDocuments,
   getDocument,
+  downloadDocument,
   updateDocumentStatus,
   deleteDocument,
   getStats,
@@ -13,6 +14,7 @@ const {
 router.get('/stats', getStats);
 router.get('/', getDocuments);
 router.get('/:id', getDocument);
+router.get('/:id/download', downloadDocument);
 router.post('/upload', upload.array('files', 10), uploadDocuments);
 router.patch('/:id/status', updateDocumentStatus);
 router.delete('/:id', deleteDocument);

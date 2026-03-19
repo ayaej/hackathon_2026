@@ -10,6 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN python -m spacy download fr_core_news_sm
 RUN python -c "import easyocr; easyocr.Reader(['fr'], gpu=False)"
 
-COPY . .
+COPY src ./src
 
 CMD ["python", "-m", "src.ocr_module.main"]

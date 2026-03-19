@@ -50,12 +50,25 @@ exports.getClient = async (req, res) => {
 exports.createClient = async (req, res) => {
   try {
     const clientData = pickAllowedFields(req.body);
-    const client = await Client.create(clientData);
-    res.status(201).json({ success: true, data: client });
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ success: false, message: 'Un client avec ce siret existe déjà' });
+
+    if (!clientData.siret) {
+      return res.status(400).json({ success: false, message: 'Le champ siret est requis' });
     }
+
+    const existing = await Client.findOne({ siret: clientData.siret });
+    if (existing) {
+      const { siret, ...updateFields } = clientData;
+      const updated = await Client.findByIdAndUpdate(
+        existing._id,
+        { $set: updateFields },
+        { new: true, runValidators: true }
+      );
+      return res.json({ success: true, data: updated, merged: true });
+    }
+
+    const client = await Client.create(clientData);
+    res.status(201).json({ success: true, data: client, merged: false });
+  } catch (error) {
     console.error('CRM createClient error:', error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
