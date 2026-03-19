@@ -4,6 +4,8 @@ const Client = require('../models/Client');
 exports.getAnomalies = async (req, res) => {
   try {
     const { severity, page = 1, limit = 20 } = req.query;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
 
     const filter = { status: 'anomaly' };
     if (severity) {
@@ -13,17 +15,18 @@ exports.getAnomalies = async (req, res) => {
     const total = await Document.countDocuments(filter);
     const docs = await Document.find(filter)
       .sort({ updatedAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit))
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber)
       .select('originalName type status extractedData validationResult updatedAt');
 
     res.json({
       success: true,
       data: docs,
-      pagination: { total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / limit) },
+      pagination: { total, page: pageNumber, limit: limitNumber, pages: Math.ceil(total / limitNumber) },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Conformite getAnomalies error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
@@ -36,7 +39,8 @@ exports.checkDocument = async (req, res) => {
 
     res.json({ success: true, data: doc });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Conformite checkDocument error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
@@ -86,7 +90,8 @@ exports.submitValidationResult = async (req, res) => {
 
     res.json({ success: true, data: doc });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Conformite submitValidationResult error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
 
@@ -106,6 +111,7 @@ exports.getStats = async (req, res) => {
       data: { total, validated, anomalies, pending, tauxConformite },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Conformite getStats error:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
