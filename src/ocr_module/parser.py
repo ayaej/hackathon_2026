@@ -78,7 +78,7 @@ def extraire_infos_cles(texte):
     bic = re.search(r"\b[A-Z]{6}[A-Z0-9]{2,5}\b", texte)
 
     # --- TVA ---
-    tva = re.search(r"TVA\s*:?\s*(\d{1,2})\s*%", texte)
+    tva = re.search(r"TVA\s*:?\s*(\d{1,2}(?:[.,]\d{1,2})?)\s*%", texte)
 
     # --- MONTANTS ---
     montant_ht = None
