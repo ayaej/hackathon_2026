@@ -3,7 +3,21 @@ import json
 import easyocr
 from datetime import datetime
 
-reader = easyocr.Reader(['fr'], gpu=False)
+# ETUDIANT 6: lazy-loading du reader easyocr pour eviter le telechargement au niveau du module
+_reader_instance = None
+
+
+def _gpu_active() -> bool:
+    """retourne true si l'utilisation gpu est activee par variable d'environnement"""
+    return os.getenv("EASYOCR_USE_GPU", "false").strip().lower() in {"1", "true", "yes", "on"}
+
+def _get_reader():
+    """initialiser le reader easyocr une seule fois (lazy loading)"""
+    global _reader_instance
+    if _reader_instance is None:
+        use_gpu = _gpu_active()
+        _reader_instance = easyocr.Reader(['fr'], gpu=use_gpu)
+    return _reader_instance
 
 
 def pretraiter_image(chemin):
@@ -26,7 +40,7 @@ def pretraiter_image(chemin):
 
 def lire_image(chemin):
     tmp = pretraiter_image(chemin)
-    resultats = reader.readtext(tmp, detail=0)
+    resultats = _get_reader().readtext(tmp, detail=0)
     if os.path.exists(tmp):
         os.remove(tmp)
     return " ".join(resultats)

@@ -18,7 +18,13 @@ x-airflow-common:
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
 
     # nombre de taches max en parallele par worker celery
-    AIRFLOW__CELERY__WORKER_CONCURRENCY: 8
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: ${AIRFLOW_WORKER_CONCURRENCY:-1}
+
+    # limite le parallelisme global du scheduler pour eviter les pics cpu
+    AIRFLOW__CORE__PARALLELISM: ${AIRFLOW_CORE_PARALLELISM:-2}
+
+    # limite le nombre de taches actives par dag run
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: ${AIRFLOW_MAX_ACTIVE_TASKS_PER_DAG:-2}
 
     # ne charge pas les DAGs d'exemple fournis par Airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
@@ -28,6 +34,23 @@ x-airflow-common:
 
     # Active l'authentification basique pour l'API REST Airflow
     AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+    
+    # cle partagee entre webserver/scheduler/workers pour signer les urls de logs
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-hackathon_2026_g28_shared_secret_key}
+
+    # cache modele easyocr partage entre workers
+    EASYOCR_MODULE_PATH: /home/airflow/.EasyOCR
+
+    # active easyocr sur gpu si true (fallback cpu si false)
+    EASYOCR_USE_GPU: ${EASYOCR_USE_GPU:-false}
+
+    # limite les threads natifs (numpy/pytorch/openmp) pour stabiliser l'ocr sur petit pc
+    OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+    OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-1}
+    MKL_NUM_THREADS: ${MKL_NUM_THREADS:-1}
+    NUMEXPR_NUM_THREADS: ${NUMEXPR_NUM_THREADS:-1}
+    VECLIB_MAXIMUM_THREADS: ${VECLIB_MAXIMUM_THREADS:-1}
+    
     PYTHONPATH: /opt/airflow/src:/opt/airflow/val
 
     AIRFLOW_UID: ${AIRFLOW_UID:-50000}
@@ -58,6 +81,9 @@ x-airflow-common:
 
     # fichiers uploades du backend pour OCR reel ETUDIANT 2
     - ../backend/uploads:/opt/airflow/backend_uploads
+
+    # cache easyocr partage pour eviter les re-telechargements par worker
+    - ./cache/easyocr:/home/airflow/.EasyOCR
 
 
   user: "${AIRFLOW_UID:-50000}:0"
@@ -98,6 +124,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+    cpus: "1.0"
+    mem_limit: 1024m
 
   # api data-lake node/express (ETUDIANT 4)
   datalake:
@@ -118,10 +146,14 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+    cpus: "1.0"
+    mem_limit: 1024m
 
   # broker redis pour celery
   redis:
     image: redis:7.2-bookworm
+    cpus: "0.50"
+    mem_limit: 256m
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -143,6 +175,8 @@ services:
       interval: 10s
       retries: 5
       start_period: 5s
+    cpus: "1.0"
+    mem_limit: 1024m
 
   # Airflow init : migrate la base et créé le compte admin (executé une seule fois)
   # TODO: faire un login plus secure pour la prod
@@ -173,6 +207,8 @@ services:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+    cpus: "1.0"
+    mem_limit: 1024m
 
   # scheduler : detecte les DAG + planifie les taches (CeleryExecutor)
   airflow-scheduler:
@@ -187,14 +223,25 @@ services:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+    cpus: "1.0"
+    mem_limit: 1024m
 
   # worker celery : execute les taches distribuees
   airflow-worker:
     <<: *airflow-common
-    command: celery worker
+    command:
+      - celery
+      - worker
+      - --celery-hostname
+      - airflow-worker@%h
+    restart: unless-stopped
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+    # exposition gpu optionnelle (desktop/windows+wsl2+nvidia runtime requis)
+    gpus: ${DOCKER_GPUS:-all}
+    cpus: "1.50"
+    mem_limit: 2048m
 
   # minio : stockage objet pour le data-lake (ETUDIANT 4)
   minio:
@@ -213,6 +260,8 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    cpus: "0.75"
+    mem_limit: 768m
 
 
 # vol persistant pour la base Postgres (docker compose down --volumes pour delete)

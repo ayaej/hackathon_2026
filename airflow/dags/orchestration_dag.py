@@ -16,29 +16,9 @@ from airflow.operators.python import PythonOperator
 
 
 ########################################################################################
-# ETUDIANT 2 - OCR (classifier + parser + extractor + evaluator)
-# monté dans /opt/airflow/src/ocr_module via docker-compose
-
-
-# classifier : detecte le type de document (facture, devis, attestation, etc.)
-from ocr_module.classifier import classifier_document
-
-# parser : extrait les informations cles (siret, montants, dates, iban, etc.)
-from ocr_module.parser import extraire_infos_cles
-
-# extractor : lit les fichiers reels (pdf, image) via easyocr
-from ocr_module.extractor import extraire_texte
-
-# evaluator : evalue la qualite de l'extraction (score sur les champs extraits)
-from ocr_module.evaluator import evaluate_extraction
-
-
-########################################################################################
-# imports ETUDIANT 5 - Validation avancee (rules + risk_scoring)
-# monté dans /opt/airflow/val via docker-compose
-
-# validateur metier (utilise rules et risk_scoring en interne)
-from val.validator import DocumentValidator
+# ETUDIANT 2 et ETUDIANT 5
+# les imports lourds sont charges localement dans les taches qui en ont besoin
+# pour eviter de charger easyocr sur toutes les taches celery
 
 ########################################################################################
 # constantes de configuration reseau
@@ -90,6 +70,83 @@ def _http_json(method: str, url: str, payload: dict[str, Any] | None = None, tim
     except error.URLError as exc:
         raise RuntimeError(f"erreur reseau sur {url}: {exc.reason}") from exc
 
+
+def _to_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        normalized = value.replace(" ", "").replace("€", "").replace("EUR", "").replace(",", ".")
+        try:
+            return float(normalized)
+        except ValueError:
+            return None
+    return None
+
+
+def _normaliser_date_iso(value: Any) -> str | None:
+    if value is None:
+        return None
+
+    texte = str(value).strip()
+    if not texte:
+        return None
+
+    # tente d'abord les formats ISO natifs
+    try:
+        dt = datetime.fromisoformat(texte.replace("Z", "+00:00"))
+        return dt.astimezone(timezone.utc).isoformat(timespec="seconds")
+    except ValueError:
+        pass
+
+    # yyyy-mm-dd ou yyyy/mm/dd
+    iso_match = re.match(r"^(\d{4})[\-\/.](\d{1,2})[\-\/.](\d{1,2})$", texte)
+    if iso_match:
+        annee, mois, jour = (int(iso_match.group(1)), int(iso_match.group(2)), int(iso_match.group(3)))
+        try:
+            return datetime(annee, mois, jour, tzinfo=timezone.utc).isoformat(timespec="seconds")
+        except ValueError:
+            return None
+
+    # dd-mm-yy ou dd/mm/yyyy
+    fr_match = re.match(r"^(\d{1,2})[\-\/.](\d{1,2})[\-\/.](\d{2,4})$", texte)
+    if fr_match:
+        jour, mois, annee = (int(fr_match.group(1)), int(fr_match.group(2)), int(fr_match.group(3)))
+        if annee < 100:
+            annee += 2000
+        try:
+            return datetime(annee, mois, jour, tzinfo=timezone.utc).isoformat(timespec="seconds")
+        except ValueError:
+            return None
+
+    return None
+
+
+def _charger_outils_ocr() -> tuple[Any, Any, Any, Any]:
+    # import local pour eviter le chargement easyocr dans les taches non ocr
+    from ocr_module.classifier import classifier_document
+    from ocr_module.evaluator import evaluate_extraction
+    from ocr_module.extractor import extraire_texte
+    from ocr_module.parser import extraire_infos_cles
+
+    return classifier_document, extraire_infos_cles, extraire_texte, evaluate_extraction
+
+
+def initialiser_cache_easyocr(**context) -> None:
+    """ETUDIANT 6: pre-creer les structures de dossiers pour easyocr.
+    evite les races condition lors du telechargement du premier modele par les workers."""
+    import pathlib
+    
+    cache_dir = pathlib.Path(os.getenv("HOME", "/home/airflow")) / ".EasyOCR"
+    model_dir = cache_dir / "model"
+    
+    try:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        model_dir.mkdir(parents=True, exist_ok=True)
+        logging.info(f"cache easyocr initialise: {cache_dir}")
+    except Exception as exc:
+        logging.warning(f"erreur initialisation cache easyocr (continuant): {exc}")
 
 
 ########################################################################################
@@ -186,6 +243,8 @@ def extraire_ocr_documents(**context) -> None:
         ti.xcom_push(key="curated_payload", value=[])
         return
 
+    classifier_document, extraire_infos_cles, extraire_texte, evaluate_extraction = _charger_outils_ocr()
+
     curated_payload: list[dict[str, Any]] = []
 
     for document_id in documents_ids:
@@ -208,7 +267,7 @@ def extraire_ocr_documents(**context) -> None:
         if not os.path.isfile(chemin_fichier):
             raise FileNotFoundError(f"Fichier physique introuvable pour {document_id}: {chemin_fichier}")
 
-        logging.info("lancement ocr reel pour %s (ETUDIANT 2 extractor)", document_id)
+        logging.info("lancement ocr reel pour %s", document_id)
         texte_source = extraire_texte(chemin_fichier)
         
         if not texte_source.strip():
@@ -238,10 +297,10 @@ def extraire_ocr_documents(**context) -> None:
             "siren": extraction.get("siren"),
             "fournisseur": extraction.get("fournisseur"),
             "numeroDocument": extraction.get("numero_document"),
-            "date": extraction.get("date"),
-            "dateExpiration": extraction.get("date_expiration"),
-            "montantHT": float(extraction.get("montant_ht")) if extraction.get("montant_ht") else None,
-            "montantTTC": float(extraction.get("montant_ttc")) if extraction.get("montant_ttc") else None,
+            "dateDocument": _normaliser_date_iso(extraction.get("date")),
+            "dateExpiration": _normaliser_date_iso(extraction.get("date_expiration")),
+            "montantHT": _to_float(extraction.get("montant_ht")),
+            "montantTTC": _to_float(extraction.get("montant_ttc")),
             "tva": extraction.get("tva_taux"),
             "iban": extraction.get("iban"),
         }
@@ -256,7 +315,11 @@ def extraire_ocr_documents(**context) -> None:
                 "curatedPath": f"curated/{document_id}.json",
             },
         }
-        _http_json("PATCH", f"{base_url}/api/documents/{document_id}/status", patch_payload)
+        try:
+            _http_json("PATCH", f"{base_url}/api/documents/{document_id}/status", patch_payload)
+        except Exception as exc:
+            logging.warning("mise a jour backend ignoree pour %s: %s", document_id, exc)
+            continue
 
         # payload curated pousse en xcom
         curated_payload.append(
@@ -339,6 +402,8 @@ def valider_documents_curated(**context) -> None:
         logging.info("aucun document curated a valider")
         ti.xcom_push(key="curated_validated", value=[])
         return
+
+    from validator import DocumentValidator
 
     validator = DocumentValidator()
     
@@ -526,6 +591,7 @@ with DAG(
     start_date=datetime(2026, 3, 16),
     schedule="*/2 * * * *", # ttes les 2 min
     catchup=False,
+    max_active_runs=1,
     default_args={
         "owner": "GROUPE 28",
         "retries": 2,
@@ -560,6 +626,12 @@ with DAG(
     passer_en_processing = PythonOperator(
         task_id="passer_documents_en_processing",
         python_callable=basculer_documents_en_processing,
+    )
+
+    # ETUDIANT 6 : initialiser le cache easyocr
+    initialiser_cache = PythonOperator(
+        task_id="initialiser_cache",
+        python_callable=initialiser_cache_easyocr,
     )
 
     # ETUDIANT 2 : OCR + classification + extraction + evaluation
@@ -612,6 +684,7 @@ with DAG(
         debut
         >> recuperer_documents
         >> passer_en_processing
+        >> initialiser_cache
         >> extraire_ocr
         >> persister_clean
         >> valider_curated

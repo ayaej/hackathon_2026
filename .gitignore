@@ -13,10 +13,12 @@ venv/
 __pycache__/
 *.pyc
 .env
+.venv
 .github
 simu/
 airflow/logs/
 airflow/dags/__pycache__/
+airflow/cache
 
 backend/node_modules/
 backend/.env
