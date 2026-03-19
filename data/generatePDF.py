@@ -64,6 +64,7 @@ for i in range(5) :
         adresse_client_1 = f"{client['adresse']}"
         adresse_client_2 = f"{client['code_postal']} {client['commune']}"
         siren_client = f"{client['siren']}"
+        siret_client = f"{client['siret']}"
         n_tva_client = f"{client['n_tva']}"
         iban_client = f"{client['iban']}"
         bic_client = f"{client['bic']}"
@@ -74,6 +75,7 @@ for i in range(5) :
         adresse_creancier_1 = f"{creancier['adresse']}"
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
+        siret_creancier = f"{creancier['siret']}"
         iban_creancier = f"{creancier['iban']}"
         bic_creancier = f"{creancier['bic']}"
 
@@ -136,8 +138,10 @@ for i in range(5) :
                                                                       "Expéditeur : ",
                                                                       "Émetteur : "]) + rnc(["<br/>", ""]) + bold_2 + header_creancier
 
-        header_client += f"<br/>N° SIREN : {siren_client}"
-        header_creancier += f"<br/>N° SIREN : {siren_creancier}"
+        # header_client += rnc([f"<br/>N° SIREN : {siren_client}", f"<br/>N° SIRET : {siret_client}"])
+        # header_creancier += rnc([f"<br/>N° SIREN : {siren_creancier}", f"<br/>N° SIRET : {siret_creancier}"])
+        header_client += f"<br/>N° SIRET : {siret_client}"
+        header_creancier += f"<br/>N° SIRET : {siret_creancier}"
 
         if rnd() > .5 :
 
