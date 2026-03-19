@@ -47,15 +47,15 @@ for i in range(5) :
 
         facture_id = document["facture_id"]
         devis_id = document["devis_id"]
-        date_facturation = document["date_facturation"]
-        date_prestation = document["date_prestation"]
-        date_emission = document["date_emission"]
-        date_expiration = document["date_expiration"]
-        date_echeance = document["date_echeance"]
-        montant_ht = document["montant_ht"]
+        dateFacturation = document["dateFacturation"]
+        datePrestation = document["datePrestation"]
+        dateEmission = document["dateEmission"]
+        dateExpiration = document["dateExpiration"]
+        dateEcheance = document["dateEcheance"]
+        montantHT = document["montantHT"]
         tva_montant = document["tva_montant"]
-        tva_taux = document["tva_taux"]
-        montant_ttc = document["montant_ttc"]
+        tva = document["tva"]
+        montantTTC = document["montantTTC"]
 
         articles = document["articles"]
 
@@ -65,12 +65,16 @@ for i in range(5) :
         adresse_client_2 = f"{client['code_postal']} {client['commune']}"
         siren_client = f"{client['siren']}"
         n_tva_client = f"{client['n_tva']}"
+        iban_client = f"{client['iban']}"
+        bic_client = f"{client['bic']}"
 
         creancier = document["creancier"]
         nom_creancier = f"{creancier['prenom']} {creancier['prenom_2']} {creancier['prenom_3']} {creancier['nom']}"
         adresse_creancier_1 = f"{creancier['adresse']}"
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
+        iban_creancier = f"{creancier['iban']}"
+        bic_creancier = f"{creancier['bic']}"
 
         if rnd()>.05 : rn.seed(seed)
 
@@ -106,9 +110,9 @@ for i in range(5) :
             reference_document = f"{doctype.capitalize()} {reference_document}"
         story.append(Paragraph(f"{bold_1}{reference_document}{bold_2}"))
         if doctype == "facture" :
-            story.append(Paragraph(f"{bold_1}Date{' de facturation' if rnd()>.5 else ''} :{bold_2} {date_facturation}", styles["Normal"]))
+            story.append(Paragraph(f"{bold_1}Date{' de facturation' if rnd()>.5 else ''} :{bold_2} {dateFacturation}", styles["Normal"]))
         elif doctype == "devis" :
-            story.append(Paragraph(f"{bold_1}{rnc(['Émission', 'Date d’émission', 'Émis le'])} :{bold_2} {date_emission}", styles["Normal"]))
+            story.append(Paragraph(f"{bold_1}{rnc(['Émission', 'Date d’émission', 'Émis le'])} :{bold_2} {dateEmission}", styles["Normal"]))
         story.append(Spacer(1, rni(12,24)))
 
         bold_1, bold_2 = ("<b>", "</b>") if rnd() > 0.5 else ("", "")
@@ -133,6 +137,15 @@ for i in range(5) :
         if rnd() > .9 :
             header_client += f"<br/>N° SIREN : {siren_client}"
             header_creancier += f"<br/>N° SIREN : {siren_creancier}"
+
+        if rnd() > .5 :
+            header_client += f"<br/>IBAN : {iban_client}"
+        if rnd() > .5 :
+            header_client += f"<br/>BIC : {bic_client}"
+        if rnd() > .5 :
+            header_creancier += f"<br/>IBAN : {iban_creancier}"
+        if rnd() > .5 :
+            header_creancier += f"<br/>BIC : {bic_creancier}"
 
         if rnd() > .5 :
             header_client += f"<br/>N° TVA : {n_tva_client}"
@@ -181,9 +194,9 @@ for i in range(5) :
         for article in articles :
             tableau.append([article["nom"], str(article["quantite"]), f"{article['prix']:.2f} €", f"{(article['quantite']*article['prix']):.2f} €"])
 
-        tableau.append(["", "", Paragraph(f"{rnc(['Total ', 'Montant total '])}{rnc(['HT', '(HT)', ''])}{ddot}", style=wordWrap), f"{montant_ht:.2f} €"])
-        tableau.append(["", "", Paragraph(f"{rnc(['TVA ', 'Montant TVA ', 'Montant de la TVA '])}{'('+str(int(tva_taux*100))+' %) ' if rnd()>.5 else ''}{ddot}", style=wordWrap), f"{tva_montant:.2f} €"])
-        tableau.append(["", "", Paragraph(f"{rnc(['Total ', 'Montant total '])}{rnc(['TTC', '(TTC)'])}{ddot}", style=wordWrap), f"{montant_ttc:.2f} €"])
+        tableau.append(["", "", Paragraph(f"{rnc(['Total ', 'Montant total '])}{rnc(['HT', '(HT)', ''])}{ddot}", style=wordWrap), f"{montantHT:.2f} €"])
+        tableau.append(["", "", Paragraph(f"{rnc(['TVA ', 'Montant TVA ', 'Montant de la TVA '])}{'('+str(int(tva*100))+' %) ' if rnd()>.5 else ''}{ddot}", style=wordWrap), f"{tva_montant:.2f} €"])
+        tableau.append(["", "", Paragraph(f"{rnc(['Total ', 'Montant total '])}{rnc(['TTC', '(TTC)'])}{ddot}", style=wordWrap), f"{montantTTC:.2f} €"])
 
         taille_col = [100, rni(20,30), rni(30,40)]
         taille_col[0] = largeur_page - taille_col[1] - 2*taille_col[2]
@@ -224,12 +237,12 @@ for i in range(5) :
 
         ## Footer
 
-        story.append(Paragraph(f"Date de {rnc(['prestation', 'livraison', 'résolution'])}{' prévue' if doctype=='devis' and rnd()>.5 else ''} : {date_prestation}", styles["Normal"]))
+        story.append(Paragraph(f"Date de {rnc(['prestation', 'livraison', 'résolution'])}{' prévue' if doctype=='devis' and rnd()>.5 else ''} : {datePrestation}", styles["Normal"]))
 
         if doctype == "facture" :
-            story.append(Paragraph(f"{rnc(['Date d’échéance', 'Échéance'])}{rnc([' du paiement', ''])} : {date_echeance}", styles["Normal"]))
+            story.append(Paragraph(f"{rnc(['Date d’échéance', 'Échéance'])}{rnc([' du paiement', ''])} : {dateEcheance}", styles["Normal"]))
         elif doctype == "devis" :
-            story.append(Paragraph(f"{rnc(['Date d’expiration', 'Expiration', 'Date de limite de validité'])} : {date_expiration}", styles["Normal"]))
+            story.append(Paragraph(f"{rnc(['Date d’expiration', 'Expiration', 'Date de limite de validité'])} : {dateExpiration}", styles["Normal"]))
         
         if table_apres_footer :
             story.append(Spacer(1, rni(6,18)))
