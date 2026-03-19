@@ -118,6 +118,16 @@ services:
       mongo:
         condition: service_healthy
 
+  # frontend react/nginx (ETUDIANT 3)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
   # api data-lake node/express (ETUDIANT 4)
   datalake:
     build:
