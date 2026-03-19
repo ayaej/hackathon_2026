@@ -1,7 +1,7 @@
 from rules import (
     check_siret,
     check_tva,
-    check_expiration,
+    check_date_coherence,
     check_amount_limits,
     check_siret_format
 )
@@ -30,43 +30,50 @@ class DocumentValidator:
             logging.warning("Could not load anomaly model. Anomaly detection disabled.")
             self.anomaly = None
 
-    def validate(self, facture, attestation):
-        logging.info("Validation started")
+    def validate(self, facture, devis):
+        logging.info("Validation started: Facture vs Devis")
 
         errors = []
 
-        if not check_siret_format(facture["siret"]):
-            errors.append("Format SIRET invalide")
+        # Vérification format SIRET
+        if not check_siret_format(facture.get("siret_creancier", "")):
+            errors.append("Format SIRET créancier invalide")
 
-        if not check_siret(facture["siret"], attestation["siret"]):
-            errors.append("SIRET mismatch")
+        # Vérification cohérence SIRET entre facture et devis
+        if not check_siret(facture.get("siret_creancier"), devis.get("siret_creancier")):
+            errors.append("SIRET créancier mismatch entre facture et devis")
+        
+        if not check_siret(facture.get("siret_client"), devis.get("siret_client")):
+            errors.append("SIRET client mismatch entre facture et devis")
 
+        # Vérification TVA
         if not check_tva(
-            facture["montant_ht"],
-            facture["montant_ttc"]
+            facture.get("montant_ht", 0),
+            facture.get("montant_ttc", 0)
         ):
             errors.append("TVA incoherente")
 
-        if not check_expiration(
-            attestation["date_expiration"]
+        # Vérification cohérence des dates (devis avant facture)
+        if not check_date_coherence(
+            devis.get("date_emission"),
+            facture.get("date_facturation")
         ):
-            errors.append("Attestation expirée")
+            errors.append("Date devis posterieure a la facture")
 
+        # Vérification des montants
         amount_issue = check_amount_limits(
-            facture["montant_ht"]
+            facture.get("montant_ht", 0)
         )
 
         if amount_issue:
             errors.append(amount_issue)
 
+        # Détection d'anomalies via ML
         if self.anomaly:
-            anomaly = self.anomaly.predict(
-                facture["montant_ht"],
-                facture["montant_ttc"]
-            )
+            anomaly = self.anomaly.predict(facture, devis)
 
             if anomaly:
-                errors.append("Montant anormal détecté")
+                errors.append("Incohérence détectée entre facture et devis")
 
         risk_score = compute_risk(errors)
 
