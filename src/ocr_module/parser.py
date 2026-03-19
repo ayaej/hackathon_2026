@@ -101,11 +101,16 @@ def extraire_infos_cles(texte):
 
     company = None
 
-
     for l in lignes[:10]:
         if any(x in l.lower() for x in ["sarl", "sas", "sa", "eurl"]):
             company = l
             break
+
+    if not company:
+        for l in lignes[:10]:
+            if re.match(r"^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+$", l):
+                company = l
+                break
 
     if not company:
         for l in lignes[:5]:
