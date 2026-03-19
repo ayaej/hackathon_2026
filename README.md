@@ -10,7 +10,7 @@
 | ÉTUDIANT 2 | Monica, Danielle | Module OCR & Extraction | `/src`     |
 | ÉTUDIANT 3 | Elliot           | Backend                 | `/backend` |
 | ÉTUDIANT 4 | Aya              | Intégration             |            |
-| ÉTUDIANT 5 | Sara             | Validation              |            |
+| ÉTUDIANT 5 | Sara             | Validation              | `/val`    |
 | ÉTUDIANT 6 | Matis            | Airflow / Orchestration | `/airflow` |
 
 ## Groupes
