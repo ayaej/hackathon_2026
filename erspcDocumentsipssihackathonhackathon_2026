@@ -1,0 +1,130 @@
+[1mdiff --git a/data/generateDataset.py b/data/generateDataset.py[m
+[1mindex a9d2427..06976e3 100644[m
+[1m--- a/data/generateDataset.py[m
+[1m+++ b/data/generateDataset.py[m
+[36m@@ -34,7 +34,9 @@[m [mdef rni_low(min, max) :[m
+ [m
+ class Facture :[m
+     def __init__(self) :[m
+[31m-        self._dictkeys = ("facture_id",[m
+[32m+[m[32m        self._dictkeys = ("erreur_date",[m
+[32m+[m[32m                          "erreur_montant",[m
+[32m+[m[32m                          "facture_id",[m
+                           "devis_id",[m
+                           "numero_document",[m
+                           "dateFacturation",[m
+[36m@@ -57,6 +59,9 @@[m [mclass Facture :[m
+             yield key, getattr(self, key)[m
+ [m
+     def generateRandom(self) :[m
+[32m+[m[32m        self.erreur_date = False[m
+[32m+[m[32m        self.erreur_montant = False[m
+[32m+[m
+         min_date = datetime.date(year=2015, month=1, day=1)[m
+         max_date = datetime.date(year=2035, month=1, day=1)[m
+ [m
+[36m@@ -64,8 +69,11 @@[m [mclass Facture :[m
+         self.dateEcheance = faker.date_between(start_date = self.dateFacturation, end_date = max_date)[m
+         self.datePrestation = self.dateFacturation if rn.random()>.5 else faker.date_between(start_date = self.dateFacturation, end_date = max_date)[m
+         self.dateEmission = faker.date_between(start_date = min_date, end_date = self.datePrestation)[m
+[31m-        self.dateExpiration = faker.date_between(start_date = self.datePrestation, end_date = max_date)[m
+[31m-[m
+[32m+[m[32m        if rn.random()<.75 :[m
+[32m+[m[32m            self.dateExpiration = faker.date_between(start_date = self.datePrestation, end_date = max_date)[m
+[32m+[m[32m        else :[m
+[32m+[m[32m            self.dateExpiration = faker.date_between(start_date = min_date, end_date = self.dateEmission)[m
+[32m+[m[32m            self.erreur_date = True[m
+         self.facture_id = f"FA-{str(self.dateFacturation)[:4]}-{rn.randint(0, 9999):04d}"[m
+         self.devis_id = f"D-{str(self.dateEmission)[:4]}-{rn.randint(0,999):03d}"[m
+         self.numero_document = rn.choice([self.facture_id, self.devis_id]) # Pour correspondance avec les normes du datalake[m
+[36m@@ -80,17 +88,29 @@[m [mclass Facture :[m
+         self.articles = [][m
+         for _ in range(rn.randint(1,10)) :[m
+             article = rn.choice(ARTICLE_DESCRIPTIONS)[m
+[31m-            if rn.random()>.2 :[m
+[32m+[m[32m            if rn.random()<.8 :[m
+                 article += rn.choice(ARTICLE_CONNECTEURS) + rn.choice(ARTICLE_DOMAINES)[m
+             prix = round(1/(rn.random()*200+1)*1000, 2)[m
+             quantite = rn.randint(1,10)[m
+             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})[m
+ [m
+         self.montantHT = sum(article["prix"] * article["quantite"] for article in self.articles)[m
+[31m-        self.montantHT = round(self.montantHT,2) if rn.random()<.95 else round(self.montantHT*(1+rn.random()/10),2)[m
+[31m-        self.tva = rn.choice([round(rn.random()/5, 2), .2, .2])[m
+[31m-        self.tva_montant = round(self.tva * self.montantHT, 2) if rn.random()<.95 else round(self.tva*(1+rn.random()/10) * self.montantHT, 2)[m
+[31m-        self.montantTTC = round(self.montantHT + self.tva_montant, 2) if rn.random()<.95 else round((self.montantHT + self.tva_montant)*(1+rn.random()/10),2)[m
+[32m+[m[32m        if rn.random()<.9 :[m
+[32m+[m[32m            self.montantHT = round(self.montantHT,2)[m
+[32m+[m[32m        else :[m
+[32m+[m[32m            self.montantHT = round(self.montantHT*(1+rn.random()/10),2)[m
+[32m+[m[32m            self.erreur_montant = True[m
+[32m+[m[32m        self.tva = round(rn.random()/5, 2) if rn.random()<.2 else .2[m
+[32m+[m[32m        if rn.random()<.9 :[m
+[32m+[m[32m            self.tva_montant = round(self.tva * self.montantHT, 2)[m[41m [m
+[32m+[m[32m        else :[m
+[32m+[m[32m            self.tva_montant = round(self.tva*(1+rn.random()/10) * self.montantHT, 2)[m
+[32m+[m[32m            self.erreur_montant = True[m
+[32m+[m[32m        if rn.random()<.9 :[m
+[32m+[m[32m            self.montantTTC = round(self.montantHT + self.tva_montant, 2)[m
+[32m+[m[32m        else :[m
+[32m+[m[32m            self.montantTTC = round((self.montantHT + self.tva_montant)*(1+rn.random()/10),2)[m
+[32m+[m[32m            self.erreur_montant = True[m
+ [m
+         creancier = Personne()[m
+         creancier.generateRandom()[m
+[1mdiff --git a/data/generatePDF.py b/data/generatePDF.py[m
+[1mindex a667ce2..dffae6c 100644[m
+[1m--- a/data/generatePDF.py[m
+[1m+++ b/data/generatePDF.py[m
+[36m@@ -64,6 +64,8 @@[m [mfor i in range(5) :[m
+         adresse_client_1 = f"{client['adresse']}"[m
+         adresse_client_2 = f"{client['code_postal']} {client['commune']}"[m
+         siren_client = f"{client['siren']}"[m
+[32m+[m[32m        nic_client = f"{client['nic']}"[m
+[32m+[m[32m        siret_client = f"{client['siret']}"[m
+         n_tva_client = f"{client['n_tva']}"[m
+         iban_client = f"{client['iban']}"[m
+         bic_client = f"{client['bic']}"[m
+[36m@@ -74,6 +76,8 @@[m [mfor i in range(5) :[m
+         adresse_creancier_1 = f"{creancier['adresse']}"[m
+         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"[m
+         siren_creancier = f"{creancier['siren']}"[m
+[32m+[m[32m        nic_creancier = f"{creancier['nic']}"[m
+[32m+[m[32m        siret_creancier = f"{creancier['siret']}"[m
+         iban_creancier = f"{creancier['iban']}"[m
+         bic_creancier = f"{creancier['bic']}"[m
+ [m
+[36m@@ -136,9 +140,10 @@[m [mfor i in range(5) :[m
+                                                                       "Expéditeur : ",[m
+                                                                       "Émetteur : "]) + rnc(["<br/>", ""]) + bold_2 + header_creancier[m
+ [m
+[31m-        if rnd() > .9 :[m
+[31m-            header_client += f"<br/>N° SIREN : {siren_client}"[m
+[31m-            header_creancier += f"<br/>N° SIREN : {siren_creancier}"[m
+[32m+[m[32m        # header_client += rnc([f"<br/>N° SIREN : {siren_client}"<br/>NIC : {nic_client}", f"<br/>N° SIRET : {siret_client}"])[m
+[32m+[m[32m        # header_creancier += rnc([f"<br/>N° SIREN : {siren_creancier}<br/>NIC : {nic_creancier}", f"<br/>N° SIRET : {siret_creancier}"])[m
+[32m+[m[32m        header_client += f"<br/>N° SIRET : {siret_client}"[m
+[32m+[m[32m        header_creancier += f"<br/>N° SIRET : {siret_creancier}"[m
+ [m
+         if rnd() > .5 :[m
+ [m
+[36m@@ -156,8 +161,8 @@[m [mfor i in range(5) :[m
+         header_creancier = Paragraph(header_creancier, styles["Normal"])[m
+ [m
+         largeur_box = rnd()[m
+[31m-        couleur_box = colors.white if rnd()>.75 else rnc([colors.black, colors.gray])[m
+[31m-        creancier_visible = True if rnd()>.25 or doctype=="devis" else False[m
+[32m+[m[32m        couleur_box = colors.white if rnd()>.5 else rnc([colors.black, colors.gray])[m
+[32m+[m[32m        creancier_visible = True if rnd()>.5 or doctype=="devis" else False[m
+         deux_colonnes = True if rnd()>.25 else False[m
+         if deux_colonnes :[m
+             taille_col = rni(70,90)[m
+[36m@@ -253,7 +258,7 @@[m [mfor i in range(5) :[m
+             story.append(table)[m
+             story.append(Spacer(1, rni(6,18)))[m
+ [m
+[31m-        story.append(Spacer(1, rni(12,96)))[m
+[32m+[m[32m        story.append(Spacer(1, rni(12,48)))[m
+ [m
+         if doctype == "devis" :[m
+ [m
