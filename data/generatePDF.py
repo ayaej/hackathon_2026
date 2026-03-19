@@ -136,9 +136,8 @@ for i in range(5) :
                                                                       "Expéditeur : ",
                                                                       "Émetteur : "]) + rnc(["<br/>", ""]) + bold_2 + header_creancier
 
-        if rnd() > .9 :
-            header_client += f"<br/>N° SIREN : {siren_client}"
-            header_creancier += f"<br/>N° SIREN : {siren_creancier}"
+        header_client += f"<br/>N° SIREN : {siren_client}"
+        header_creancier += f"<br/>N° SIREN : {siren_creancier}"
 
         if rnd() > .5 :
 
