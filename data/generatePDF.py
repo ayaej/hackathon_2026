@@ -111,6 +111,7 @@ for i in range(5) :
             reference_document = f"{doctype.capitalize()} {reference_document}"
         story.append(Paragraph(f"{bold_1}{reference_document}{bold_2}"))
         if doctype == "facture" :
+
             story.append(Paragraph(f"{bold_1}Date{' de facturation' if rnd()>.5 else ''} :{bold_2} {dateFacturation}", styles["Normal"]))
         elif doctype == "devis" :
             story.append(Paragraph(f"{bold_1}{rnc(['Émission', 'Date d’émission', 'Émis le'])} :{bold_2} {dateEmission}", styles["Normal"]))
@@ -140,6 +141,7 @@ for i in range(5) :
             header_creancier += f"<br/>N° SIREN : {siren_creancier}"
 
         if rnd() > .5 :
+
             header_client += f"<br/>IBAN : {iban_client}"
         if rnd() > .5 :
             header_client += f"<br/>BIC : {bic_client}"
@@ -147,7 +149,6 @@ for i in range(5) :
             header_creancier += f"<br/>IBAN : {iban_creancier}"
         if rnd() > .5 :
             header_creancier += f"<br/>BIC : {bic_creancier}"
-
         if rnd() > .5 :
             header_client += f"<br/>N° TVA : {n_tva_client}"
 
@@ -195,6 +196,7 @@ for i in range(5) :
         for article in articles :
             tableau.append([article["nom"], str(article["quantite"]), f"{article['prix']:.2f} €", f"{(article['quantite']*article['prix']):.2f} €"])
 
+
         tableau.append(["", "", Paragraph(f"{rnc(['Total ', 'Montant total '])}{rnc(['HT', '(HT)', ''])}{ddot}", style=wordWrap), f"{montantHT:.2f} €"])
         tableau.append(["", "", Paragraph(f"{rnc(['TVA ', 'Montant TVA ', 'Montant de la TVA '])}{'('+str(int(tva*100))+' %) ' if rnd()>.5 else ''}{ddot}", style=wordWrap), f"{tva_montant:.2f} €"])
         tableau.append(["", "", Paragraph(f"{rnc(['Total ', 'Montant total '])}{rnc(['TTC', '(TTC)'])}{ddot}", style=wordWrap), f"{montantTTC:.2f} €"])
@@ -237,6 +239,7 @@ for i in range(5) :
             story.append(Spacer(1, rni(6,18)))
 
         ## Footer
+
 
         story.append(Paragraph(f"Date de {rnc(['prestation', 'livraison', 'résolution'])}{' prévue' if doctype=='devis' and rnd()>.5 else ''} : {datePrestation}", styles["Normal"]))
 

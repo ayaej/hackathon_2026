@@ -59,12 +59,13 @@ class Facture :
     def generateRandom(self) :
         min_date = datetime.date(year=2015, month=1, day=1)
         max_date = datetime.date(year=2035, month=1, day=1)
+
         self.dateFacturation = faker.date_between(start_date = min_date, end_date = max_date)
         self.dateEcheance = faker.date_between(start_date = self.dateFacturation, end_date = max_date)
         self.datePrestation = self.dateFacturation if rn.random()>.5 else faker.date_between(start_date = self.dateFacturation, end_date = max_date)
         self.dateEmission = faker.date_between(start_date = min_date, end_date = self.datePrestation)
         self.dateExpiration = faker.date_between(start_date = self.datePrestation, end_date = max_date)
-        
+
         self.facture_id = f"FA-{str(self.dateFacturation)[:4]}-{rn.randint(0, 9999):04d}"
         self.devis_id = f"D-{str(self.dateEmission)[:4]}-{rn.randint(0,999):03d}"
         self.numero_document = rn.choice([self.facture_id, self.devis_id]) # Pour correspondance avec les normes du datalake

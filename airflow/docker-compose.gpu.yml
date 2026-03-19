@@ -1,0 +1,5 @@
+services:
+  airflow-worker:
+    environment:
+      EASYOCR_USE_GPU: "true"
+    gpus: all

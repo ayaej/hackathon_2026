@@ -2,7 +2,9 @@ name: hackathon_2026_G28
 
 x-airflow-common:
   &airflow-common
-  image: apache/airflow:2.10.5
+  build:
+    context: ../
+    dockerfile: airflow/Dockerfile
   environment:
     &airflow-common-env
 
@@ -16,7 +18,13 @@ x-airflow-common:
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
 
     # nombre de taches max en parallele par worker celery
-    AIRFLOW__CELERY__WORKER_CONCURRENCY: 8
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: ${AIRFLOW_WORKER_CONCURRENCY:-2}
+
+    # limite le parallelisme global du scheduler pour eviter les pics cpu
+    AIRFLOW__CORE__PARALLELISM: ${AIRFLOW_CORE_PARALLELISM:-4}
+
+    # limite le nombre de taches actives par dag run
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: ${AIRFLOW_MAX_ACTIVE_TASKS_PER_DAG:-4}
 
     # ne charge pas les DAGs d'exemple fournis par Airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
@@ -26,7 +34,17 @@ x-airflow-common:
 
     # Active l'authentification basique pour l'API REST Airflow
     AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
-    PYTHONPATH: /opt/airflow/src
+    
+    # cle partagee entre webserver/scheduler/workers pour signer les urls de logs
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-hackathon_2026_g28_shared_secret_key}
+
+    # cache modele easyocr partage entre workers
+    EASYOCR_MODULE_PATH: /home/airflow/.EasyOCR
+
+    # active easyocr sur gpu si true (fallback cpu si false)
+    EASYOCR_USE_GPU: ${EASYOCR_USE_GPU:-false}
+
+    PYTHONPATH: /opt/airflow/src:/opt/airflow/val
 
     AIRFLOW_UID: ${AIRFLOW_UID:-50000}
   volumes:
@@ -51,6 +69,15 @@ x-airflow-common:
     # modules python OCR/validation du projet
     - ../src:/opt/airflow/src
 
+    # modules de validation ETUDIANT 5 (rules, risk_scoring, anomaly_model)
+    - ../val:/opt/airflow/val
+
+    # fichiers uploades du backend pour OCR reel ETUDIANT 2
+    - ../backend/uploads:/opt/airflow/backend_uploads
+
+    # cache easyocr partage pour eviter les re-telechargements par worker
+    - ./cache/easyocr:/home/airflow/.EasyOCR
+
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
@@ -64,7 +91,7 @@ services:
   mongo:
     image: mongo:7
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -74,7 +101,7 @@ services:
       retries: 5
       start_period: 10s
 
-  # backend api node/express
+  # backend api node/express (ETUDIANT 3)
   backend:
     build:
       context: ../backend
@@ -87,6 +114,26 @@ services:
       - "5000:5000"
     volumes:
       - ../backend/uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # api data-lake node/express (ETUDIANT 4)
+  datalake:
+    build:
+      context: ../data-lake
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/document_processing_datalake
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_USE_SSL: "false"
+    ports:
+      - "3000:3000"
     depends_on:
       mongo:
         condition: service_healthy
@@ -126,6 +173,10 @@ services:
       - |
         airflow db migrate
         airflow users create --username admin --firstname Matis --lastname Admin --role Admin --email admin@example.com --password admin
+        airflow variables set backend_base_url http://backend:5000
+        airflow variables set datalake_base_url http://datalake:3000
+        airflow variables set crm_autofill_url http://backend:5000/api/crm/autofill
+        airflow variables set conformite_autofill_url http://backend:5000/api/conformite/autofill
     restart: "no"
 
   # interface web Airflow : http://localhost:8080 (admin-admin)
@@ -161,12 +212,39 @@ services:
   # worker celery : execute les taches distribuees
   airflow-worker:
     <<: *airflow-common
-    command: celery worker
+    command:
+      - celery
+      - worker
+      - --celery-hostname
+      - airflow-worker@%h
+    restart: unless-stopped
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+    # exposition gpu optionnelle (desktop/windows+wsl2+nvidia runtime requis)
+    gpus: ${DOCKER_GPUS:-all}
+
+  # minio : stockage objet pour le data-lake (ETUDIANT 4)
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
 
 # vol persistant pour la base Postgres (docker compose down --volumes pour delete)
 volumes:
   postgres-db-volume:
   mongo-data:
+  minio-data:
