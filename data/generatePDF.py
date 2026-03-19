@@ -70,6 +70,7 @@ for i in range(5) :
 
         creancier = document["creancier"]
         nom_creancier = f"{creancier['prenom']} {creancier['prenom_2']} {creancier['prenom_3']} {creancier['nom']}"
+        company_creancier = f"{creancier['companyName']}"
         adresse_creancier_1 = f"{creancier['adresse']}"
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
@@ -104,7 +105,7 @@ for i in range(5) :
             titleStyle = ParagraphStyle(name="doc_title", fontSize=rni(10,20),
                                         alignment=rnc([TA_LEFT, TA_CENTER, TA_CENTER]),
                                         fontName=rnc(['Helvetica','Helvetica-Bold']))
-            story.append(Paragraph(f"{doctype.upper()}", style=titleStyle))
+            story.append(Paragraph(f"{doctype.upper()}{' - ' + company_creancier if rnd()>.75 else ''}", style=titleStyle))
             story.append(Spacer(1, rni(6,18)))
         else :
             reference_document = f"{doctype.capitalize()} {reference_document}"
@@ -124,7 +125,7 @@ for i in range(5) :
             story.append(Spacer(1, rni(6,18)))
 
         header_client = f"{nom_client}<br/>{adresse_client_1}<br/>{adresse_client_2}"
-        header_creancier = f"{nom_creancier}<br/>{adresse_creancier_1}<br/>{adresse_creancier_2}"
+        header_creancier = f"{nom_creancier if rnd()>.5 else company_creancier}<br/>{adresse_creancier_1}<br/>{adresse_creancier_2}"
 
         if rnd() > .25 : header_client = bold_1 + rnc(["Client : ",
                                                                    "Nom du client : "]) + rnc(["<br/>", ""]) + bold_2 + header_client
