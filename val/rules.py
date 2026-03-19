@@ -6,7 +6,6 @@ def check_siret(siret1, siret2):
 
 
 def check_siret_format(siret):
-
     if len(siret) != 14:
         return False
 
@@ -17,21 +16,16 @@ def check_siret_format(siret):
 
 
 def check_tva(ht, ttc, tolerance=1):
-
     expected_ttc = ht * 1.2
 
     return abs(expected_ttc - ttc) < tolerance
 
 
 def check_tva_format(tva):
-
     pattern = r"^FR[0-9A-Z]{2}[0-9]{9}$"
 
     return bool(re.match(pattern, tva))
 
-
-
-from datetime import datetime
 
 def check_expiration(date_exp):
     try:
@@ -42,9 +36,7 @@ def check_expiration(date_exp):
         return False
 
 
-
 def check_amount_limits(ht):
-
     if ht < 10:
         return "Montant anormalement faible"
 
