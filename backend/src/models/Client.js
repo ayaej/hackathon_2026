@@ -1,0 +1,55 @@
+const mongoose = require('mongoose');
+
+const clientSchema = new mongoose.Schema(
+  {
+    siret: { type: String, required: true, unique: true, index: true },
+    raisonSociale: { type: String, required: true },
+    siren: String,
+    tva: String,
+    tvaId: String,
+    iban: String,
+
+    contact: {
+      nom: String,
+      prenom: String,
+      email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'entrer une adresse email valide'],
+      },
+      telephone: String,
+    },
+
+    adresse: {
+      rue: String,
+      codePostal: String,
+      ville: String,
+      pays: { type: String, default: 'France' },
+    },
+    documents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],
+
+    statut: {
+      type: String,
+      enum: ['actif', 'inactif', 'bloque', 'en_verification'],
+      default: 'actif',
+    },
+
+    conformiteScore: { type: Number, min: 0, max: 100 },
+    dernierControle: Date,
+    anomaliesDetectees: [
+      {
+        documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
+        type: { type: String }, // Mongoose "type" keyword escape
+        description: String,
+        detectedAt: { type: Date, default: Date.now },
+        resolved: { type: Boolean, default: false },
+      },
+    ],
+
+    notes: String,
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model('Client', clientSchema);

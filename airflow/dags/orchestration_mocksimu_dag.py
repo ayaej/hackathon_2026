@@ -1,0 +1,123 @@
+from __future__ import annotations
+
+import json
+import logging
+from datetime import datetime, timezone
+from pathlib import Path
+
+from airflow import DAG
+from airflow.models.taskinstance import TaskInstance
+from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import PythonOperator, get_current_context
+
+# chemins des fichiers de simu dans le conteneur airflow
+# (le dossier simu/ local est monte via docker-compose)
+SIMU_INPUT = Path("/opt/airflow/simu/input/mock_ocr.json")
+SIMU_OUTPUT = Path("/opt/airflow/simu/output/curated_payload.json")
+SIMU_ARCHIVE = Path("/opt/airflow/simu/archive")
+
+ 
+def lire_mock_ocr() -> None:
+    context = get_current_context()
+    ti: TaskInstance = context["ti"]
+    if not SIMU_INPUT.exists():
+        raise FileNotFoundError(f"Fichier de simulation introuvable: {SIMU_INPUT}")
+
+    with SIMU_INPUT.open("r", encoding="utf-8-sig") as fichier:
+        contenu = json.load(fichier)
+
+    ti.xcom_push(key="ocr_source", value=str(SIMU_INPUT))
+    ti.xcom_push(key="ocr_document_id", value=contenu.get("document_id"))
+    logging.info("Simulation OCR lue avec succes pour le document %s", contenu.get("document_id"))
+
+
+def construire_curated() -> None:
+    context = get_current_context()
+    ti: TaskInstance = context["ti"]
+    source_path = ti.xcom_pull(task_ids="simuler_ocr", key="ocr_source")
+    if not source_path:
+        raise ValueError("Aucun chemin OCR mock disponible dans XCom")
+
+    chemin_source = Path(source_path)
+    if not chemin_source.exists():
+        raise FileNotFoundError(f"Fichier OCR mock introuvable: {chemin_source}")
+
+    with chemin_source.open("r", encoding="utf-8-sig") as fichier:
+        ocr_mock = json.load(fichier)
+
+    curated = {
+        "document_id": ocr_mock["document_id"],
+        "type_document": ocr_mock.get("type_document"),
+        "fournisseur": ocr_mock.get("fournisseur"),
+        "siret": ocr_mock.get("siret"),
+        "montant_ttc": ocr_mock.get("montant_ttc"),
+        "devise": ocr_mock.get("devise"),
+        "date_facture": ocr_mock.get("date_facture"),
+        "statut_validation": "valide_mock",
+        "source": "simulation",
+        "date_traitement": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+
+    SIMU_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    with SIMU_OUTPUT.open("w", encoding="utf-8") as fichier:
+        json.dump(curated, fichier, ensure_ascii=False, indent=2)
+
+    logging.info("Payload Curated de simulation ecrit dans %s", SIMU_OUTPUT)
+
+
+def archiver_resultat() -> None:
+    SIMU_ARCHIVE.mkdir(parents=True, exist_ok=True)
+    horodatage = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    destination = SIMU_ARCHIVE / f"curated_payload_{horodatage}.json"
+
+    if not SIMU_OUTPUT.exists():
+        raise FileNotFoundError(f"Fichier Curated introuvable: {SIMU_OUTPUT}")
+
+    destination.write_text(SIMU_OUTPUT.read_text(encoding="utf-8"), encoding="utf-8")
+    logging.info("Archive de simulation creee: %s", destination)
+
+
+with DAG(
+    dag_id="orchestration_mocksimu_dag",
+    start_date=datetime(2026, 3, 16),
+    schedule=None,
+    catchup=False,
+    tags=["mock", "simu", "matis"],
+) as dag:
+    debut = EmptyOperator(task_id="debut_pipeline")
+
+    ingestion_raw = EmptyOperator(task_id="ingestion_raw")
+
+    simuler_ocr = PythonOperator(
+        task_id="simuler_ocr",
+        python_callable=lire_mock_ocr,
+    )
+
+    persister_clean = EmptyOperator(task_id="persister_clean")
+
+    construire_zone_curated = PythonOperator(
+        task_id="construire_zone_curated",
+        python_callable=construire_curated,
+    )
+
+    envoyer_crm_mock = EmptyOperator(task_id="envoyer_crm_mock")
+
+    envoyer_conformite_mock = EmptyOperator(task_id="envoyer_conformite_mock")
+
+    archiver_trace = PythonOperator(
+        task_id="archiver_trace",
+        python_callable=archiver_resultat,
+    )
+
+    fin = EmptyOperator(task_id="fin_pipeline")
+
+    (
+        debut
+        >> ingestion_raw
+        >> simuler_ocr
+        >> persister_clean
+        >> construire_zone_curated
+        >> [envoyer_crm_mock, envoyer_conformite_mock]
+        >> archiver_trace
+        >> fin
+    )

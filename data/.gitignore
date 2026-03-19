@@ -1,0 +1,9 @@
+dataset.json
+pdf/
+raw/*.json
+silver/*.json
+curated/*.json
+
+pdf
+poppler
+

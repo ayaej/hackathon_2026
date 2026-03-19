@@ -1,0 +1,260 @@
+name: hackathon_2026_G28
+
+x-airflow-common:
+  &airflow-common
+  build:
+    context: ../
+    dockerfile: airflow/Dockerfile
+  environment:
+    &airflow-common-env
+
+    # LocalExecutor   : le scheduler execute les taches directement, sans worker externe (pour le mock)
+    # CeleryExecutor  : le scheduler distribue les taches aux workers via redis
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+
+    # connexion a la base Postgres qui stocke l'etat des DAGs et des runs
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+
+    # nombre de taches max en parallele par worker celery
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: ${AIRFLOW_WORKER_CONCURRENCY:-2}
+
+    # limite le parallelisme global du scheduler pour eviter les pics cpu
+    AIRFLOW__CORE__PARALLELISM: ${AIRFLOW_CORE_PARALLELISM:-4}
+
+    # limite le nombre de taches actives par dag run
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: ${AIRFLOW_MAX_ACTIVE_TASKS_PER_DAG:-4}
+
+    # ne charge pas les DAGs d'exemple fournis par Airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+
+    # un nouveau DAG sera en pause par defaut, on l'active manuellement
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+
+    # Active l'authentification basique pour l'API REST Airflow
+    AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session
+    
+    # cle partagee entre webserver/scheduler/workers pour signer les urls de logs
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-hackathon_2026_g28_shared_secret_key}
+
+    # cache modele easyocr partage entre workers
+    EASYOCR_MODULE_PATH: /home/airflow/.EasyOCR
+
+    # active easyocr sur gpu si true (fallback cpu si false)
+    EASYOCR_USE_GPU: ${EASYOCR_USE_GPU:-false}
+
+    PYTHONPATH: /opt/airflow/src:/opt/airflow/val
+
+    AIRFLOW_UID: ${AIRFLOW_UID:-50000}
+  volumes:
+    # DAGs Python monté en live (pas besoin de rebuild)
+    - ./dags:/opt/airflow/dags
+
+    # logs des tâches
+    - ./logs:/opt/airflow/logs
+
+    # plugins Airflow
+    - ./plugins:/opt/airflow/plugins
+
+    # fichiers de config Airflow supplementaires
+    - ./config:/opt/airflow/config
+
+    # dossier de simulation locale via les taches mock
+    - ../simu:/opt/airflow/simu
+
+    # dataset de test genere localement
+    - ../data:/opt/airflow/data
+
+    # modules python OCR/validation du projet
+    - ../src:/opt/airflow/src
+
+    # modules de validation ETUDIANT 5 (rules, risk_scoring, anomaly_model)
+    - ../val:/opt/airflow/val
+
+    # fichiers uploades du backend pour OCR reel ETUDIANT 2
+    - ../backend/uploads:/opt/airflow/backend_uploads
+
+    # cache easyocr partage pour eviter les re-telechargements par worker
+    - ./cache/easyocr:/home/airflow/.EasyOCR
+
+
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+
+services:
+  # base mongo pour le backend node/express
+  mongo:
+    image: mongo:7
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  # backend api node/express (ETUDIANT 3)
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    environment:
+      PORT: 5000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/hackathon_docs
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../backend/uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # frontend react/nginx (ETUDIANT 3)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+  # api data-lake node/express (ETUDIANT 4)
+  datalake:
+    build:
+      context: ../data-lake
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongo:27017/document_processing_datalake
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_USE_SSL: "false"
+    ports:
+      - "3000:3000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # broker redis pour celery
+  redis:
+    image: redis:7.2-bookworm
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+
+  # BDD Airflow : DAGs, runs, logs metadonnees, XCom
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+
+  # Airflow init : migrate la base et créé le compte admin (executé une seule fois)
+  # TODO: faire un login plus secure pour la prod
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create --username admin --firstname Matis --lastname Admin --role Admin --email admin@example.com --password admin
+        airflow variables set backend_base_url http://backend:5000
+        airflow variables set datalake_base_url http://datalake:3000
+        airflow variables set crm_autofill_url http://backend:5000/api/crm/autofill
+        airflow variables set conformite_autofill_url http://backend:5000/api/conformite/autofill
+    restart: "no"
+
+  # interface web Airflow : http://localhost:8080 (admin-admin)
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # scheduler : detecte les DAG + planifie les taches (CeleryExecutor)
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # worker celery : execute les taches distribuees
+  airflow-worker:
+    <<: *airflow-common
+    command:
+      - celery
+      - worker
+      - --celery-hostname
+      - airflow-worker@%h
+    restart: unless-stopped
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    # exposition gpu optionnelle (desktop/windows+wsl2+nvidia runtime requis)
+    gpus: ${DOCKER_GPUS:-all}
+
+  # minio : stockage objet pour le data-lake (ETUDIANT 4)
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+
+# vol persistant pour la base Postgres (docker compose down --volumes pour delete)
+volumes:
+  postgres-db-volume:
+  mongo-data:
+  minio-data:
