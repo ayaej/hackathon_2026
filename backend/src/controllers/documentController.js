@@ -120,10 +120,11 @@ exports.downloadDocument = async (req, res) => {
 
 exports.updateDocumentStatus = async (req, res) => {
   try {
-    const { status, extractedData, validationResult, storage, pipeline } = req.body;
+    const { status, type, extractedData, validationResult, storage, pipeline } = req.body;
 
     const update = {};
     if (status) update.status = status;
+    if (type) update.type = type;
     if (extractedData) update.extractedData = extractedData;
     if (validationResult) update.validationResult = validationResult;
     if (storage) update.storage = storage;

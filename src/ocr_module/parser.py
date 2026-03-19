@@ -19,11 +19,18 @@ def to_date(val):
     if not val:
         return None
 
+    # normaliser les séparateurs OCR incoherents: "06 02 - 25" -> "06/02/25"
+    val = re.sub(r"\s+", " ", str(val)).strip()
+    val = re.sub(r"\s*[-.]\s*", "/", val)
+    val = re.sub(r"\s+", "/", val)
+
     formats = [
         "%d/%m/%Y",
         "%Y-%m-%d",
         "%d-%m-%Y",
-        "%d.%m.%Y"
+        "%d.%m.%Y",
+        "%d/%m/%y",
+        "%d-%m-%y",
     ]
 
     for fmt in formats:
@@ -72,12 +79,21 @@ def extraire_infos_cles(texte):
 
     siren = siret[:9] if siret else None
 
+    # fallback : extraire le siren du numero de tva (FR + 2 cles + 9 chiffres siren)
+    if not siren:
+        m_tva_siren = re.search(r"FR[0-9A-Z]{2}(\d{9})", re.sub(r"\s+", "", texte.upper()))
+        if m_tva_siren:
+            siren = m_tva_siren.group(1)
+            # siret derive : siren + nic generique 00000
+            if not siret:
+                siret = siren + "00000"
+
     # ------------------ NUMERO ------------------
     numero = re.search(r"\b[A-Z]{2,5}[-_]?\d{3,}\b", texte)
 
     # ------------------ DATES ------------------
 
-    PATTERN_DATE = r"(\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4}|\d{2}\.\d{2}\.\d{4})"
+    PATTERN_DATE = r"(\d{4}-\d{2}-\d{2}|\d{2}/\d{2}/\d{4}|\d{2}-\d{2}-\d{4}|\d{2}\.\d{2}\.\d{4}|\d{2}[\s\-\./]+\d{2}[\s\-\./]+\d{2,4})"
 
     date_emission = re.search(
         r"(?:facturation|émission)[^\d]*" + PATTERN_DATE,
@@ -99,11 +115,17 @@ def extraire_infos_cles(texte):
         date_emission = re.search(PATTERN_DATE, texte)
 
     # ------------------ IBAN / BIC ------------------
-    iban = re.search(r"\bFR\d{2}[A-Z0-9]{10,30}\b", texte)
-    bic = re.search(r"\b[A-Z]{6}[A-Z0-9]{2,5}\b", texte)
+    texte_compact = re.sub(r"\s+", "", texte.upper())
+    iban = re.search(r"FR[0-9A-Z]{25}", texte_compact)
+    bic_labeled = re.search(
+        r"(?:\bBIC\b|\bSWIFT\b)[^A-Z0-9]{0,8}([A-Z]{4}\s?[A-Z]{2}\s?[A-Z0-9]{2}(?:\s?[A-Z0-9]{3})?)",
+        texte.upper(),
+    )
+    bic = re.sub(r"\s+", "", bic_labeled.group(1)) if bic_labeled else None
 
     # ------------------ TVA ------------------
-    tva = re.search(r"TVA\s*:?\s*(\d{1,2}(?:[.,]\d{1,2})?)\s*%", texte)
+    tva = re.search(r"TVA\s*\(?\s*(\d{1,2}(?:[.,]\d{1,2})?)\s*%\s*\)?", texte, re.IGNORECASE)
+    tva_id = re.search(r"\b(FR[0-9A-Z]{2}\s*\d{9})\b", texte, re.IGNORECASE)
 
     # ------------------ MONTANTS ------------------
     montant_ht = None
@@ -117,6 +139,25 @@ def extraire_infos_cles(texte):
     if match_ttc:
         montant_ttc = to_float(match_ttc.group(1))
 
+    # derive ht si ttc+tva connus
+    if montant_ttc is not None and tva:
+        try:
+            taux = float(tva.group(1).replace(",", "."))
+            if montant_ht is None or montant_ht >= montant_ttc:
+                montant_ht = round(montant_ttc / (1 + taux / 100), 2)
+        except Exception:
+            pass
+
+    # fallback montant ht: le plus grand montant hors ttc si ht absent
+    if not montant_ht:
+        nums = [to_float(n) for n in re.findall(r"\d+[.,]\d{2}", texte)]
+        nums = [n for n in nums if n is not None]
+        if nums:
+            if montant_ttc and len(nums) > 1:
+                montant_ht = max([n for n in nums if n <= montant_ttc] or nums)
+            else:
+                montant_ht = max(nums)
+
     if not montant_ttc:
         nums = re.findall(r"\d+[.,]\d{2}", texte)
         if nums:
@@ -126,10 +167,14 @@ def extraire_infos_cles(texte):
 
     company = None
 
-    # 1. après "Client"
-    match_client = re.search(r"Client\s+([A-Z][a-z]+\s+[A-Z][a-z]+)", texte)
+    # 1. apres "Client" sur la meme ligne
+    match_client = re.search(r"Client\s+([A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ\-']+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ\-']+){1,4})", texte, re.MULTILINE)
     if match_client:
-        company = match_client.group(1)
+        # limiter au contenu avant tout mot-cle (SIRET, Date, etc.)
+        raw_company = match_client.group(1).strip()
+        raw_company = re.split(r"\b(?:SIRET|Date|TVA|Montant|IBAN|BIC|Total|Facture)\b", raw_company, flags=re.IGNORECASE)[0].strip()
+        if raw_company:
+            company = raw_company
 
     # 2. société
     if not company:
@@ -141,14 +186,14 @@ def extraire_infos_cles(texte):
     # 3. nom prénom
     if not company:
         for l in lignes[:10]:
-            if re.match(r"^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+$", l):
+            if re.match(r"^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ\-']+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ\-']+)+$", l):
                 company = l
                 break
 
     # ------------------ ADDRESS ------------------
 
     address = re.search(
-        r"\d{1,4}\s*,?\s*(?:rue|avenue|bd|boulevard)\s+(?:de\s+|du\s+|des\s+)?[A-Za-z\s\-]+",
+        r"\d{1,4}\s*,?\s*(?:rue|avenue|bd|boulevard)\s+(?:de\s+|du\s+|des\s+)?[A-Za-zÀ-ÖØ-öø-ÿ \-]+",
         texte_lower
     )
 
@@ -164,6 +209,7 @@ def extraire_infos_cles(texte):
             "montantHT": montant_ht,
             "montantTTC": montant_ttc,
             "tva": float(tva.group(1).replace(",", ".")) if tva else None,
+            "tvaId": re.sub(r"\s+", "", tva_id.group(1).upper()) if tva_id else None,
 
             "dateEmission": get_date(date_emission),
             "dateExpiration": get_date(date_expiration),
@@ -171,7 +217,7 @@ def extraire_infos_cles(texte):
 
             "numeroDocument": numero.group() if numero else None,
             "iban": iban.group() if iban else None,
-            "bic": bic.group() if bic else None
+            "bic": bic
         },
         "texte_brut": texte
     }

@@ -6,6 +6,8 @@ const clientSchema = new mongoose.Schema(
     raisonSociale: { type: String, required: true },
     siren: String,
     tva: String,
+    tvaId: String,
+    iban: String,
 
     contact: {
       nom: String,
@@ -38,7 +40,7 @@ const clientSchema = new mongoose.Schema(
     anomaliesDetectees: [
       {
         documentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
-        type: String,
+        type: { type: String }, // Mongoose "type" keyword escape
         description: String,
         detectedAt: { type: Date, default: Date.now },
         resolved: { type: Boolean, default: false },

@@ -18,22 +18,28 @@ const documentSchema = new mongoose.Schema(
     },
     extractedData: {
       siret: String,
+      siren: String,
       raisonSociale: String,
-      tva: String,
+      tva: mongoose.Schema.Types.Mixed,
+      tvaId: String,
       montantHT: Number,
       montantTTC: Number,
       dateDocument: Date,
       dateExpiration: Date,
+      dateEcheance: Date,
       fournisseur: String,
       client: String,
       numeroDocument: String,
+      iban: String,
+      bic: String,
+      address: String,
     },
     validationResult: {
       isValid: Boolean,
       score: Number,
       anomalies: [
         {
-          type: String,
+          type: { type: String }, // Mongoose "type" keyword escape
           description: String,
           severity: { type: String, enum: ['low', 'medium', 'high', 'critical'] },
         },
