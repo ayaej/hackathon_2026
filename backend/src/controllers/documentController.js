@@ -1,6 +1,35 @@
 const Document = require('../models/Document');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
+const FormData = require('form-data');
+
+const DATALAKE_URL = process.env.DATALAKE_URL || 'http://localhost:3000';
+
+const forwardToDataLake = async (doc) => {
+  try {
+    const filePath = path.join(__dirname, '../../uploads', doc.filename);
+    if (!fs.existsSync(filePath)) return;
+
+    const form = new FormData();
+    form.append('file', fs.createReadStream(filePath), {
+      filename: doc.originalName,
+      contentType: doc.mimetype,
+    });
+    form.append('metadata', JSON.stringify({
+      backendDocumentId: String(doc._id),
+      originalName: doc.originalName,
+      type: doc.type,
+    }));
+
+    await axios.post(`${DATALAKE_URL}/api/raw/upload`, form, {
+      headers: form.getHeaders(),
+      timeout: 10000,
+    });
+  } catch (err) {
+    console.warn(`[DataLake] Forward échoué pour ${doc._id} :`, err.message);
+  }
+};
 
 exports.uploadDocuments = async (req, res) => {
   try {
@@ -26,6 +55,8 @@ exports.uploadDocuments = async (req, res) => {
       message: `${docs.length} document(s) uploadé(s) avec succès`,
       data: docs,
     });
+
+    docs.forEach((doc) => forwardToDataLake(doc));
   } catch (error) {
     console.error('Erreur upload :', error);
     res.status(500).json({ success: false, message: error.message });
@@ -61,6 +92,25 @@ exports.getDocument = async (req, res) => {
     if (!doc) return res.status(404).json({ success: false, message: 'Document introuvable' });
     res.json({ success: true, data: doc });
   } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.downloadDocument = async (req, res) => {
+  try {
+    const doc = await Document.findById(req.params.id);
+    if (!doc) return res.status(404).json({ success: false, message: 'Document introuvable' });
+
+    const filePath = path.join(__dirname, '../../uploads', doc.filename);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ success: false, message: 'Fichier introuvable sur le serveur' });
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(doc.originalName)}"`);
+    res.setHeader('Content-Type', doc.mimetype);
+    res.sendFile(filePath);
+  } catch (error) {
+    console.error('Erreur download :', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
