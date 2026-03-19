@@ -1,16 +1,16 @@
 const config = {
-  uploaded:   { label: 'Uploadé',       color: 'bg-gray-100 text-gray-600' },
-  processing: { label: 'En traitement', color: 'bg-yellow-100 text-yellow-700' },
-  processed:  { label: 'Traité',        color: 'bg-blue-100 text-blue-700' },
-  validated:  { label: 'Validé',        color: 'bg-green-100 text-green-700' },
-  rejected:   { label: 'Rejeté',        color: 'bg-red-100 text-red-600' },
-  anomaly:    { label: 'Anomalie',       color: 'bg-orange-100 text-orange-700' },
+  uploaded:   { label: 'Uploadé',       color: 'bg-white/10 text-white/60 border border-white/10' },
+  processing: { label: 'En traitement', color: 'bg-amber-500/20 text-amber-300 border border-amber-500/20' },
+  processed:  { label: 'Traité',        color: 'bg-blue-500/20 text-blue-300 border border-blue-500/20' },
+  validated:  { label: 'Validé',        color: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/20' },
+  rejected:   { label: 'Rejeté',        color: 'bg-red-500/20 text-red-400 border border-red-500/20' },
+  anomaly:    { label: 'Anomalie',       color: 'bg-orange-500/20 text-orange-300 border border-orange-500/20' },
 };
 
 export default function StatusBadge({ status }) {
-  const { label, color } = config[status] ?? { label: status, color: 'bg-gray-100 text-gray-500' };
+  const { label, color } = config[status] ?? { label: status, color: 'bg-white/10 text-white/50' };
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium backdrop-blur-sm ${color}`}>
       {label}
     </span>
   );
