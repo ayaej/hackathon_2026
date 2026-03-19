@@ -377,7 +377,7 @@ def persister_documents_clean(**context) -> None:
         try:
             _http_json("POST", f"{datalake_url}/api/clean", payload)
             persisted += 1
-        except Exception as exc:
+        except RuntimeError as exc:
             logging.warning("erreur persistence clean pour %s: %s", document_id, exc)
 
     logging.info("documents persistes en zone clean (ETUDIANT 4): %s/%s", persisted, len(curated_payload))
@@ -423,7 +423,19 @@ def valider_documents_curated(**context) -> None:
             "date_expiration": item.get("date_expiration")
         }
 
-        report = validator.validate(facture, attestation)
+        try:
+            report = validator.validate(facture, attestation)
+        except TypeError:
+            logging.warning(
+                "typeerror lors de la validation du document %s, probablement a cause de montants nuls",
+                document_id,
+            )
+            report = {
+                "status": "invalid",
+                "risk_score": 100,
+                "severity": "high",
+                "errors": ["donnees invalides pour la validation (montants manquants)"],
+            }
         
         is_valid = report["status"] == "valid"
         item["statut_validation"] = "valide" if is_valid else "anomaly"
@@ -505,7 +517,7 @@ def persister_documents_curated(**context) -> None:
         try:
             _http_json("POST", f"{datalake_url}/api/curated", payload)
             persisted += 1
-        except Exception as exc:
+        except RuntimeError as exc:
             logging.warning("erreur persistence curated pour %s: %s", document_id, exc)
 
     logging.info("documents persistes en zone curated (ETUDIANT 4): %s/%s", persisted, len(curated_validated))
