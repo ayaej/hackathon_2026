@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import DropZone from '../components/DropZone';
 import DocumentList from '../components/DocumentList';
+import DocumentComparePanel from '../components/DocumentComparePanel';
 import StatsBar from '../components/StatsBar';
 import BlurText from '../components/ui/BlurText';
 import { uploadDocuments, getDocuments, getDocumentStats, deleteDocument } from '../api/documents';
@@ -22,6 +23,8 @@ export default function UploadPage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [toast, setToast] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [showCompare, setShowCompare] = useState(false);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -70,12 +73,27 @@ export default function UploadPage() {
   const handleDelete = async (id) => {
     try {
       await deleteDocument(id);
+      setSelectedIds((prev) => prev.filter((sid) => sid !== id));
       showToast('Document supprimé');
       await Promise.all([fetchDocuments(), fetchStats()]);
     } catch {
       showToast('Impossible de supprimer le document', 'error');
     }
   };
+
+  const handleToggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+    setShowCompare(false);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+    setShowCompare(false);
+  };
+
+  const selectedDocs = documents.filter((d) => selectedIds.includes(d._id));
 
   return (
     <div className="min-h-screen p-8 space-y-8">
@@ -96,24 +114,61 @@ export default function UploadPage() {
       <div className="spotlight-card p-6 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h2 className="text-sm font-semibold text-white/70">Documents</h2>
-          <div className="flex gap-1.5 flex-wrap">
-            {STATUS_FILTERS.map(({ value, label }) => (
-              <button
-                key={value}
-                onClick={() => setStatusFilter(value)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all
-                  ${statusFilter === value
-                    ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-500/40'
-                    : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white/70'
-                  }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex gap-1.5 flex-wrap">
+              {STATUS_FILTERS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setStatusFilter(value)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all
+                    ${statusFilter === value
+                      ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-500/40'
+                      : 'bg-white/5 text-white/40 border border-white/10 hover:bg-white/10 hover:text-white/70'
+                    }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {selectedIds.length >= 2 && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setShowCompare(true)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/25 text-indigo-200 border border-indigo-500/35 hover:bg-indigo-500/35 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                  </svg>
+                  Comparer {selectedIds.length} docs
+                </button>
+                <button
+                  onClick={handleClearSelection}
+                  className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/5 text-white/35 border border-white/10 hover:bg-white/10 transition-colors"
+                >
+                  Effacer
+                </button>
+              </div>
+            )}
+            {selectedIds.length === 1 && (
+              <span className="text-xs text-white/30 italic">Sélectionnez au moins 2 docs pour comparer</span>
+            )}
           </div>
         </div>
-        <DocumentList documents={documents} onDelete={handleDelete} loading={loadingDocs} />
+        <DocumentList
+          documents={documents}
+          onDelete={handleDelete}
+          loading={loadingDocs}
+          selectedIds={selectedIds}
+          onToggleSelect={handleToggleSelect}
+        />
       </div>
+
+      {showCompare && selectedDocs.length >= 2 && (
+        <DocumentComparePanel
+          documents={selectedDocs}
+          onClose={() => setShowCompare(false)}
+        />
+      )}
 
       {toast && (
         <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium backdrop-blur-md border
