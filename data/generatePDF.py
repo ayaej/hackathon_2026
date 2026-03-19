@@ -64,6 +64,7 @@ for i in range(5) :
         adresse_client_1 = f"{client['adresse']}"
         adresse_client_2 = f"{client['code_postal']} {client['commune']}"
         siren_client = f"{client['siren']}"
+        nic_client = f"{client['nic']}"
         siret_client = f"{client['siret']}"
         n_tva_client = f"{client['n_tva']}"
         iban_client = f"{client['iban']}"
@@ -75,6 +76,7 @@ for i in range(5) :
         adresse_creancier_1 = f"{creancier['adresse']}"
         adresse_creancier_2 = f"{creancier['code_postal']} {creancier['commune']}"
         siren_creancier = f"{creancier['siren']}"
+        nic_creancier = f"{creancier['nic']}"
         siret_creancier = f"{creancier['siret']}"
         iban_creancier = f"{creancier['iban']}"
         bic_creancier = f"{creancier['bic']}"
@@ -138,8 +140,8 @@ for i in range(5) :
                                                                       "Expéditeur : ",
                                                                       "Émetteur : "]) + rnc(["<br/>", ""]) + bold_2 + header_creancier
 
-        # header_client += rnc([f"<br/>N° SIREN : {siren_client}", f"<br/>N° SIRET : {siret_client}"])
-        # header_creancier += rnc([f"<br/>N° SIREN : {siren_creancier}", f"<br/>N° SIRET : {siret_creancier}"])
+        # header_client += rnc([f"<br/>N° SIREN : {siren_client}"<br/>NIC : {nic_client}", f"<br/>N° SIRET : {siret_client}"])
+        # header_creancier += rnc([f"<br/>N° SIREN : {siren_creancier}<br/>NIC : {nic_creancier}", f"<br/>N° SIRET : {siret_creancier}"])
         header_client += f"<br/>N° SIRET : {siret_client}"
         header_creancier += f"<br/>N° SIRET : {siret_creancier}"
 
@@ -159,8 +161,8 @@ for i in range(5) :
         header_creancier = Paragraph(header_creancier, styles["Normal"])
 
         largeur_box = rnd()
-        couleur_box = colors.white if rnd()>.75 else rnc([colors.black, colors.gray])
-        creancier_visible = True if rnd()>.25 or doctype=="devis" else False
+        couleur_box = colors.white if rnd()>.5 else rnc([colors.black, colors.gray])
+        creancier_visible = True if rnd()>.5 or doctype=="devis" else False
         deux_colonnes = True if rnd()>.25 else False
         if deux_colonnes :
             taille_col = rni(70,90)
@@ -256,7 +258,7 @@ for i in range(5) :
             story.append(table)
             story.append(Spacer(1, rni(6,18)))
 
-        story.append(Spacer(1, rni(12,96)))
+        story.append(Spacer(1, rni(12,48)))
 
         if doctype == "devis" :
 

@@ -34,7 +34,9 @@ def rni_low(min, max) :
 
 class Facture :
     def __init__(self) :
-        self._dictkeys = ("facture_id",
+        self._dictkeys = ("erreur_date",
+                          "erreur_montant",
+                          "facture_id",
                           "devis_id",
                           "numero_document",
                           "dateFacturation",
@@ -57,6 +59,9 @@ class Facture :
             yield key, getattr(self, key)
 
     def generateRandom(self) :
+        self.erreur_date = False
+        self.erreur_montant = False
+
         min_date = datetime.date(year=2015, month=1, day=1)
         max_date = datetime.date(year=2035, month=1, day=1)
 
@@ -64,8 +69,11 @@ class Facture :
         self.dateEcheance = faker.date_between(start_date = self.dateFacturation, end_date = max_date)
         self.datePrestation = self.dateFacturation if rn.random()>.5 else faker.date_between(start_date = self.dateFacturation, end_date = max_date)
         self.dateEmission = faker.date_between(start_date = min_date, end_date = self.datePrestation)
-        self.dateExpiration = faker.date_between(start_date = self.datePrestation, end_date = max_date)
-
+        if rn.random()<.75 :
+            self.dateExpiration = faker.date_between(start_date = self.datePrestation, end_date = max_date)
+        else :
+            self.dateExpiration = faker.date_between(start_date = min_date, end_date = self.dateEmission)
+            self.erreur_date = True
         self.facture_id = f"FA-{str(self.dateFacturation)[:4]}-{rn.randint(0, 9999):04d}"
         self.devis_id = f"D-{str(self.dateEmission)[:4]}-{rn.randint(0,999):03d}"
         self.numero_document = rn.choice([self.facture_id, self.devis_id]) # Pour correspondance avec les normes du datalake
@@ -80,17 +88,29 @@ class Facture :
         self.articles = []
         for _ in range(rn.randint(1,10)) :
             article = rn.choice(ARTICLE_DESCRIPTIONS)
-            if rn.random()>.2 :
+            if rn.random()<.8 :
                 article += rn.choice(ARTICLE_CONNECTEURS) + rn.choice(ARTICLE_DOMAINES)
             prix = round(1/(rn.random()*200+1)*1000, 2)
             quantite = rn.randint(1,10)
             self.articles.append({"nom":article, "prix":prix, "quantite":quantite})
 
         self.montantHT = sum(article["prix"] * article["quantite"] for article in self.articles)
-        self.montantHT = round(self.montantHT,2) if rn.random()<.95 else round(self.montantHT*(1+rn.random()/10),2)
-        self.tva = rn.choice([round(rn.random()/5, 2), .2, .2])
-        self.tva_montant = round(self.tva * self.montantHT, 2) if rn.random()<.95 else round(self.tva*(1+rn.random()/10) * self.montantHT, 2)
-        self.montantTTC = round(self.montantHT + self.tva_montant, 2) if rn.random()<.95 else round((self.montantHT + self.tva_montant)*(1+rn.random()/10),2)
+        if rn.random()<.9 :
+            self.montantHT = round(self.montantHT,2)
+        else :
+            self.montantHT = round(self.montantHT*(1+rn.random()/10),2)
+            self.erreur_montant = True
+        self.tva = round(rn.random()/5, 2) if rn.random()<.2 else .2
+        if rn.random()<.9 :
+            self.tva_montant = round(self.tva * self.montantHT, 2) 
+        else :
+            self.tva_montant = round(self.tva*(1+rn.random()/10) * self.montantHT, 2)
+            self.erreur_montant = True
+        if rn.random()<.9 :
+            self.montantTTC = round(self.montantHT + self.tva_montant, 2)
+        else :
+            self.montantTTC = round((self.montantHT + self.tva_montant)*(1+rn.random()/10),2)
+            self.erreur_montant = True
 
         creancier = Personne()
         creancier.generateRandom()
