@@ -9,7 +9,10 @@ const DATALAKE_URL = process.env.DATALAKE_URL || 'http://localhost:3000';
 const forwardToDataLake = async (doc) => {
   try {
     const filePath = path.join(__dirname, '../../uploads', doc.filename);
-    if (!fs.existsSync(filePath)) return;
+    if (!fs.existsSync(filePath)) {
+      console.warn(`DL :  fichier non trouvé pour le document ${doc._id}: ${filePath}`);
+      return;
+    }
 
     const form = new FormData();
     form.append('file', fs.createReadStream(filePath), {
